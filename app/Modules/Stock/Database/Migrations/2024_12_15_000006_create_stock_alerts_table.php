@@ -1,4 +1,5 @@
 <?php
+// app/Modules/Stock/Database/Migrations/2024_12_15_000006_create_stock_alerts_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -23,11 +24,11 @@ return new class extends Migration
             ]);
 
             // Alarm bilgileri
-            $table->string('title'); // Alarm başlığı
-            $table->text('message'); // Alarm mesajı
-            $table->integer('current_stock_level')->nullable(); // Mevcut stok seviyesi
-            $table->integer('threshold_level')->nullable(); // Eşik seviyesi
-            $table->date('expiry_date')->nullable(); // Son kullanma tarihi
+            $table->string('title');
+            $table->text('message');
+            $table->integer('current_stock_level')->nullable();
+            $table->integer('threshold_level')->nullable();
+            $table->date('expiry_date')->nullable();
 
             // Durum
             $table->boolean('is_active')->default(true);

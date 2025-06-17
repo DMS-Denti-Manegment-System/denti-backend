@@ -1,4 +1,5 @@
 <?php
+// app/Modules/Stock/Database/Migrations/2024_12_15_000004_create_stock_requests_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('stock_requests', function (Blueprint $table) {
             $table->id();
-            $table->string('request_number')->unique(); // Talep numarası
+            $table->string('request_number')->unique();
 
             // Talep eden ve talep edilen klinik
             $table->foreignId('requester_clinic_id')->constrained('clinics')->onDelete('restrict');
@@ -18,26 +19,26 @@ return new class extends Migration
 
             // Talep edilen stok
             $table->foreignId('stock_id')->constrained()->onDelete('restrict');
-            $table->integer('requested_quantity'); // Talep edilen miktar
-            $table->integer('approved_quantity')->nullable(); // Onaylanan miktar
+            $table->integer('requested_quantity');
+            $table->integer('approved_quantity')->nullable();
 
             // Durum
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed', 'cancelled'])
                   ->default('pending');
 
             // Açıklamalar
-            $table->text('request_reason')->nullable(); // Talep sebebi
-            $table->text('admin_notes')->nullable(); // Yönetici notları
-            $table->text('rejection_reason')->nullable(); // Red sebebi
+            $table->text('request_reason')->nullable();
+            $table->text('admin_notes')->nullable();
+            $table->text('rejection_reason')->nullable();
 
             // Tarihler
-            $table->timestamp('requested_at'); // Talep tarihi
-            $table->timestamp('approved_at')->nullable(); // Onay tarihi
-            $table->timestamp('completed_at')->nullable(); // Tamamlanma tarihi
+            $table->timestamp('requested_at');
+            $table->timestamp('approved_at')->nullable();
+            $table->timestamp('completed_at')->nullable();
 
             // Kullanıcı bilgileri
-            $table->string('requested_by'); // Talep eden kişi
-            $table->string('approved_by')->nullable(); // Onaylayan kişi
+            $table->string('requested_by');
+            $table->string('approved_by')->nullable();
 
             $table->timestamps();
 

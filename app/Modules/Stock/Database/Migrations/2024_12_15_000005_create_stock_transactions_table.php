@@ -1,4 +1,5 @@
 <?php
+// app/Modules/Stock/Database/Migrations/2024_12_15_000005_create_stock_transactions_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -10,7 +11,7 @@ return new class extends Migration
     {
         Schema::create('stock_transactions', function (Blueprint $table) {
             $table->id();
-            $table->string('transaction_number')->unique(); // İşlem numarası
+            $table->string('transaction_number')->unique();
 
             $table->foreignId('stock_id')->constrained()->onDelete('restrict');
             $table->foreignId('clinic_id')->constrained()->onDelete('restrict');
@@ -28,9 +29,9 @@ return new class extends Migration
             ]);
 
             // Miktarlar
-            $table->integer('quantity'); // Miktar
-            $table->integer('previous_stock'); // Önceki stok
-            $table->integer('new_stock'); // Yeni stok
+            $table->integer('quantity');
+            $table->integer('previous_stock');
+            $table->integer('new_stock');
 
             // Fiyat bilgileri
             $table->decimal('unit_price', 10, 2)->nullable();
@@ -38,16 +39,16 @@ return new class extends Migration
 
             // Referans bilgileri
             $table->foreignId('stock_request_id')->nullable()->constrained()->onDelete('set null');
-            $table->string('reference_number')->nullable(); // Fatura/Fiş no
-            $table->string('batch_number')->nullable(); // Lot numarası
+            $table->string('reference_number')->nullable();
+            $table->string('batch_number')->nullable();
 
             // Açıklama
             $table->text('description')->nullable();
             $table->text('notes')->nullable();
 
             // Kullanıcı bilgileri
-            $table->string('performed_by'); // İşlemi yapan
-            $table->timestamp('transaction_date'); // İşlem tarihi
+            $table->string('performed_by');
+            $table->timestamp('transaction_date');
 
             $table->timestamps();
 
