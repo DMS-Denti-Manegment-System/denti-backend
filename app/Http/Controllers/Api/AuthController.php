@@ -4,13 +4,17 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Traits\JsonResponseTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
-    public function login(Request $request)
+    use JsonResponseTrait;
+
+    public function login(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -18,52 +22,42 @@ class AuthController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['success' => false, 'errors' => $validator->errors()], 422);
+            return $this->error('Validation error', 422, $validator->errors());
         }
 
         $user = User::with('company')->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'E-posta veya şifre hatalı'
-            ], 401);
+            return $this->error('Invalid credentials', 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Giriş başarılı',
-            'data' => [
-                'user' => $user,
-                'token' => $token,
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-                'company' => $user->company
-            ]
-        ]);
+        return $this->success([
+            'user' => $user,
+            'token' => $token,
+            'roles' => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'company' => $user->company
+        ], 'Login successful');
     }
 
-    public function me(Request $request)
+    public function me(Request $request): JsonResponse
     {
         $user = $request->user()->load('company');
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'user' => $user,
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name')
-            ]
+        
+        return $this->success([
+            'user' => $user,
+            'roles' => $user->getRoleNames(),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
+            'company' => $user->company
         ]);
     }
 
-    public function logout(Request $request)
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
-        return response()->json([
-            'success' => true,
-            'message' => 'Oturum kapatıldı'
-        ]);
+        
+        return $this->success(null, 'Logged out successfully');
     }
 }

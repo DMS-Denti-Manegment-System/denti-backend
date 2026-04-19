@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('domain')->nullable()->unique();
             $table->string('subscription_plan')->default('basic'); // basic, pro, premium
+            $table->integer('max_users')->default(5);
             $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
             $table->timestamps();
         });

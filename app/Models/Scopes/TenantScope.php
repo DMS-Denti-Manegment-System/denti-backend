@@ -14,8 +14,17 @@ class TenantScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        if (Auth::check() && Auth::user()->company_id) {
-            $builder->where($model->getTable() . '.company_id', Auth::user()->company_id);
+        if (Auth::check()) {
+            $user = Auth::user();
+            
+            // Super Admin her şeyi görebilir
+            if ($user->hasRole('Super Admin')) {
+                return;
+            }
+
+            if ($user->company_id) {
+                $builder->where($model->getTable() . '.company_id', $user->company_id);
+            }
         }
     }
 }
