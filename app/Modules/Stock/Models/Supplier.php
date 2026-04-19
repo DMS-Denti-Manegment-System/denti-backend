@@ -6,8 +6,10 @@
 
 namespace App\Modules\Stock\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\DB;
 
@@ -24,6 +26,11 @@ class Supplier extends Model
         'is_active' => 'boolean',
         'additional_info' => 'array',
     ];
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function stocks(): HasMany
     {

@@ -3,8 +3,10 @@
 
 namespace App\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Category extends Model
 {
@@ -33,6 +35,11 @@ class Category extends Model
     /**
      * İLİŞKİLER - Burada Laravel'in gücünü görüyoruz!
      */
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     /**
      * Bu kategoriye ait tüm todo'ları getir

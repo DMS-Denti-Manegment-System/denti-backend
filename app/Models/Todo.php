@@ -3,8 +3,10 @@
 
 namespace App\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Todo extends Model
 {
@@ -27,6 +29,11 @@ class Todo extends Model
     /**
      * İLİŞKİLER
      */
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     /**
      * Bu todo hangi kategoriye ait?

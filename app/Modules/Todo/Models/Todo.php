@@ -3,8 +3,10 @@
 
 namespace App\Modules\Todo\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Todo extends Model
 {
@@ -23,6 +25,11 @@ class Todo extends Model
         'completed' => 'boolean',
         'completed_at' => 'datetime'
     ];
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function category()
     {

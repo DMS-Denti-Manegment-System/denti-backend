@@ -3,6 +3,7 @@
 
 namespace App\Modules\Stock\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -51,6 +52,11 @@ class Stock extends Model
     ];
 
     // İlişkiler
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
+
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(\App\Modules\Stock\Models\Supplier::class);

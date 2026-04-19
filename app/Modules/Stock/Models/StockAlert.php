@@ -6,6 +6,7 @@
 
 namespace App\Modules\Stock\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -27,6 +28,11 @@ class StockAlert extends Model
         'resolved_at' => 'datetime',
         'expiry_date' => 'date',
     ];
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function stock(): BelongsTo
     {

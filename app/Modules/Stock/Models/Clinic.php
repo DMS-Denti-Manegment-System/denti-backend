@@ -6,8 +6,10 @@
 
 namespace App\Modules\Stock\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Clinic extends Model
@@ -19,9 +21,13 @@ class Clinic extends Model
         'phone', 'location', 'is_active', 'company_id'
     ];
 
-    protected $casts = [
-        'is_active' => 'boolean',
-    ];
+    /**
+     * Get the company that owns the clinic.
+     */
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function stocks(): HasMany
     {

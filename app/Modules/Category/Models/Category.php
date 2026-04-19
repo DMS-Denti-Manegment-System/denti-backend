@@ -3,8 +3,10 @@
 
 namespace App\Modules\Category\Models;
 
+use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Category extends Model
 {
@@ -21,6 +23,11 @@ class Category extends Model
     protected $casts = [
         'is_active' => 'boolean'
     ];
+
+    public function company(): BelongsTo
+    {
+        return $this->belongsTo(Company::class);
+    }
 
     public function todos()
     {
