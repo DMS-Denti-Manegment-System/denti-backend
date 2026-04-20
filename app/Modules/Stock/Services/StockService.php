@@ -1,5 +1,4 @@
 <?php
-// app/Modules/Stock/Services/StockService.php
 
 namespace App\Modules\Stock\Services;
 
@@ -8,18 +7,16 @@ use App\Modules\Stock\Models\Stock;
 use App\Modules\Stock\Jobs\CheckStockLevelsJob;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 
 class StockService
 {
-    protected $stockRepository;
-
-    public function __construct(StockRepositoryInterface $stockRepository)
-    {
-        $this->stockRepository = $stockRepository;
-    }
+    public function __construct(
+        protected StockRepositoryInterface $stockRepository,
+        protected StockCalculatorService $calculatorService,
+        protected StockTransactionService $transactionService
+    ) {}
 
     public function getAllStocks(array $filters = []): Collection
     {
@@ -37,7 +34,6 @@ class StockService
             $stock = $this->stockRepository->find($id);
             if (!$stock) return null;
 
-            // Kullanılabilir stok güncelle (Ana birim cinsinden)
             if (isset($data['current_stock']) || isset($data['reserved_stock'])) {
                 $currentStock = $data['current_stock'] ?? $stock->current_stock;
                 $reservedStock = $data['reserved_stock'] ?? $stock->reserved_stock;
@@ -63,29 +59,18 @@ class StockService
 
             $previousTotal = $stock->total_base_units;
             
-            if ($isSubUnit && $stock->has_sub_unit) {
-                // Alt birim düzeltmesi
-                $newSubStock = $stock->current_sub_stock + $quantity;
-                $newMainStock = $stock->current_stock;
+            if ($isSubUnit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
+                $newLevels = $this->calculatorService->calculateAdjustment(
+                    $stock->current_stock,
+                    $stock->current_sub_stock,
+                    $quantity,
+                    $stock->sub_unit_multiplier
+                );
 
-                if ($newSubStock >= $stock->sub_unit_multiplier) {
-                    $boxesToAdd = (int) floor($newSubStock / $stock->sub_unit_multiplier);
-                    $newMainStock += $boxesToAdd;
-                    $newSubStock = $newSubStock % $stock->sub_unit_multiplier;
-                } elseif ($newSubStock < 0) {
-                    $boxesToTake = (int) ceil(abs($newSubStock) / $stock->sub_unit_multiplier);
-                    if ($newMainStock < $boxesToTake) return false; 
-                    $newMainStock -= $boxesToTake;
-                    $newSubStock = ($boxesToTake * $stock->sub_unit_multiplier) + $newSubStock;
-                }
-
-                $this->stockRepository->update($stockId, [
-                    'current_stock' => $newMainStock,
-                    'current_sub_stock' => $newSubStock,
-                    'available_stock' => $newMainStock - $stock->reserved_stock
-                ]);
+                $this->stockRepository->update($stockId, array_merge($newLevels, [
+                    'available_stock' => $newLevels['current_stock'] - $stock->reserved_stock
+                ]));
             } else {
-                // Ana birim düzeltmesi
                 $newStock = $stock->current_stock + $quantity;
                 if ($newStock < 0) return false;
 
@@ -106,7 +91,8 @@ class StockService
                 'new_stock' => $freshStock->total_base_units,
                 'description' => ($isSubUnit ? "Alt Birim Düzeltme: " : "Ana Birim Düzeltme: ") . $reason,
                 'performed_by' => $performedBy,
-                'transaction_date' => now()
+                'transaction_date' => now(),
+                'is_sub_unit' => $isSubUnit
             ]);
 
             $this->checkStockLevels($freshStock);
@@ -120,64 +106,50 @@ class StockService
     {
         return DB::transaction(function () use ($stockId, $quantity, $performedBy, $notes) {
             $stock = $this->stockRepository->find($stockId);
-            
-            if (!$stock) {
-                return false;
-            }
+            if (!$stock) return false;
 
             $isSubUnitUsage = $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
-            $newMainStock = $stock->current_stock;
-            $newSubStock = $stock->current_sub_stock;
+            $previousTotal = $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock;
 
             if ($isSubUnitUsage) {
-                $needed = $quantity;
-                
-                if ($newSubStock >= $needed) {
-                    $newSubStock -= $needed;
-                } else {
-                    $deficit = $needed - $newSubStock;
-                    $boxesToOpen = (int) ceil($deficit / $stock->sub_unit_multiplier);
+                $newLevels = $this->calculatorService->calculateUsage(
+                    $stock->current_stock,
+                    $stock->current_sub_stock,
+                    $quantity,
+                    $stock->sub_unit_multiplier
+                );
 
-                    if ($newMainStock < $boxesToOpen) {
-                        return false; 
-                    }
+                if (!$newLevels) return false;
 
-                    $newMainStock -= $boxesToOpen;
-                    $newSubStock = $newSubStock + ($boxesToOpen * $stock->sub_unit_multiplier) - $needed;
-                }
+                $updateData = array_merge($newLevels, [
+                    'available_stock' => $newLevels['current_stock'] - $stock->reserved_stock,
+                    'internal_usage_count' => $stock->internal_usage_count + $quantity
+                ]);
             } else {
-                if ($stock->available_stock < $quantity) {
-                    return false;
-                }
-                $newMainStock -= $quantity;
-            }
-
-            $updateData = [
-                'current_stock' => $newMainStock,
-                'available_stock' => $newMainStock - $stock->reserved_stock,
-                'internal_usage_count' => $stock->internal_usage_count + $quantity
-            ];
-
-            if ($isSubUnitUsage) {
-                $updateData['current_sub_stock'] = $newSubStock;
+                if ($stock->available_stock < $quantity) return false;
+                
+                $newMainStock = $stock->current_stock - $quantity;
+                $updateData = [
+                    'current_stock' => $newMainStock,
+                    'available_stock' => $newMainStock - $stock->reserved_stock,
+                    'internal_usage_count' => $stock->internal_usage_count + $quantity
+                ];
             }
 
             $this->stockRepository->update($stockId, $updateData);
-
             $freshStock = $stock->fresh();
-            
+
             $this->createTransaction([
                 'stock_id' => $stockId,
                 'clinic_id' => $stock->clinic_id,
                 'type' => 'usage',
                 'quantity' => $quantity,
-                'previous_stock' => $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock,
-                'new_stock' => $isSubUnitUsage ? 
-                    (($newMainStock * $stock->sub_unit_multiplier) + $newSubStock) : 
-                    $newMainStock,
+                'previous_stock' => $previousTotal,
+                'new_stock' => $isSubUnitUsage ? $freshStock->total_base_units : $freshStock->current_stock,
                 'notes' => $notes,
                 'performed_by' => $performedBy,
-                'transaction_date' => now()
+                'transaction_date' => now(),
+                'is_sub_unit' => $isSubUnitUsage
             ]);
 
             $this->checkStockLevels($freshStock);
@@ -190,19 +162,7 @@ class StockService
     public function createStock(array $data): Stock
     {
         return DB::transaction(function () use ($data) {
-            $data['is_active'] = $data['is_active'] ?? true;
-            $data['status'] = $data['is_active'] ? 'active' : 'inactive';
-            $data['currency'] = $data['currency'] ?? 'TRY';
-            $data['track_expiry'] = $data['track_expiry'] ?? true;
-            $data['track_batch'] = $data['track_batch'] ?? false;
-            $data['current_sub_stock'] = $data['current_sub_stock'] ?? 0;
-            $data['has_sub_unit'] = $data['has_sub_unit'] ?? false;
-
-            if (!isset($data['code'])) {
-                $data['code'] = $this->generateStockCode($data['clinic_id']);
-            }
-
-            $data['available_stock'] = $data['current_stock'] - ($data['reserved_stock'] ?? 0);
+            $data['available_stock'] = ($data['current_stock'] ?? 0) - ($data['reserved_stock'] ?? 0);
 
             $stock = $this->stockRepository->create($data);
 
@@ -233,11 +193,6 @@ class StockService
         });
     }
 
-    public function forceDeleteStock(int $id): bool
-    {
-        return $this->deleteStock($id);
-    }
-
     public function getStockStats(int $clinicId = null): array
     {
         $companyId = Auth::user()->company_id;
@@ -245,29 +200,16 @@ class StockService
 
         return Cache::remember($cacheKey, now()->addMinutes(15), function () use ($clinicId) {
             $baseQuery = $this->stockRepository->getBaseQuery();
-
-            if ($clinicId) {
-                $baseQuery->where('clinic_id', $clinicId);
-            }
+            if ($clinicId) $baseQuery->where('clinic_id', $clinicId);
 
             $nearExpiryLimit = now()->addDays(30)->toDateTimeString();
             $now = now()->toDateTimeString();
 
-            // Tek bir sorguda tüm istatistikleri hesapla
             $stats = $baseQuery->selectRaw("
                 COUNT(*) as total_items,
-                SUM(CASE 
-                    WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(yellow_alert_level, min_stock_level) 
-                    THEN 1 ELSE 0 
-                END) as low_stock_items,
-                SUM(CASE 
-                    WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(red_alert_level, critical_stock_level) 
-                    THEN 1 ELSE 0 
-                END) as critical_stock_items,
-                SUM(CASE 
-                    WHEN is_active = 1 AND track_expiry = 1 AND expiry_date <= ? AND expiry_date > ? 
-                    THEN 1 ELSE 0 
-                END) as expiring_items,
+                SUM(CASE WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(yellow_alert_level, min_stock_level) THEN 1 ELSE 0 END) as low_stock_items,
+                SUM(CASE WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(red_alert_level, critical_stock_level) THEN 1 ELSE 0 END) as critical_stock_items,
+                SUM(CASE WHEN is_active = 1 AND track_expiry = 1 AND expiry_date <= ? AND expiry_date > ? THEN 1 ELSE 0 END) as expiring_items,
                 SUM(purchase_price * current_stock) as total_value
             ", [$nearExpiryLimit, $now])->first();
 
@@ -287,35 +229,6 @@ class StockService
         Cache::forget("stock_stats_{$companyId}_{$clinicId}");
     }
 
-    public function getLowStockItems(int $clinicId = null): Collection
-    {
-        return $this->stockRepository->getLowStockItems($clinicId);
-    }
-
-    public function getCriticalStockItems(int $clinicId = null): Collection
-    {
-        return $this->stockRepository->getCriticalStockItems($clinicId);
-    }
-
-    public function getExpiringItems(int $days = 30, int $clinicId = null): Collection
-    {
-        return $this->stockRepository->getExpiringItems($days, $clinicId);
-    }
-
-    public function getExpiredItems(int $clinicId = null): Collection
-    {
-        return $this->stockRepository->getExpiredItems($clinicId);
-    }
-
-    protected function generateStockCode(int $clinicId): string
-    {
-        $clinic = app(ClinicService::class)->getClinicById($clinicId);
-        $prefix = $clinic ? $clinic->code : 'STK';
-        $sequence = $this->stockRepository->getNextSequenceNumber($clinicId);
-
-        return $prefix . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
-    }
-
     protected function checkStockLevels(Stock $stock): void
     {
         CheckStockLevelsJob::dispatch($stock->id, $stock->company_id);
@@ -324,7 +237,7 @@ class StockService
     protected function createTransaction(array $data): void
     {
         $data['transaction_number'] = $this->generateTransactionNumber();
-        app(StockTransactionService::class)->createTransaction($data);
+        $this->transactionService->createTransaction($data);
     }
 
     protected function generateTransactionNumber(): string
