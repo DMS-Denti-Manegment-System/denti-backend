@@ -25,7 +25,7 @@ class AuthController extends Controller
             return $this->error('Validation error', 422, $validator->errors());
         }
 
-        $user = User::with('company')->where('email', $request->email)->first();
+        $user = User::with(['company', 'roles'])->where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
             return $this->error('Invalid credentials', 401);
@@ -44,7 +44,7 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load('company');
+        $user = $request->user()->load(['company', 'roles']);
         
         return $this->success([
             'user' => $user,

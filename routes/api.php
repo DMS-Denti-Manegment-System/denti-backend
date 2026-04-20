@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\Admin\CompanyController;
 use App\Http\Controllers\Api\RoleController;
 
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ProfileController;
 
 // Auth Routes (Public)
 Route::post('/login', [AuthController::class, 'login']);
@@ -16,6 +17,10 @@ Route::post('/invitations/accept', [UserInvitationController::class, 'accept']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+
+    // Profile Settings
+    Route::put('/profile/info', [ProfileController::class, 'updateInfo']);
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword']);
 
     // User Management (Employee Management)
     Route::apiResource('users', UserController::class);
