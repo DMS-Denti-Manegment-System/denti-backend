@@ -9,6 +9,9 @@ use App\Modules\Stock\Jobs\CheckStockLevelsJob;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
+
 class StockService
 {
     protected $stockRepository;
@@ -45,6 +48,7 @@ class StockService
 
             if ($updatedStock) {
                 $this->checkStockLevels($updatedStock);
+                $this->clearStockCache($updatedStock->company_id, $updatedStock->clinic_id);
             }
 
             return $updatedStock;
@@ -106,6 +110,7 @@ class StockService
             ]);
 
             $this->checkStockLevels($freshStock);
+            $this->clearStockCache($freshStock->company_id, $freshStock->clinic_id);
 
             return true;
         });
@@ -159,6 +164,8 @@ class StockService
 
             $this->stockRepository->update($stockId, $updateData);
 
+            $freshStock = $stock->fresh();
+            
             $this->createTransaction([
                 'stock_id' => $stockId,
                 'clinic_id' => $stock->clinic_id,
@@ -173,7 +180,8 @@ class StockService
                 'transaction_date' => now()
             ]);
 
-            $this->checkStockLevels($stock->fresh());
+            $this->checkStockLevels($freshStock);
+            $this->clearStockCache($freshStock->company_id, $freshStock->clinic_id);
 
             return true;
         });
@@ -199,6 +207,7 @@ class StockService
             $stock = $this->stockRepository->create($data);
 
             $this->checkStockLevels($stock);
+            $this->clearStockCache($stock->company_id, $stock->clinic_id);
 
             return $stock;
         });
@@ -210,8 +219,17 @@ class StockService
             $stock = $this->stockRepository->find($id);
             if (!$stock) return false;
 
+            $companyId = $stock->company_id;
+            $clinicId = $stock->clinic_id;
+
             $stock->alerts()->delete();
-            return $this->stockRepository->delete($id);
+            $result = $this->stockRepository->delete($id);
+            
+            if ($result) {
+                $this->clearStockCache($companyId, $clinicId);
+            }
+
+            return $result;
         });
     }
 
@@ -222,25 +240,51 @@ class StockService
 
     public function getStockStats(int $clinicId = null): array
     {
-        $baseQuery = $this->stockRepository->getBaseQuery();
+        $companyId = Auth::user()->company_id;
+        $cacheKey = "stock_stats_{$companyId}_" . ($clinicId ?? 'all');
 
-        if ($clinicId) {
-            $baseQuery->where('clinic_id', $clinicId);
-        }
+        return Cache::remember($cacheKey, now()->addMinutes(15), function () use ($clinicId) {
+            $baseQuery = $this->stockRepository->getBaseQuery();
 
-        $totalItems = $baseQuery->count();
-        $lowStockItems = (clone $baseQuery)->lowStock()->count();
-        $criticalStockItems = (clone $baseQuery)->criticalStock()->count();
-        $expiringItems = (clone $baseQuery)->nearExpiry(30)->count();
-        $totalValue = (clone $baseQuery)->sum(DB::raw('purchase_price * current_stock'));
+            if ($clinicId) {
+                $baseQuery->where('clinic_id', $clinicId);
+            }
 
-        return [
-            'total_items' => $totalItems,
-            'low_stock_items' => $lowStockItems,
-            'critical_stock_items' => $criticalStockItems,
-            'expiring_items' => $expiringItems,
-            'total_value' => round($totalValue, 2)
-        ];
+            $nearExpiryLimit = now()->addDays(30)->toDateTimeString();
+            $now = now()->toDateTimeString();
+
+            // Tek bir sorguda tüm istatistikleri hesapla
+            $stats = $baseQuery->selectRaw("
+                COUNT(*) as total_items,
+                SUM(CASE 
+                    WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(yellow_alert_level, min_stock_level) 
+                    THEN 1 ELSE 0 
+                END) as low_stock_items,
+                SUM(CASE 
+                    WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(red_alert_level, critical_stock_level) 
+                    THEN 1 ELSE 0 
+                END) as critical_stock_items,
+                SUM(CASE 
+                    WHEN is_active = 1 AND track_expiry = 1 AND expiry_date <= ? AND expiry_date > ? 
+                    THEN 1 ELSE 0 
+                END) as expiring_items,
+                SUM(purchase_price * current_stock) as total_value
+            ", [$nearExpiryLimit, $now])->first();
+
+            return [
+                'total_items' => (int) ($stats->total_items ?? 0),
+                'low_stock_items' => (int) ($stats->low_stock_items ?? 0),
+                'critical_stock_items' => (int) ($stats->critical_stock_items ?? 0),
+                'expiring_items' => (int) ($stats->expiring_items ?? 0),
+                'total_value' => round((float) ($stats->total_value ?? 0), 2)
+            ];
+        });
+    }
+
+    protected function clearStockCache(int $companyId, int $clinicId): void
+    {
+        Cache::forget("stock_stats_{$companyId}_all");
+        Cache::forget("stock_stats_{$companyId}_{$clinicId}");
     }
 
     public function getLowStockItems(int $clinicId = null): Collection
