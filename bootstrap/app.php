@@ -14,11 +14,6 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
         
-        // CSRF korumasından API rotalarını muaf tutuyoruz
-        $middleware->validateCsrfTokens(except: [
-            'api/*',
-        ]);
-
         $middleware->api(append: [
             \App\Http\Middleware\SetPermissionsTeamId::class,
         ]);
