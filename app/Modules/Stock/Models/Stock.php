@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Stock extends Model
 {
     use Tenantable, SoftDeletes;
+    
+    protected $appends = ['total_base_units', 'stock_status', 'is_expired', 'is_near_expiry', 'days_to_expiry'];
 
     protected $fillable = [
         'name', 'code', 'description', 'unit', 'category', 'brand',

@@ -26,6 +26,47 @@ class StockRequestRepository implements StockRequestRepositoryInterface
                           ->get();
     }
 
+    public function getAllWithFilters(array $filters = []): Collection
+    {
+        $query = $this->model->with(['requesterClinic', 'requestedFromClinic', 'stock']);
+
+        if (!empty($filters['search'])) {
+            $search = '%' . $filters['search'] . '%';
+            $query->where(function ($q) use ($search) {
+                $q->where('request_number', 'like', $search)
+                  ->orWhereHas('stock', function($sq) use ($search) {
+                      $sq->where('name', 'like', $search);
+                  });
+            });
+        }
+
+        if (!empty($filters['status'])) {
+            $query->where('status', $filters['status']);
+        }
+
+        $clinicId = $filters['clinic_id'] ?? null;
+        $type = $filters['type'] ?? 'all';
+
+        if ($clinicId) {
+            if ($type === 'sent') {
+                $query->where('requester_clinic_id', $clinicId);
+            } elseif ($type === 'received') {
+                $query->where('requested_from_clinic_id', $clinicId);
+            } else {
+                $query->where(function ($q) use ($clinicId) {
+                    $q->where('requester_clinic_id', $clinicId)
+                      ->orWhere('requested_from_clinic_id', $clinicId);
+                });
+            }
+        } elseif ($type === 'sent' && !empty($filters['requester_clinic_id'])) {
+            $query->where('requester_clinic_id', $filters['requester_clinic_id']);
+        } elseif ($type === 'received' && !empty($filters['requested_from_clinic_id'])) {
+            $query->where('requested_from_clinic_id', $filters['requested_from_clinic_id']);
+        }
+
+        return $query->orderByDesc('requested_at')->get();
+    }
+
     public function find(int $id): ?StockRequest
     {
         return $this->model->with(['requesterClinic', 'requestedFromClinic', 'stock'])->find($id);

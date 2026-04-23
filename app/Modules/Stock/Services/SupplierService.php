@@ -19,9 +19,14 @@ class SupplierService
         $this->supplierRepository = $supplierRepository;
     }
 
-    public function getAllSuppliers(): Collection
+    public function getAllSuppliers()
     {
         return $this->supplierRepository->all();
+    }
+
+    public function getAllWithFilters(array $filters)
+    {
+        return $this->supplierRepository->getAllWithFilters($filters);
     }
 
     public function getActiveSuppliers(): Collection

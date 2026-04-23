@@ -20,9 +20,14 @@ class ClinicService
         $this->clinicRepository = $clinicRepository;
     }
 
-    public function getAllClinics(): Collection
+    public function getAllClinics()
     {
         return $this->clinicRepository->all();
+    }
+
+    public function getAllWithFilters(array $filters)
+    {
+        return $this->clinicRepository->getAllWithFilters($filters);
     }
 
     public function getActiveClinics(): Collection

@@ -29,6 +29,9 @@ class StockAlertController extends Controller
         
         $activeOnly = $request->query('active_only', true);
 
+        // Otomatik Senkronizasyon: Her istekte güncel veriyi sağla
+        $this->stockAlertService->syncAlerts($filters['clinic_id'] ?? null);
+
         if ($activeOnly === 'false' || $activeOnly === false) {
             $alerts = $this->stockAlertService->getAlerts($filters);
         } else {
@@ -111,6 +114,10 @@ class StockAlertController extends Controller
     public function getStatistics(Request $request)
     {
         $clinicId = $request->query('clinic_id');
+        
+        // Otomatik Senkronizasyon
+        $this->stockAlertService->syncAlerts($clinicId);
+        
         $statistics = $this->stockAlertService->getAlertStatistics($clinicId);
 
         return response()->json([
@@ -122,6 +129,10 @@ class StockAlertController extends Controller
     public function getPendingCount(Request $request)
     {
         $clinicId = $request->query('clinic_id');
+        
+        // Otomatik Senkronizasyon
+        $this->stockAlertService->syncAlerts($clinicId);
+        
         $count = $this->stockAlertService->getPendingCount($clinicId);
 
         return response()->json([

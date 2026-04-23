@@ -25,6 +25,31 @@ class SupplierRepository implements SupplierRepositoryInterface
         return $this->model->orderBy('name')->get();
     }
 
+    public function getAllWithFilters(array $filters = []): Collection
+    {
+        $query = $this->model->newQuery();
+
+        if (!empty($filters['search']) || !empty($filters['name'])) {
+            $search = '%' . ($filters['search'] ?? $filters['name']) . '%';
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', $search)
+                  ->orWhere('contact_person', 'like', $search)
+                  ->orWhere('email', 'like', $search);
+            });
+        }
+
+        if (isset($filters['is_active'])) {
+            $query->where('is_active', $filters['is_active']);
+        }
+
+        if (!empty($filters['status'])) {
+            if ($filters['status'] === 'active') $query->where('is_active', true);
+            if ($filters['status'] === 'inactive') $query->where('is_active', false);
+        }
+
+        return $query->orderBy('name')->get();
+    }
+
     public function find(int $id): ?Supplier
     {
         return $this->model->with(['stocks'])->find($id);

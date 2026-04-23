@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 interface ClinicRepositoryInterface
 {
     public function all(): Collection;
+    public function getAllWithFilters(array $filters = []): Collection;
     public function find(int $id): ?Clinic;
     public function create(array $data): Clinic;
     public function update(int $id, array $data): ?Clinic;

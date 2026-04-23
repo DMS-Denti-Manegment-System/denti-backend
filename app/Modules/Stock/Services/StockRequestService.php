@@ -25,9 +25,14 @@ class StockRequestService
     }
 
     // ✅ EKSİK METOD EKLENDİ
-    public function getAllRequests(): Collection
+    public function getAllRequests()
     {
         return $this->stockRequestRepository->all();
+    }
+
+    public function getAllWithFilters(array $filters)
+    {
+        return $this->stockRequestRepository->getAllWithFilters($filters);
     }
 
     // ✅ EKSİK METOD EKLENDİ

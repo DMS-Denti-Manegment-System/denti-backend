@@ -19,17 +19,10 @@ class SupplierController extends Controller
 
     public function index(Request $request)
     {
-        $search = $request->query('search');
-
-        if ($search) {
-            $suppliers = $this->supplierService->searchSuppliers($search);
-        } else {
-            $suppliers = $this->supplierService->getAllSuppliers();
-        }
-
+        $filters = $request->only(['search', 'status']);
         return response()->json([
             'success' => true,
-            'data' => $suppliers
+            'data' => $this->supplierService->getAllWithFilters($filters)
         ]);
     }
 

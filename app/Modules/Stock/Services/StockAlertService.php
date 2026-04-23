@@ -39,20 +39,22 @@ class StockAlertService
 
         // 1. Kritik Stok Kontrolü (Öncelikli)
         if ($currentValue <= $redLevel) {
+            $unitName = $stock->has_sub_unit ? $stock->sub_unit_name : $stock->unit;
             $alerts[] = [
                 'type' => 'critical_stock',
                 'title' => 'Kritik Stok Seviyesi',
-                'message' => "{$stock->name} için kritik stok seviyesine ulaşıldı. Mevcut: {$currentValue} {$stock->unit}",
+                'message' => "{$stock->name} için kritik stok seviyesine ulaşıldı. Mevcut: {$currentValue} {$unitName}",
                 'current_stock_level' => $currentValue,
                 'threshold_level' => $redLevel
             ];
         }
         // 2. Düşük Stok Kontrolü (Sadece kritik değilse)
         elseif ($currentValue <= $yellowLevel) {
+            $unitName = $stock->has_sub_unit ? $stock->sub_unit_name : $stock->unit;
             $alerts[] = [
                 'type' => 'low_stock',
                 'title' => 'Düşük Stok Seviyesi',
-                'message' => "{$stock->name} stok miktarı azaldı. Mevcut: {$currentValue} {$stock->unit}",
+                'message' => "{$stock->name} stok miktarı azaldı. Mevcut: {$currentValue} {$unitName}",
                 'current_stock_level' => $currentValue,
                 'threshold_level' => $yellowLevel
             ];

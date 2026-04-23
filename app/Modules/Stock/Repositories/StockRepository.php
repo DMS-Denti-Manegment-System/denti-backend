@@ -67,8 +67,9 @@ class StockRepository implements StockRepositoryInterface
             $query->where('status', $filters['status']);
         }
 
-        if (!empty($filters['stock_status'])) {
-            switch ($filters['stock_status']) {
+        if (!empty($filters['stock_status']) || !empty($filters['level'])) {
+            $statusFilter = $filters['stock_status'] ?? $filters['level'];
+            switch ($statusFilter) {
                 case 'low':
                     $query->lowStock();
                     break;
@@ -81,8 +82,8 @@ class StockRepository implements StockRepositoryInterface
             }
         }
 
-        if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
+        if (!empty($filters['search']) || !empty($filters['name'])) {
+            $search = '%' . ($filters['search'] ?? $filters['name']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', $search)
                   ->orWhere('code', 'like', $search)

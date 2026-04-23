@@ -23,14 +23,9 @@ class StockRequestController extends Controller
 
     public function index(Request $request)
     {
-        $clinicId = $request->query('clinic_id');
-        $type = $request->query('type', 'all'); // all, sent, received
-
-        if ($clinicId) {
-            $requests = $this->stockRequestService->getRequestsByClinic($clinicId, $type);
-        } else {
-            $requests = $this->stockRequestService->getAllRequests();
-        }
+        $filters = $request->only(['search', 'status', 'requester_clinic_id', 'requested_from_clinic_id', 'type']);
+        
+        $requests = $this->stockRequestService->getAllWithFilters($filters);
 
         return response()->json([
             'success' => true,

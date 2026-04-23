@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 interface StockRequestRepositoryInterface
 {
     public function all(): Collection;
+    public function getAllWithFilters(array $filters = []): Collection;
     public function find(int $id): ?StockRequest;
     public function create(array $data): StockRequest;
     public function update(int $id, array $data): ?StockRequest;
