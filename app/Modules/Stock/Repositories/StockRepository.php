@@ -26,6 +26,18 @@ class StockRepository implements StockRepositoryInterface
         return $this->model->with(['supplier', 'clinic', 'alerts'])->find($id);
     }
 
+    /**
+     * Satırı kilitlererek bul (Pessimistic Locking).
+     * Sadece DB::transaction() bloğu içinde kullanılmalıdır.
+     * NOT: SQLite desteklemez. Production'da MySQL/PostgreSQL gerektirir.
+     */
+    public function findAndLock(int $id): ?Stock
+    {
+        return $this->model->with(['supplier', 'clinic'])
+                           ->lockForUpdate()
+                           ->find($id);
+    }
+
     public function create(array $data): Stock
     {
         return $this->model->create($data);

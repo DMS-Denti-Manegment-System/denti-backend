@@ -8,8 +8,11 @@ use App\Modules\Stock\Repositories\Interfaces\StockRepositoryInterface;
 use App\Modules\Stock\Services\StockTransactionService;
 use App\Modules\Stock\Models\StockRequest;
 use App\Modules\Stock\Jobs\SendStockRequestNotificationJob;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class StockRequestService
 {
@@ -58,9 +61,21 @@ class StockRequestService
         });
     }
 
-    // ✅ HATA DÜZELTİLDİ: Missing interface import
+    /**
+     * Stok talebini onayla.
+     * Sadece Company Owner veya Super Admin rolüne sahip kullanıcılar onaylayabilir.
+     *
+     * @throws AuthorizationException   Yetki yoksa
+     * @throws \Exception               Talep geçersizse veya stok yetersizse
+     */
     public function approveRequest(int $requestId, int $approvedQuantity, string $approvedBy, string $notes = null): bool
     {
+        // 🔒 Güvenlik: Onaylama yetkisi sadece belirli rollere aittir
+        $user = Auth::user();
+        if (!$user || !$user->hasAnyRole(['Super Admin', 'Company Owner', 'Stock Manager'])) {
+            throw new AuthorizationException('Bu talebi onaylama yetkiniz bulunmamaktadır.');
+        }
+
         return DB::transaction(function () use ($requestId, $approvedQuantity, $approvedBy, $notes) {
             $request = $this->stockRequestRepository->find($requestId);
             if (!$request || $request->status !== 'pending') {
@@ -88,9 +103,21 @@ class StockRequestService
         });
     }
 
-    // ✅ HATA DÜZELTİLDİ: Missing interface import
+    /**
+     * Onaylanmış talebi tamamla (fiziksel transfer).
+     * Sadece Company Owner veya Super Admin rolüne sahip kullanıcılar tamamlayabilir.
+     *
+     * @throws AuthorizationException   Yetki yoksa
+     * @throws \Exception               Talep geçersizse
+     */
     public function completeRequest(int $requestId, string $performedBy): bool
     {
+        // 🔒 Güvenlik: Tamamlama yetkisi sadece belirli rollere aittir
+        $user = Auth::user();
+        if (!$user || !$user->hasAnyRole(['Super Admin', 'Company Owner', 'Stock Manager'])) {
+            throw new AuthorizationException('Bu talebi tamamlama yetkiniz bulunmamaktadır.');
+        }
+
         return DB::transaction(function () use ($requestId, $performedBy) {
             $request = $this->stockRequestRepository->find($requestId);
             if (!$request || $request->status !== 'approved') {
@@ -125,24 +152,22 @@ class StockRequestService
         ]);
     }
 
+    /**
+     * Benzersiz talep numarası üretir (UUID suffix ile çakışma önlendi).
+     */
     protected function generateRequestNumber(): string
     {
         $date = now()->format('Ymd');
-        $sequence = DB::table('stock_requests')
-                     ->whereDate('created_at', now())
-                     ->count() + 1;
-
-        return 'REQ-' . $date . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        return 'REQ-' . $date . '-' . strtoupper(substr(Str::uuid()->toString(), 0, 8));
     }
 
+    /**
+     * Benzersiz işlem numarası üretir (UUID suffix ile çakışma önlendi).
+     */
     protected function generateTransactionNumber(): string
     {
         $date = now()->format('Ymd');
-        $sequence = DB::table('stock_transactions')
-                     ->whereDate('created_at', now())
-                     ->count() + 1;
-
-        return 'TXN-' . $date . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        return 'TXN-' . $date . '-' . strtoupper(substr(Str::uuid()->toString(), 0, 8));
     }
 
     // ✅ HATA DÜZELTİLDİ: Proper interface resolution

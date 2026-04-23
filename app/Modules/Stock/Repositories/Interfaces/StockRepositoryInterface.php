@@ -9,6 +9,7 @@ interface StockRepositoryInterface
 {
     public function all(): Collection;
     public function find(int $id): ?Stock;
+    public function findAndLock(int $id): ?Stock; // Pessimistic locking için (DB::transaction içinde kullanılmalı)
     public function create(array $data): Stock;
     public function update(int $id, array $data): ?Stock;
     public function delete(int $id): bool;

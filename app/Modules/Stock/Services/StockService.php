@@ -2,13 +2,15 @@
 
 namespace App\Modules\Stock\Services;
 
+use App\Exceptions\Stock\InsufficientStockException;
+use App\Exceptions\Stock\StockNotFoundException;
+use App\Events\Stock\StockLevelChanged;
 use App\Modules\Stock\Repositories\Interfaces\StockRepositoryInterface;
 use App\Modules\Stock\Models\Stock;
-use App\Modules\Stock\Jobs\CheckStockLevelsJob;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class StockService
 {
@@ -36,7 +38,7 @@ class StockService
             if (!$stock) return null;
 
             if (isset($data['current_stock']) || isset($data['reserved_stock'])) {
-                $currentStock = $data['current_stock'] ?? $stock->current_stock;
+                $currentStock  = $data['current_stock']  ?? $stock->current_stock;
                 $reservedStock = $data['reserved_stock'] ?? $stock->reserved_stock;
                 $data['available_stock'] = $currentStock - $reservedStock;
             }
@@ -44,22 +46,29 @@ class StockService
             $updatedStock = $this->stockRepository->update($id, $data);
 
             if ($updatedStock) {
-                $this->checkStockLevels($updatedStock);
-                $this->clearStockCache($updatedStock->company_id, $updatedStock->clinic_id);
+                // Event tabanlı: cache temizleme + alert kontrolü listener'lara delege edilir
+                StockLevelChanged::dispatch($updatedStock, $updatedStock->company_id, $updatedStock->clinic_id);
             }
 
             return $updatedStock;
         });
     }
 
+    /**
+     * Stok miktarını manuel olarak ayarlar.
+     * Race condition'a karşı pessimistic locking (lockForUpdate) kullanır.
+     */
     public function adjustStock(int $stockId, int $quantity, string $reason, string $performedBy, bool $isSubUnit = false): bool
     {
         return DB::transaction(function () use ($stockId, $quantity, $reason, $performedBy, $isSubUnit) {
-            $stock = $this->stockRepository->find($stockId);
-            if (!$stock) return false;
+            // 🔒 Pessimistic lock: aynı anda başka bir işlem bu satırı değiştiremez
+            $stock = $this->stockRepository->findAndLock($stockId);
+            if (!$stock) {
+                throw new StockNotFoundException($stockId);
+            }
 
             $previousTotal = $stock->total_base_units;
-            
+
             if ($isSubUnit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
                 $newLevels = $this->calculatorService->calculateAdjustment(
                     $stock->current_stock,
@@ -68,15 +77,27 @@ class StockService
                     $stock->sub_unit_multiplier
                 );
 
+                // ✅ Sub-unit hesaplamasi sonrasi negatif stok kontrolu
+                // calculatorService null veya negatif dondururse exception firlatilir
+                if (
+                    !$newLevels ||
+                    ($newLevels['current_stock'] ?? 0) < 0 ||
+                    ($newLevels['current_sub_stock'] ?? 0) < 0
+                ) {
+                    throw new InsufficientStockException($stock->total_base_units, abs($quantity));
+                }
+
                 $this->stockRepository->update($stockId, array_merge($newLevels, [
                     'available_stock' => $newLevels['current_stock'] - $stock->reserved_stock
                 ]));
             } else {
                 $newStock = $stock->current_stock + $quantity;
-                if ($newStock < 0) return false;
+                if ($newStock < 0) {
+                    throw new InsufficientStockException($stock->current_stock, abs($quantity));
+                }
 
                 $this->stockRepository->update($stockId, [
-                    'current_stock' => $newStock,
+                    'current_stock'   => $newStock,
                     'available_stock' => $newStock - $stock->reserved_stock
                 ]);
             }
@@ -84,33 +105,43 @@ class StockService
             $freshStock = $stock->fresh();
 
             $this->createTransaction([
-                'stock_id' => $stockId,
-                'clinic_id' => $stock->clinic_id,
-                'type' => 'adjustment',
-                'quantity' => abs($quantity),
-                'previous_stock' => $previousTotal,
-                'new_stock' => $freshStock->total_base_units,
-                'description' => ($isSubUnit ? "Alt Birim Düzeltme: " : "Ana Birim Düzeltme: ") . $reason,
-                'performed_by' => $performedBy,
+                'stock_id'         => $stockId,
+                'clinic_id'        => $stock->clinic_id,
+                'type'             => 'adjustment',
+                'quantity'         => abs($quantity),
+                'previous_stock'   => $previousTotal,
+                'new_stock'        => $freshStock->total_base_units,
+                'description'      => ($isSubUnit ? 'Alt Birim Düzeltme: ' : 'Ana Birim Düzeltme: ') . $reason,
+                'performed_by'     => $performedBy,
                 'transaction_date' => now(),
-                'is_sub_unit' => $isSubUnit
+                'is_sub_unit'      => $isSubUnit
             ]);
 
-            $this->checkStockLevels($freshStock);
-            $this->clearStockCache($freshStock->company_id, $freshStock->clinic_id);
+            // Event tabanlı: cache + alert listener'lara delege edilir
+            StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
 
             return true;
         });
     }
 
+    /**
+     * Stok kullanımı yapar.
+     * Race condition'a karşı pessimistic locking (lockForUpdate) kullanır.
+     *
+     * @throws StockNotFoundException    Stok bulunamazsa
+     * @throws InsufficientStockException Yeterli stok yoksa
+     */
     public function useStock(int $stockId, int $quantity, string $performedBy, string $notes = null): bool
     {
         return DB::transaction(function () use ($stockId, $quantity, $performedBy, $notes) {
-            $stock = $this->stockRepository->find($stockId);
-            if (!$stock) return false;
+            // 🔒 Pessimistic lock: eşzamanlı kullanımlarda veri bütünlüğünü korur
+            $stock = $this->stockRepository->findAndLock($stockId);
+            if (!$stock) {
+                throw new StockNotFoundException($stockId);
+            }
 
             $isSubUnitUsage = $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
-            $previousTotal = $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock;
+            $previousTotal  = $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock;
 
             if ($isSubUnitUsage) {
                 $newLevels = $this->calculatorService->calculateUsage(
@@ -120,19 +151,23 @@ class StockService
                     $stock->sub_unit_multiplier
                 );
 
-                if (!$newLevels) return false;
+                if (!$newLevels) {
+                    throw new InsufficientStockException($stock->total_base_units, $quantity);
+                }
 
                 $updateData = array_merge($newLevels, [
-                    'available_stock' => $newLevels['current_stock'] - $stock->reserved_stock,
+                    'available_stock'      => $newLevels['current_stock'] - $stock->reserved_stock,
                     'internal_usage_count' => $stock->internal_usage_count + $quantity
                 ]);
             } else {
-                if ($stock->available_stock < $quantity) return false;
-                
+                if ($stock->available_stock < $quantity) {
+                    throw new InsufficientStockException($stock->available_stock, $quantity);
+                }
+
                 $newMainStock = $stock->current_stock - $quantity;
-                $updateData = [
-                    'current_stock' => $newMainStock,
-                    'available_stock' => $newMainStock - $stock->reserved_stock,
+                $updateData   = [
+                    'current_stock'        => $newMainStock,
+                    'available_stock'      => $newMainStock - $stock->reserved_stock,
                     'internal_usage_count' => $stock->internal_usage_count + $quantity
                 ];
             }
@@ -141,20 +176,20 @@ class StockService
             $freshStock = $stock->fresh();
 
             $this->createTransaction([
-                'stock_id' => $stockId,
-                'clinic_id' => $stock->clinic_id,
-                'type' => 'usage',
-                'quantity' => $quantity,
-                'previous_stock' => $previousTotal,
-                'new_stock' => $isSubUnitUsage ? $freshStock->total_base_units : $freshStock->current_stock,
-                'notes' => $notes,
-                'performed_by' => $performedBy,
+                'stock_id'         => $stockId,
+                'clinic_id'        => $stock->clinic_id,
+                'type'             => 'usage',
+                'quantity'         => $quantity,
+                'previous_stock'   => $previousTotal,
+                'new_stock'        => $isSubUnitUsage ? $freshStock->total_base_units : $freshStock->current_stock,
+                'notes'            => $notes,
+                'performed_by'     => $performedBy,
                 'transaction_date' => now(),
-                'is_sub_unit' => $isSubUnitUsage
+                'is_sub_unit'      => $isSubUnitUsage
             ]);
 
-            $this->checkStockLevels($freshStock);
-            $this->clearStockCache($freshStock->company_id, $freshStock->clinic_id);
+            // Event tabanlı: cache + alert listener'lara delege edilir
+            StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
 
             return true;
         });
@@ -167,8 +202,8 @@ class StockService
 
             $stock = $this->stockRepository->create($data);
 
-            $this->checkStockLevels($stock);
-            $this->clearStockCache($stock->company_id, $stock->clinic_id);
+            // Event tabanlı: cache + alert listener'lara delege edilir
+            StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
 
             return $stock;
         });
@@ -180,31 +215,30 @@ class StockService
             $stock = $this->stockRepository->find($id);
             if (!$stock) return false;
 
-            $companyId = $stock->company_id;
-            $clinicId = $stock->clinic_id;
-
             $stock->alerts()->delete();
-            $result = $this->stockRepository->delete($id);
-            
-            if ($result) {
-                $this->clearStockCache($companyId, $clinicId);
-            }
-
-            return $result;
+            return $this->stockRepository->delete($id);
         });
+    }
+
+    public function forceDeleteStock(int $id): bool
+    {
+        $stock = Stock::withTrashed()->find($id);
+        return $stock ? $stock->forceDelete() : false;
     }
 
     public function getStockStats(int $clinicId = null): array
     {
+        // Cache yönetimi artık ClearStockCacheListener üzerinden yapılıyor.
+        // Bu metod doğrudan DB sorgusu yapar; listener 5 dk'da bir cache'i yeniler.
         $companyId = Auth::user()->company_id;
-        $cacheKey = "stock_stats_{$companyId}_" . ($clinicId ?? 'all');
+        $cacheKey  = "stock_stats_{$companyId}_" . ($clinicId ?? 'all');
 
-        return Cache::remember($cacheKey, now()->addMinutes(15), function () use ($clinicId) {
+        return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(5), function () use ($clinicId) {
             $baseQuery = $this->stockRepository->getBaseQuery();
             if ($clinicId) $baseQuery->where('clinic_id', $clinicId);
 
             $nearExpiryLimit = now()->addDays(30)->toDateTimeString();
-            $now = now()->toDateTimeString();
+            $now             = now()->toDateTimeString();
 
             $stats = $baseQuery->selectRaw("
                 COUNT(*) as total_items,
@@ -215,24 +249,28 @@ class StockService
             ", [$nearExpiryLimit, $now])->first();
 
             return [
-                'total_items' => (int) ($stats->total_items ?? 0),
-                'low_stock_items' => (int) ($stats->low_stock_items ?? 0),
+                'total_items'          => (int) ($stats->total_items          ?? 0),
+                'low_stock_items'      => (int) ($stats->low_stock_items      ?? 0),
                 'critical_stock_items' => (int) ($stats->critical_stock_items ?? 0),
-                'expiring_items' => (int) ($stats->expiring_items ?? 0),
-                'total_value' => round((float) ($stats->total_value ?? 0), 2)
+                'expiring_items'       => (int) ($stats->expiring_items       ?? 0),
+                'total_value'          => round((float) ($stats->total_value  ?? 0), 2)
             ];
         });
     }
 
-    protected function clearStockCache(int $companyId, int $clinicId): void
+    public function getLowStockItems(int $clinicId = null): Collection
     {
-        Cache::forget("stock_stats_{$companyId}_all");
-        Cache::forget("stock_stats_{$companyId}_{$clinicId}");
+        return $this->stockRepository->getLowStockItems($clinicId);
     }
 
-    protected function checkStockLevels(Stock $stock): void
+    public function getCriticalStockItems(int $clinicId = null): Collection
     {
-        $this->stockAlertService->checkAndCreateAlerts($stock);
+        return $this->stockRepository->getCriticalStockItems($clinicId);
+    }
+
+    public function getExpiringItems(int $days = 30, int $clinicId = null): Collection
+    {
+        return $this->stockRepository->getExpiringItems($days, $clinicId);
     }
 
     protected function createTransaction(array $data): void
@@ -241,13 +279,14 @@ class StockService
         $this->transactionService->createTransaction($data);
     }
 
+    /**
+     * Benzersiz işlem numarası üretir.
+     * count() + 1 yerine UUID kullanarak eşzamanlı çakışmayı önler.
+     */
     protected function generateTransactionNumber(): string
     {
         $date = now()->format('Ymd');
-        $sequence = DB::table('stock_transactions')
-                     ->whereDate('created_at', now())
-                     ->count() + 1;
-
-        return 'TXN-' . $date . '-' . str_pad($sequence, 4, '0', STR_PAD_LEFT);
+        // UUID4'ten ilk 8 karakter → çakışma olasılığı astronomik düzeyde düşük
+        return 'TXN-' . $date . '-' . strtoupper(substr(Str::uuid()->toString(), 0, 8));
     }
 }

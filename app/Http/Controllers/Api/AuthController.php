@@ -33,10 +33,12 @@ class AuthController extends Controller
             }
 
             return $this->success([
-                'user' => $user,
-                'roles' => $user->getRoleNames(),
-                'permissions' => $user->getAllPermissions()->pluck('name'),
-                'company' => $user->company
+                'user'        => $user,
+                'roles'       => $user->getRoleNames(),
+                // getDirectPermissions: sadece kullanıcıya direkt atanan yetkiler
+                // getAllPermissions yerine kullanılıyor — rol üzerinden gelen yükleri düşürür
+                'permissions' => $user->getDirectPermissions()->pluck('name'),
+                'company'     => $user->company
             ], 'Login successful');
         }
 
@@ -53,10 +55,10 @@ class AuthController extends Controller
         $user = $request->user()->load(['company', 'roles']);
 
         return $this->success([
-            'user' => $user,
-            'roles' => $user->getRoleNames(),
-            'permissions' => $user->getAllPermissions()->pluck('name'),
-            'company' => $user->company
+            'user'        => $user,
+            'roles'       => $user->getRoleNames(),
+            'permissions' => $user->getDirectPermissions()->pluck('name'),
+            'company'     => $user->company
         ]);
     }
 

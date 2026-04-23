@@ -40,11 +40,11 @@ class StockReportService
             SUM(CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) as total_base_quantity,
             SUM(current_stock * purchase_price) as total_value,
             SUM(CASE 
-                WHEN (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= yellow_alert_level THEN 1 
+                WHEN (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(yellow_alert_level, min_stock_level, 0) THEN 1 
                 ELSE 0 
             END) as low_stock_items,
             SUM(CASE 
-                WHEN (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= red_alert_level THEN 1 
+                WHEN (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(red_alert_level, critical_stock_level, 0) THEN 1 
                 ELSE 0 
             END) as critical_stock_items,
             SUM(CASE WHEN track_expiry = 1 AND expiry_date < ? THEN 1 ELSE 0 END) as expired_items,

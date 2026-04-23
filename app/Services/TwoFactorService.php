@@ -6,6 +6,7 @@ use App\Models\User;
 use PragmaRX\Google2FA\Google2FA;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\DB;
 
 class TwoFactorService
 {
@@ -95,21 +96,33 @@ class TwoFactorService
 
     /**
      * Verify and use a recovery code.
+     *
+     * Race condition önlemi: Ayni recovery code'un eşzamanli iki istekte
+     * geçerli sayilmamasi icin DB::transaction + lockForUpdate kullanilir.
      */
     public function verifyRecoveryCode(User $user, string $code): bool
     {
-        $codes = $user->two_factor_recovery_codes ?? [];
+        return DB::transaction(function () use ($user, $code) {
+            // Satiri kilitle: baska bir islem ayni anda bu kullanicinin kodlarini degistiremez
+            $freshUser = User::lockForUpdate()->find($user->id);
 
-        if (($key = array_search($code, $codes)) !== false) {
-            unset($codes[$key]);
-            
-            $user->update([
-                'two_factor_recovery_codes' => array_values($codes),
-            ]);
+            if (!$freshUser) {
+                return false;
+            }
 
-            return true;
-        }
+            $codes = $freshUser->two_factor_recovery_codes ?? [];
 
-        return false;
+            if (($key = array_search($code, $codes)) !== false) {
+                unset($codes[$key]);
+
+                $freshUser->update([
+                    'two_factor_recovery_codes' => array_values($codes),
+                ]);
+
+                return true;
+            }
+
+            return false;
+        });
     }
 }

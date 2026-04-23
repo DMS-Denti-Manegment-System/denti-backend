@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\Stock\Services\StockService;
 use App\Modules\Stock\Requests\StoreStockRequest;
 use App\Modules\Stock\Requests\UpdateStockRequest;
+use App\Exceptions\Stock\StockNotFoundException;
+use App\Exceptions\Stock\InsufficientStockException;
 use App\Traits\JsonResponseTrait;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -120,11 +122,11 @@ class StockController extends Controller
     public function adjustStock(Request $request, $id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'type' => 'required|in:increase,decrease',
-            'quantity' => 'required|integer|min:1',
-            'reason' => 'required|string|max:500',
-            'performed_by' => 'required|string|max:255',
-            'notes' => 'nullable|string|max:1000',
+            'type'        => 'required|in:increase,decrease',
+            'quantity'    => 'required|integer|min:1',
+            'reason'      => 'required|string|max:500',
+            // performed_by güvenlik düzeltmesi: artık client'tan alınmıyor, sunucudan üretiliyor
+            'notes'       => 'nullable|string|max:1000',
             'is_sub_unit' => 'nullable|boolean'
         ]);
 
@@ -133,23 +135,25 @@ class StockController extends Controller
         }
 
         try {
-            $data = $validator->validated();
-            $quantity = $data['type'] === 'increase' ? $data['quantity'] : -$data['quantity'];
-            $isSubUnit = $data['is_sub_unit'] ?? false;
+            $data        = $validator->validated();
+            $quantity    = $data['type'] === 'increase' ? $data['quantity'] : -$data['quantity'];
+            $isSubUnit   = $data['is_sub_unit'] ?? false;
+            // 🔒 Güvenlik: Kim yaptı bilgisini asla client'tan alma, oturum'dan al
+            $performedBy = auth()->user()->name;
 
-            $result = $this->stockService->adjustStock(
+            $this->stockService->adjustStock(
                 (int)$id,
                 $quantity,
                 $data['reason'],
-                $data['performed_by'],
+                $performedBy,
                 $isSubUnit
             );
 
-            if (!$result) {
-                return $this->error('Stok düzeltmesi başarısız', 400);
-            }
-
             return $this->success($this->stockService->getStockById((int)$id), 'Stok başarıyla düzeltildi');
+        } catch (StockNotFoundException $e) {
+            return $this->error($e->getMessage(), 404);
+        } catch (InsufficientStockException $e) {
+            return $this->error($e->getMessage(), 400);
         } catch (\Exception $e) {
             Log::error($e);
             return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
@@ -160,10 +164,10 @@ class StockController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'quantity' => 'required|integer|min:1',
-            'reason' => 'required|string|max:500',
-            'performed_by' => 'required|string|max:255',
-            'used_by' => 'nullable|string|max:255',
-            'notes' => 'nullable|string|max:1000'
+            'reason'   => 'required|string|max:500',
+            // performed_by güvenlik düzeltmesi: artık client'tan alınmıyor
+            'used_by'  => 'nullable|string|max:255',
+            'notes'    => 'nullable|string|max:1000'
         ]);
 
         if ($validator->fails()) {
@@ -171,7 +175,7 @@ class StockController extends Controller
         }
 
         try {
-            $data = $validator->validated();
+            $data  = $validator->validated();
             $notes = $data['notes'] ?? '';
             if (!empty($data['used_by'])) {
                 $notes .= "\nKullanan: " . $data['used_by'];
@@ -180,18 +184,21 @@ class StockController extends Controller
                 $notes .= "\nSebep: " . $data['reason'];
             }
 
-            $result = $this->stockService->useStock(
+            // 🔒 Güvenlik: Kim yaptı bilgisini asla client'tan alma, oturum'dan al
+            $performedBy = auth()->user()->name;
+
+            $this->stockService->useStock(
                 (int)$id,
                 $data['quantity'],
-                $data['performed_by'],
+                $performedBy,
                 $notes
             );
 
-            if (!$result) {
-                return $this->error('Yetersiz stok veya stok bulunamadı', 400);
-            }
-
             return $this->success($this->stockService->getStockById((int)$id), 'Stok kullanımı kaydedildi');
+        } catch (StockNotFoundException $e) {
+            return $this->error($e->getMessage(), 404);
+        } catch (InsufficientStockException $e) {
+            return $this->error($e->getMessage(), 400);
         } catch (\Exception $e) {
             Log::error($e);
             return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);

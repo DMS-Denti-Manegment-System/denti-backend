@@ -19,7 +19,15 @@ class RoleController extends Controller
      */
     public function index(): JsonResponse
     {
-        $roles = Role::with('permissions')->get();
+        // Şirkete özel roller + Sistem genelindeki roller (Super Admin vb.)
+        $roles = Role::withoutGlobalScopes()
+            ->where(function($query) {
+                $query->where('company_id', auth()->user()->company_id)
+                      ->orWhereNull('company_id');
+            })
+            ->with('permissions')
+            ->get();
+            
         return $this->success($roles, 'Roles retrieved successfully.');
     }
 

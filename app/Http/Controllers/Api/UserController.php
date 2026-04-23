@@ -14,18 +14,61 @@ class UserController extends Controller
 {
     use JsonResponseTrait;
 
-    /**
-     * Display a listing of the users for the authenticated user's company.
-     */
     public function index(): JsonResponse
     {
-        $companyId = Auth::user()->company_id;
+        $user = Auth::user();
+        
+        // Super Admin ise tüm kullanıcıları görebilir, değilse sadece kendi şirketini
+        $query = User::query();
+        if (!$user->hasRole('Super Admin')) {
+            $query->where('company_id', $user->company_id);
+        }
 
-        $users = User::where('company_id', $companyId)
-            ->with('roles')
-            ->get();
+        $users = $query->with('roles')->get();
 
         return $this->success($users, 'Users retrieved successfully.');
+    }
+
+    /**
+     * Store a new user directly (without invitation).
+     */
+    public function store(\Illuminate\Http\Request $request): JsonResponse
+    {
+        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'role_id' => 'required|integer',
+            'company_id' => 'nullable|integer',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->error($validator->errors()->first(), 422);
+        }
+
+        $currentUser = Auth::user();
+        $companyId = $request->company_id ?? $currentUser->company_id;
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => \Illuminate\Support\Facades\Hash::make($request->password),
+            'company_id' => $companyId,
+            'is_active' => true,
+        ]);
+
+        // Rol atama (Global rolleri de destekle)
+        $role = Role::withoutGlobalScopes()
+            ->where(function($q) use ($companyId) {
+                $q->where('company_id', $companyId)->orWhereNull('company_id');
+            })
+            ->find($request->role_id);
+
+        if ($role) {
+            $user->assignRole($role->name);
+        }
+
+        return $this->success($user->load('roles'), 'User created successfully.', 201);
     }
 
     /**
@@ -62,8 +105,11 @@ class UserController extends Controller
         // Update user details
         $user->update($request->only(['name', 'is_active']));
 
-        // Sync roles
-        $role = Role::where('company_id', $companyId)
+        // Sync roles (Global rolleri de destekle)
+        $role = Role::withoutGlobalScopes()
+            ->where(function($q) use ($companyId) {
+                $q->where('company_id', $companyId)->orWhereNull('company_id');
+            })
             ->where('id', $request->role_id)
             ->first();
 

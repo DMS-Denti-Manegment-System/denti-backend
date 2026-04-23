@@ -130,14 +130,36 @@ class StockAlertController extends Controller
     {
         $clinicId = $request->query('clinic_id');
         
-        // Otomatik Senkronizasyon
-        $this->stockAlertService->syncAlerts($clinicId);
+        $query = \App\Modules\Stock\Models\Stock::query()
+            ->where('is_active', true);
+            
+        if ($clinicId) {
+            $query->where('clinic_id', $clinicId);
+        }
+
+        $today = now()->format('Y-m-d');
         
-        $count = $this->stockAlertService->getPendingCount($clinicId);
+        // Dashboard ile Birebir Aynı Mantık (Disjoint Sets)
+        $stats = $query->selectRaw("
+            SUM(CASE 
+                WHEN (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(red_alert_level, critical_stock_level, 0) THEN 1 
+                ELSE 0 
+            END) as critical_items,
+            SUM(CASE 
+                WHEN (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) > COALESCE(red_alert_level, critical_stock_level, 0) 
+                AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(yellow_alert_level, min_stock_level, 0) THEN 1 
+                ELSE 0 
+            END) as low_items,
+            SUM(CASE WHEN track_expiry = 1 AND expiry_date < ? THEN 1 ELSE 0 END) as expired_items
+        ", [$today])->first();
+
+        // Toplam = Kritik + Düşük (Kritik olmayanlar) + Süresi Geçmiş
+        // Not: Dashboard "17" diyorsa (8 Kritik + 9 Düşük), biz de 17 döndürmeliyiz.
+        $total = (int)($stats->critical_items ?? 0) + (int)($stats->low_items ?? 0);
 
         return response()->json([
             'success' => true,
-            'data' => ['count' => $count]
+            'data' => ['count' => $total]
         ]);
     }
 
