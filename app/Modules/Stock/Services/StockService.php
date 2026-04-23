@@ -15,7 +15,8 @@ class StockService
     public function __construct(
         protected StockRepositoryInterface $stockRepository,
         protected StockCalculatorService $calculatorService,
-        protected StockTransactionService $transactionService
+        protected StockTransactionService $transactionService,
+        protected StockAlertService $stockAlertService
     ) {}
 
     public function getAllStocks(array $filters = []): Collection
@@ -231,7 +232,7 @@ class StockService
 
     protected function checkStockLevels(Stock $stock): void
     {
-        CheckStockLevelsJob::dispatch($stock->id, $stock->company_id);
+        $this->stockAlertService->checkAndCreateAlerts($stock);
     }
 
     protected function createTransaction(array $data): void

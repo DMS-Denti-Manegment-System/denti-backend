@@ -19,7 +19,9 @@ class Clinic extends Model
 
     protected $fillable = [
         'name', 'code', 'description', 'responsible_person',
-        'phone', 'location', 'is_active', 'company_id'
+        'phone', 'location', 'is_active', 'company_id',
+        'email', 'address', 'city', 'district', 'manager_name',
+        'postal_code', 'website', 'opening_hours', 'latitude', 'longitude'
     ];
 
     /**

@@ -34,6 +34,20 @@ class StockAlert extends Model
         return $this->belongsTo(Company::class);
     }
 
+    protected $appends = ['severity'];
+
+    /**
+     * Get the severity based on alert type.
+     */
+    public function getSeverityAttribute(): string
+    {
+        return match($this->type) {
+            'critical_stock', 'expired' => 'critical',
+            'low_stock', 'near_expiry' => 'high',
+            default => 'medium'
+        };
+    }
+
     public function stock(): BelongsTo
     {
         return $this->belongsTo(Stock::class);

@@ -70,6 +70,7 @@ class ClinicRepository implements ClinicRepositoryInterface
         $summary = DB::table('stocks')
             ->where('clinic_id', $clinicId)
             ->where('status', 'active')
+            ->whereNull('deleted_at')
             ->selectRaw('
                 COUNT(*) as total_items,
                 SUM(current_stock) as total_quantity,
@@ -95,6 +96,7 @@ class ClinicRepository implements ClinicRepositoryInterface
         
         $stockStats = DB::table('stocks')
             ->where('status', 'active')
+            ->whereNull('deleted_at')
             ->selectRaw('
                 COUNT(*) as total_items,
                 SUM(CASE WHEN current_stock <= yellow_alert_level THEN 1 ELSE 0 END) as low_stock_items,

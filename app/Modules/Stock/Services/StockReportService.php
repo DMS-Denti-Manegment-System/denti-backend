@@ -101,6 +101,7 @@ class StockReportService
     {
         $query = DB::table('stock_transactions as st')
                     ->join('stocks as s', 'st.stock_id', '=', 's.id')
+                    ->whereNull('s.deleted_at')
                     ->where('st.type', 'usage')
                     ->where('st.company_id', auth()->user()->company_id)
                     ->whereBetween('st.transaction_date', [$startDate, $endDate]);
@@ -186,7 +187,10 @@ class StockReportService
     public function getClinicComparisonReport(): array
     {
         return DB::table('clinics as c')
-                  ->leftJoin('stocks as s', 'c.id', '=', 's.clinic_id')
+                  ->leftJoin('stocks as s', function($join) {
+                      $join->on('c.id', '=', 's.clinic_id')
+                          ->whereNull('s.deleted_at');
+                  })
                   ->selectRaw('
                       c.name as clinic_name,
                       c.code as clinic_code,
@@ -197,6 +201,7 @@ class StockReportService
                       SUM(CASE WHEN s.current_stock <= red_alert_level THEN 1 ELSE 0 END) as critical_stock_count
                   ')
                   ->where('c.company_id', auth()->user()->company_id)
+                  ->whereNull('c.deleted_at')
                   ->where('c.is_active', true)
                   ->groupBy('c.id', 'c.name', 'c.code')
                   ->orderBy('c.name')
@@ -224,9 +229,10 @@ class StockReportService
         }
         
         $query = DB::table('stock_transactions')
-                    ->where('company_id', auth()->user()->company_id)
-                    ->where('type', 'usage')
-                    ->whereBetween('transaction_date', [$startDate, $endDate]);
+            ->where('company_id', auth()->user()->company_id)
+            ->where('type', 'usage')
+            ->whereNull('deleted_at')
+            ->whereBetween('transaction_date', [$startDate, $endDate]);
 
         if ($clinicId) {
             $query->where('clinic_id', $clinicId);
@@ -248,6 +254,7 @@ class StockReportService
     {
         $query = DB::table('stocks')
                     ->where('company_id', auth()->user()->company_id)
+                    ->whereNull('deleted_at')
                     ->selectRaw('
                         category,
                         COUNT(*) as item_count,
@@ -276,6 +283,7 @@ class StockReportService
                     ->leftJoinSub($usageData, 'usage', function ($join) {
                         $join->on('s.id', '=', 'usage.stock_id');
                     })
+                    ->whereNull('s.deleted_at')
                     ->selectRaw('
                         s.name,
                         s.current_stock,

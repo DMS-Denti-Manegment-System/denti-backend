@@ -79,6 +79,7 @@ Route::prefix('api')->middleware(['api', 'auth:sanctum'])->group(function () {
     Route::prefix('stock-alerts')->group(function () {
         Route::get('/', [StockAlertController::class, 'index']);
         Route::get('/pending/count', [StockAlertController::class, 'getPendingCount']);
+        Route::post('/sync', [StockAlertController::class, 'sync']);
         Route::get('/active', [StockAlertController::class, 'getActive']);
         Route::get('/statistics', [StockAlertController::class, 'getStatistics']);
         Route::get('/settings', [StockAlertController::class, 'getSettings']);
@@ -87,7 +88,7 @@ Route::prefix('api')->middleware(['api', 'auth:sanctum'])->group(function () {
         Route::post('/bulk/dismiss', [StockAlertController::class, 'bulkDismiss']);
         Route::post('/bulk/delete', [StockAlertController::class, 'bulkDelete']);
         Route::get('/{id}', [StockAlertController::class, 'show']);
-        Route::put('/{id}/resolve', [StockAlertController::class, 'resolve']);
+        Route::post('/{id}/resolve', [StockAlertController::class, 'resolve']);
         Route::post('/{id}/dismiss', [StockAlertController::class, 'dismiss']);
         Route::delete('/{id}', [StockAlertController::class, 'destroy']);
     });

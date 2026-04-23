@@ -23,19 +23,33 @@ class StockAlertController extends Controller
 
     public function index(Request $request)
     {
-        $clinicId = $request->query('clinic_id');
-        $type = $request->query('type');
+        $filters = $request->only([
+            'clinic_id', 'type', 'severity', 'search', 'date_from', 'date_to'
+        ]);
+        
         $activeOnly = $request->query('active_only', true);
 
-        if ($activeOnly) {
-            $alerts = $this->stockAlertService->getActiveAlerts($clinicId, $type);
+        if ($activeOnly === 'false' || $activeOnly === false) {
+            $alerts = $this->stockAlertService->getAlerts($filters);
         } else {
-            $alerts = $this->stockAlertService->getAllAlerts();
+            $alerts = $this->stockAlertService->getActiveAlerts($filters);
         }
 
         return response()->json([
             'success' => true,
             'data' => $alerts
+        ]);
+    }
+
+    public function sync(Request $request)
+    {
+        $clinicId = $request->query('clinic_id');
+        $count = $this->stockAlertService->syncAlerts($clinicId);
+
+        return response()->json([
+            'success' => true,
+            'message' => "{$count} ürün tarandı ve uyarılar kontrol edildi.",
+            'data' => ['processed_count' => $count]
         ]);
     }
 
@@ -118,10 +132,11 @@ class StockAlertController extends Controller
 
     public function getActive(Request $request)
     {
-        $clinicId = $request->query('clinic_id');
-        $type = $request->query('type');
+        $filters = $request->only([
+            'clinic_id', 'type', 'severity', 'search', 'date_from', 'date_to'
+        ]);
         
-        $alerts = $this->stockAlertService->getActiveAlerts($clinicId, $type);
+        $alerts = $this->stockAlertService->getActiveAlerts($filters);
 
         return response()->json([
             'success' => true,

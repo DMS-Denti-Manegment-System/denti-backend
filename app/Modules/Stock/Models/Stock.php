@@ -195,5 +195,14 @@ class Stock extends Model
                 $stock->available_stock = $stock->current_stock - ($stock->reserved_stock ?? 0);
             }
         });
+
+        static::deleting(function ($stock) {
+            // Soft delete sırasında status'ü güncelle ve uyarılrı sil
+            $stock->status = 'deleted';
+            $stock->saveQuietly();
+            
+            // Bağlı uyarıları sil
+            $stock->alerts()->delete();
+        });
     }
 }

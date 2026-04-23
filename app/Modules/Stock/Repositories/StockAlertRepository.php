@@ -20,11 +20,11 @@ class StockAlertRepository implements StockAlertRepositoryInterface
         $this->model = $model;
     }
 
-    public function all(): Collection
+    public function getAlerts(array $filters = []): Collection
     {
-        return $this->model->with(['stock', 'clinic'])
-                          ->orderByDesc('created_at')
-                          ->get();
+        return $this->applyFilters($this->model->with(['stock', 'clinic']), $filters)
+                    ->orderByDesc('created_at')
+                    ->get();
     }
 
     public function find(int $id): ?StockAlert
@@ -53,19 +53,41 @@ class StockAlertRepository implements StockAlertRepositoryInterface
         return $alert ? $alert->delete() : false;
     }
 
-    public function getActiveAlerts(int $clinicId = null, string $type = null): Collection
+    public function getActiveAlerts(array $filters = []): Collection
     {
         $query = $this->model->active()->with(['stock', 'clinic']);
+        return $this->applyFilters($query, $filters)
+                    ->orderByDesc('created_at')
+                    ->get();
+    }
 
-        if ($clinicId) {
-            $query->where('clinic_id', $clinicId);
+    protected function applyFilters($query, array $filters)
+    {
+        if (!empty($filters['clinic_id'])) {
+            $query->where('clinic_id', $filters['clinic_id']);
         }
 
-        if ($type) {
-            $query->byType($type);
+        if (!empty($filters['type'])) {
+            $query->byType($filters['type']);
         }
 
-        return $query->orderByDesc('created_at')->get();
+        if (!empty($filters['search'])) {
+            $search = $filters['search'];
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('message', 'like', "%{$search}%");
+            });
+        }
+
+        if (!empty($filters['date_from'])) {
+            $query->whereDate('created_at', '>=', $filters['date_from']);
+        }
+
+        if (!empty($filters['date_to'])) {
+            $query->whereDate('created_at', '<=', $filters['date_to']);
+        }
+
+        return $query;
     }
 
     public function resolveActiveAlerts(int $stockId): void

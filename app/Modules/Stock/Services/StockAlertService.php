@@ -21,31 +21,40 @@ class StockAlertService
 
     public function checkAndCreateAlerts(Stock $stock): void
     {
+        // Pasif stoklar için uyarı üretme
+        if (!$stock->is_active) {
+            $this->forceDeleteAlertsByStock($stock->id);
+            return;
+        }
+
         // Mevcut alarmları tamamen temizle (Yeni kural: direkt sil)
         $this->forceDeleteAlertsByStock($stock->id);
 
         $alerts = [];
+        $currentValue = $stock->total_base_units;
 
-        // Düşük stok kontrolü (Sarı alarm)
-        if ($stock->current_stock <= $stock->yellow_alert_level &&
-            $stock->current_stock > $stock->red_alert_level) {
-            $alerts[] = [
-                'type' => 'low_stock',
-                'title' => 'Düşük Stok Uyarısı',
-                'message' => "{$stock->name} stoku azalmıştır. Mevcut: {$stock->current_stock} {$stock->unit}",
-                'current_stock_level' => $stock->current_stock,
-                'threshold_level' => $stock->yellow_alert_level
-            ];
-        }
+        // Seviye değerlerini al (Null ise varsayılanlara düş)
+        $yellowLevel = $stock->yellow_alert_level ?? $stock->min_stock_level ?? 10;
+        $redLevel = $stock->red_alert_level ?? $stock->critical_stock_level ?? 5;
 
-        // Kritik stok kontrolü (Kırmızı alarm)
-        if ($stock->current_stock <= $stock->red_alert_level) {
+        // 1. Kritik Stok Kontrolü (Öncelikli)
+        if ($currentValue <= $redLevel) {
             $alerts[] = [
                 'type' => 'critical_stock',
-                'title' => 'Kritik Stok Uyarısı',
-                'message' => "{$stock->name} stoku kritik seviyede! Mevcut: {$stock->current_stock} {$stock->unit}",
-                'current_stock_level' => $stock->current_stock,
-                'threshold_level' => $stock->red_alert_level
+                'title' => 'Kritik Stok Seviyesi',
+                'message' => "{$stock->name} için kritik stok seviyesine ulaşıldı. Mevcut: {$currentValue} {$stock->unit}",
+                'current_stock_level' => $currentValue,
+                'threshold_level' => $redLevel
+            ];
+        }
+        // 2. Düşük Stok Kontrolü (Sadece kritik değilse)
+        elseif ($currentValue <= $yellowLevel) {
+            $alerts[] = [
+                'type' => 'low_stock',
+                'title' => 'Düşük Stok Seviyesi',
+                'message' => "{$stock->name} stok miktarı azaldı. Mevcut: {$currentValue} {$stock->unit}",
+                'current_stock_level' => $currentValue,
+                'threshold_level' => $yellowLevel
             ];
         }
 
@@ -114,9 +123,35 @@ class StockAlertService
         }
     }
 
-    public function getActiveAlerts(int $clinicId = null, string $type = null): Collection
+    public function getActiveAlerts(array $filters = []): Collection
     {
-        return $this->stockAlertRepository->getActiveAlerts($clinicId, $type);
+        return $this->stockAlertRepository->getActiveAlerts($filters);
+    }
+
+    public function getAlerts(array $filters = []): Collection
+    {
+        return $this->stockAlertRepository->getAlerts($filters);
+    }
+
+    /**
+     * Tüm stokları tarayıp eksik uyarıları oluşturur.
+     */
+    public function syncAlerts(int $clinicId = null): int
+    {
+        $query = Stock::query();
+        if ($clinicId) {
+            $query->where('clinic_id', $clinicId);
+        }
+
+        $stocks = $query->get();
+        $count = 0;
+
+        foreach ($stocks as $stock) {
+            $this->checkAndCreateAlerts($stock);
+            $count++;
+        }
+
+        return $count;
     }
 
     public function resolveAlert(int $alertId, string $resolvedBy): bool

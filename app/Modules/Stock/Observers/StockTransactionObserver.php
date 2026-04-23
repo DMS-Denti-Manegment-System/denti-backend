@@ -72,6 +72,9 @@ class StockTransactionObserver
                 'available_stock' => $stock->current_stock - $stock->reserved_stock
             ]);
         }
+
+        // Trigger alert check for any stock change
+        app(\App\Modules\Stock\Services\StockAlertService::class)->checkAndCreateAlerts($stock);
     }
 
     /**

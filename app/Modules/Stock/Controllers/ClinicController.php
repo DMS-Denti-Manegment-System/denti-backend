@@ -40,6 +40,16 @@ class ClinicController extends Controller
             'responsible_person' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'district' => 'nullable|string|max:100',
+            'manager_name' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:20',
+            'website' => 'nullable|string|max:255',
+            'opening_hours' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'is_active' => 'boolean'
         ]);
 
@@ -92,6 +102,16 @@ class ClinicController extends Controller
             'responsible_person' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
             'location' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'district' => 'nullable|string|max:100',
+            'manager_name' => 'nullable|string|max:255',
+            'postal_code' => 'nullable|string|max:20',
+            'website' => 'nullable|string|max:255',
+            'opening_hours' => 'nullable|string|max:255',
+            'latitude' => 'nullable|numeric',
+            'longitude' => 'nullable|numeric',
             'is_active' => 'boolean'
         ]);
 
