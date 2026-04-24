@@ -22,9 +22,9 @@ class AuthController extends Controller
             $user = Auth::user()->load(['company', 'roles']);
 
             // If 2FA is enabled but not verified yet for this session
-            if ($user->two_factor_confirmed_at) {
+            if ($user->hasTwoFactorEnabled()) {
                 return $this->success([
-                    'two_factor_required' => true,
+                    'requires_2fa' => true,
                     'user' => [
                         'id' => $user->id,
                         'email' => $user->email

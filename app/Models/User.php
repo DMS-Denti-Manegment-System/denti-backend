@@ -14,10 +14,14 @@ class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasApiTokens, HasFactory, Notifiable, HasRoles;
+
+    const ROLE_SUPER_ADMIN = 'Super Admin';
+    const ROLE_OWNER = 'Owner';
+
     /**
      * The attributes that are mass assignable.
      *
-     * @var list<string>
+     * @var array<int, string>
      */
     protected $fillable = [
         'name',
@@ -29,6 +33,14 @@ class User extends Authenticatable
         'two_factor_recovery_codes',
         'two_factor_confirmed_at',
     ];
+
+    /**
+     * Check if 2FA is enabled and confirmed.
+     */
+    public function hasTwoFactorEnabled(): bool
+    {
+        return !empty($this->two_factor_secret) && !is_null($this->two_factor_confirmed_at);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

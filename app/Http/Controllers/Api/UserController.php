@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateUserRequest;
+use App\Http\Requests\StoreUserRequest;
 use App\Models\User;
 use App\Models\Role;
 use App\Traits\JsonResponseTrait;
@@ -20,7 +21,7 @@ class UserController extends Controller
         
         // Super Admin ise tüm kullanıcıları görebilir, değilse sadece kendi şirketini
         $query = User::query();
-        if (!$user->hasRole('Super Admin')) {
+        if (!$user->hasRole(User::ROLE_SUPER_ADMIN)) {
             $query->where('company_id', $user->company_id);
         }
 
@@ -42,24 +43,8 @@ class UserController extends Controller
     /**
      * Store a new user directly (without invitation).
      */
-    public function store(\Illuminate\Http\Request $request): JsonResponse
+    public function store(StoreUserRequest $request): JsonResponse
     {
-        if (!Auth::user()->can('manage-users')) {
-            return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
-        }
-
-        $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'role_id' => 'required|integer',
-            'company_id' => 'nullable|integer',
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error($validator->errors()->first(), 422);
-        }
-
         $currentUser = Auth::user();
         $companyId = $request->company_id ?? $currentUser->company_id;
 
@@ -161,9 +146,8 @@ class UserController extends Controller
             return $this->error('You cannot delete your own account.', 403);
         }
 
-        // SECURITY: Protect the main "Company Owner" from being deleted (assuming Owner role name is 'Owner')
-        // Note: This logic can be refined based on specific "Owner" identification criteria
-        if ($userToDelete->hasRole('Owner')) {
+        // SECURITY: Protect the main "Company Owner" from being deleted
+        if ($userToDelete->hasRole(User::ROLE_OWNER)) {
             return $this->error('The Company Owner cannot be deleted.', 403);
         }
 
