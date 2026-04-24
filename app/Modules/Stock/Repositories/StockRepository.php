@@ -65,7 +65,7 @@ class StockRepository implements StockRepositoryInterface
         return $stock ? $stock->forceDelete() : false;
     }
 
-    public function getAllWithFilters(array $filters): Collection
+    public function getAllWithFilters(array $filters, int $perPage = 50)
     {
         $query = $this->model->with(['supplier', 'clinic']);
 
@@ -120,7 +120,7 @@ class StockRepository implements StockRepositoryInterface
             }
         }
 
-        return $query->orderBy('name')->get();
+        return $query->orderBy('name')->paginate($perPage);
     }
 
     public function getLowStockItems(int $clinicId = null): Collection

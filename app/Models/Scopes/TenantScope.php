@@ -14,6 +14,12 @@ class TenantScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
+        // User modeli için global scope'u devre dışı bırakıyoruz 
+        // çünkü Sanctum user'ı çekerken bu scope sonsuz döngüye giriyor.
+        if ($model instanceof \App\Models\User) {
+            return;
+        }
+
         if (Auth::check()) {
             $user = Auth::user();
             

@@ -1,15 +1,19 @@
 <?php
-// app/Http/Controllers/Api/TodoController.php
 
 namespace App\Modules\Todo\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Modules\Todo\Services\TodoService;
+use App\Modules\Todo\Requests\StoreTodoRequest;
+use App\Modules\Todo\Requests\UpdateTodoRequest;
+use App\Traits\JsonResponseTrait;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class TodoController extends Controller
 {
+    use JsonResponseTrait;
+
     protected $todoService;
 
     public function __construct(TodoService $todoService)
@@ -17,169 +21,91 @@ class TodoController extends Controller
         $this->todoService = $todoService;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
         $todos = $this->todoService->getAllTodos();
-
-        return response()->json([
-            'success' => true,
-            'data' => $todos
-        ]);
+        return $this->success($todos, 'Todos retrieved successfully');
     }
 
-    public function store(Request $request)
+    public function store(StoreTodoRequest $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'required|string|min:3|max:255',
-            'description' => 'nullable|string|max:1000',
-            'category_id' => 'nullable|exists:categories,id'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
-            $todo = $this->todoService->createTodo($validator->validated());
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Todo başarıyla oluşturuldu',
-                'data' => $todo->load('category')
-            ], 201);
+            $todo = $this->todoService->createTodo($request->validated());
+            return $this->success($todo->load('category'), 'Todo created successfully', 201);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            return $this->error($e->getMessage());
         }
     }
 
-    public function show($id)
+    public function show($id): JsonResponse
     {
         $todo = $this->todoService->getTodoById($id);
 
         if (!$todo) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Todo bulunamadı'
-            ], 404);
+            return $this->error('Todo not found', 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $todo->load('category')
-        ]);
+        return $this->success($todo->load('category'), 'Todo retrieved successfully');
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateTodoRequest $request, $id): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'title' => 'sometimes|required|string|min:3|max:255',
-            'description' => 'nullable|string|max:1000',
-            'completed' => 'sometimes|boolean',
-            'category_id' => 'nullable|exists:categories,id'
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
         try {
-            $todo = $this->todoService->updateTodo($id, $validator->validated());
+            $todo = $this->todoService->updateTodo($id, $request->validated());
 
             if (!$todo) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Todo bulunamadı'
-                ], 404);
+                return $this->error('Todo not found', 404);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Todo başarıyla güncellendi',
-                'data' => $todo->load('category')
-            ]);
+            return $this->success($todo->load('category'), 'Todo updated successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            return $this->error($e->getMessage());
         }
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         try {
             $deleted = $this->todoService->deleteTodo($id);
 
             if (!$deleted) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Todo bulunamadı'
-                ], 404);
+                return $this->error('Todo not found', 404);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Todo başarıyla silindi'
-            ]);
+            return $this->success(null, 'Todo deleted successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            return $this->error($e->getMessage());
         }
     }
 
-    public function toggle($id)
+    public function toggle($id): JsonResponse
     {
         try {
             $todo = $this->todoService->toggleTodoStatus($id);
 
             if (!$todo) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Todo bulunamadı'
-                ], 404);
+                return $this->error('Todo not found', 404);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Todo durumu güncellendi',
-                'data' => $todo->load('category')
-            ]);
+            return $this->success($todo->load('category'), 'Todo status toggled successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            return $this->error($e->getMessage());
         }
     }
 
-    public function stats()
+    public function stats(): JsonResponse
     {
         $stats = $this->todoService->getTodoStats();
-
-        return response()->json([
-            'success' => true,
-            'data' => $stats
-        ]);
+        return $this->success($stats, 'Todo statistics retrieved successfully');
     }
 
-    public function byCategory($categoryId)
+    public function byCategory($categoryId): JsonResponse
     {
-        $todos = $this->todoService->getTodosByCategory($categoryId);
-
-        return response()->json([
-            'success' => true,
-            'data' => $todos
-        ]);
+        try {
+            $todos = $this->todoService->getTodosByCategory($categoryId);
+            return $this->success($todos, 'Todos by category retrieved successfully');
+        } catch (\Exception $e) {
+            return $this->error($e->getMessage());
+        }
     }
 }

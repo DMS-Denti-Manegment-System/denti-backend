@@ -14,7 +14,7 @@ interface StockRepositoryInterface
     public function update(int $id, array $data): ?Stock;
     public function delete(int $id): bool;
     public function forceDelete(int $id): bool;
-    public function getAllWithFilters(array $filters): Collection;
+    public function getAllWithFilters(array $filters, int $perPage = 50);
     public function getLowStockItems(int $clinicId = null): Collection;
     public function getCriticalStockItems(int $clinicId = null): Collection;
     public function getExpiringItems(int $days = 30, int $clinicId = null): Collection;

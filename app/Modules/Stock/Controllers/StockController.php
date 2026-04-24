@@ -35,7 +35,7 @@ class StockController extends Controller
                 'stock_status', 'search', 'expiry_filter', 'name'
             ]);
 
-            $stocks = $this->stockService->getAllStocks($filters);
+            $stocks = $this->stockService->getAllStocks($filters, (int)$request->query('per_page', 50));
 
             return $this->success(StockResource::collection($stocks));
         } catch (\Exception $e) {

@@ -21,9 +21,9 @@ class StockService
         protected StockAlertService $stockAlertService
     ) {}
 
-    public function getAllStocks(array $filters = []): Collection
+    public function getAllStocks(array $filters = [], int $perPage = 50)
     {
-        return $this->stockRepository->getAllWithFilters($filters);
+        return $this->stockRepository->getAllWithFilters($filters, $perPage);
     }
 
     public function getStockById(int $id): ?Stock

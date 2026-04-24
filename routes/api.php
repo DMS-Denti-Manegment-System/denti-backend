@@ -11,7 +11,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ProfileController;
 
 // Auth Routes (Public)
-Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:login');
+Route::post('/login', [AuthController::class, 'login']);
 Route::post('/invitations/accept', [UserInvitationController::class, 'accept']);
 
 // Auth Routes (Protected)

@@ -55,9 +55,9 @@ class CompanyController extends Controller
                     'owner' => [
                         'name' => $user->name,
                         'email' => $user->email,
-                        'temporary_password' => $temporaryPassword,
+                        'password_sent_to' => $user->email,
                     ]
-                ], 'Company and owner created successfully.', 201);
+                ], 'Company and owner created successfully. Password sent to email.', 201);
             });
         } catch (\Exception $e) {
             return $this->error('Failed to create company: ' . $e->getMessage());
