@@ -19,13 +19,12 @@ class AuthController extends Controller
 
     /**
      * Throttle key: IP + email kombinasyonu.
-     * Her kullanıcı adına bağımsız sınır uygulanır.
+     * 🛡️ Güvenlik Notu: Sunucu bir proxy (Nginx, Cloudflare vb.) arkasındaysa 
+     * TrustedProxies middleware'i mutlaka doğru ayarlanmalıdır.
      */
     private function throttleKey(LoginRequest $request): string
     {
-        return Str::transliterate(
-            Str::lower($request->input('email')) . '|' . $request->ip()
-        );
+        return Str::lower($request->input('email')) . '|' . $request->ip();
     }
 
     public function login(LoginRequest $request): JsonResponse

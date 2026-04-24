@@ -46,8 +46,9 @@ class StockService
             $updatedStock = $this->stockRepository->update($id, $data);
 
             if ($updatedStock) {
-                // Event tabanlı: cache temizleme + alert kontrolü listener'lara delege edilir
-                StockLevelChanged::dispatch($updatedStock, $updatedStock->company_id, $updatedStock->clinic_id);
+                DB::afterCommit(function () use ($updatedStock) {
+                    StockLevelChanged::dispatch($updatedStock, $updatedStock->company_id, $updatedStock->clinic_id);
+                });
             }
 
             return $updatedStock;
@@ -117,8 +118,9 @@ class StockService
                 'is_sub_unit'      => $isSubUnit
             ]);
 
-            // Event tabanlı: cache + alert listener'lara delege edilir
-            StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
+            DB::afterCommit(function () use ($freshStock) {
+                StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
+            });
 
             return true;
         });
@@ -188,8 +190,9 @@ class StockService
                 'is_sub_unit'      => $isSubUnitUsage
             ]);
 
-            // Event tabanlı: cache + alert listener'lara delege edilir
-            StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
+            DB::afterCommit(function () use ($freshStock) {
+                StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
+            });
 
             return true;
         });
@@ -202,8 +205,9 @@ class StockService
 
             $stock = $this->stockRepository->create($data);
 
-            // Event tabanlı: cache + alert listener'lara delege edilir
-            StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
+            DB::afterCommit(function () use ($stock) {
+                StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
+            });
 
             return $stock;
         });
@@ -238,10 +242,11 @@ class StockService
             $nearExpiryLimit = now()->addDays(30)->toDateTimeString();
             $now             = now()->toDateTimeString();
 
+            $totalUnitsRaw = Stock::totalBaseUnitsRaw();
             $stats = $baseQuery->selectRaw("
                 COUNT(*) as total_items,
-                SUM(CASE WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(yellow_alert_level, min_stock_level) THEN 1 ELSE 0 END) as low_stock_items,
-                SUM(CASE WHEN is_active = 1 AND (CASE WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock ELSE current_stock END) <= COALESCE(red_alert_level, critical_stock_level) THEN 1 ELSE 0 END) as critical_stock_items,
+                SUM(CASE WHEN is_active = 1 AND {$totalUnitsRaw} <= COALESCE(yellow_alert_level, min_stock_level) THEN 1 ELSE 0 END) as low_stock_items,
+                SUM(CASE WHEN is_active = 1 AND {$totalUnitsRaw} <= COALESCE(red_alert_level, critical_stock_level) THEN 1 ELSE 0 END) as critical_stock_items,
                 SUM(CASE WHEN is_active = 1 AND track_expiry = 1 AND expiry_date <= ? AND expiry_date > ? THEN 1 ELSE 0 END) as expiring_items,
                 SUM(purchase_price * current_stock) as total_value
             ", [$nearExpiryLimit, $now])->first();
@@ -284,7 +289,14 @@ class StockService
     protected function generateTransactionNumber(): string
     {
         $date = now()->format('Ymd');
-        // UUID4'ten ilk 8 karakter → çakışma olasılığı astronomik düzeyde düşük
-        return 'TXN-' . $date . '-' . strtoupper(substr(Str::uuid()->toString(), 0, 8));
+        
+        do {
+            $uuid = strtoupper(substr(Str::uuid()->toString(), 0, 8));
+            $number = 'TXN-' . $date . '-' . $uuid;
+            // Veritabanında çakışma kontrolü (opsiyonel ama güvenlik için iyi)
+            $exists = DB::table('stock_transactions')->where('transaction_number', $number)->exists();
+        } while ($exists);
+
+        return $number;
     }
 }

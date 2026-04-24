@@ -7,6 +7,8 @@ use App\Http\Controllers\Controller;
 use App\Modules\Stock\Services\StockService;
 use App\Modules\Stock\Requests\StoreStockRequest;
 use App\Modules\Stock\Requests\UpdateStockRequest;
+use App\Modules\Stock\Requests\AdjustStockRequest;
+use App\Modules\Stock\Requests\UseStockRequest;
 use App\Exceptions\Stock\StockNotFoundException;
 use App\Exceptions\Stock\InsufficientStockException;
 use App\Traits\JsonResponseTrait;
@@ -35,7 +37,10 @@ class StockController extends Controller
                 'stock_status', 'search', 'expiry_filter', 'name'
             ]);
 
-            $stocks = $this->stockService->getAllStocks($filters, (int)$request->query('per_page', 50));
+            // 🛡️ Güvenlik: Sayfalama limitine üst sınır koy (DDoS koruması)
+            $perPage = min((int)$request->query('per_page', 50), 100);
+
+            $stocks = $this->stockService->getAllStocks($filters, $perPage);
 
             return $this->success(StockResource::collection($stocks));
         } catch (\Exception $e) {
@@ -120,25 +125,13 @@ class StockController extends Controller
         }
     }
 
-    public function adjustStock(Request $request, $id): JsonResponse
+    public function adjustStock(AdjustStockRequest $request, $id): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'type'        => 'required|in:increase,decrease',
-            'quantity'    => 'required|integer|min:1',
-            'reason'      => 'required|string|max:500',
-            // performed_by güvenlik düzeltmesi: artık client'tan alınmıyor, sunucudan üretiliyor
-            'notes'       => 'nullable|string|max:1000',
-            'is_sub_unit' => 'nullable|boolean'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error('Validation error', 422, $validator->errors());
-        }
-
         try {
-            $data        = $validator->validated();
+            $data        = $request->validated();
             $quantity    = $data['type'] === 'increase' ? $data['quantity'] : -$data['quantity'];
             $isSubUnit   = $data['is_sub_unit'] ?? false;
+            
             // 🔒 Güvenlik: Kim yaptı bilgisini asla client'tan alma, oturum'dan al
             $performedBy = auth()->user()->name;
 
@@ -161,22 +154,10 @@ class StockController extends Controller
         }
     }
 
-    public function useStock(Request $request, $id): JsonResponse
+    public function useStock(UseStockRequest $request, $id): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
-            'quantity' => 'required|integer|min:1',
-            'reason'   => 'required|string|max:500',
-            // performed_by güvenlik düzeltmesi: artık client'tan alınmıyor
-            'used_by'  => 'nullable|string|max:255',
-            'notes'    => 'nullable|string|max:1000'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error('Validation error', 422, $validator->errors());
-        }
-
         try {
-            $data  = $validator->validated();
+            $data  = $request->validated();
             $notes = $data['notes'] ?? '';
             if (!empty($data['used_by'])) {
                 $notes .= "\nKullanan: " . $data['used_by'];

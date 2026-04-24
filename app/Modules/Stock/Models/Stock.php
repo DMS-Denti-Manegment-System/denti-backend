@@ -85,6 +85,18 @@ class Stock extends Model
         return $this->hasMany(\App\Modules\Stock\Models\StockAlert::class);
     }
 
+    /**
+     * Toplam baz birim miktarını hesaplayan Raw SQL ifadesini döner.
+     * DRY ilkesi için merkezi olarak tanımlanmıştır.
+     */
+    public static function totalBaseUnitsRaw(): string
+    {
+        return "(CASE 
+                    WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock 
+                    ELSE current_stock 
+                 END)";
+    }
+
     // Scope'lar
     public function scopeActive($query)
     {
@@ -98,22 +110,14 @@ class Stock extends Model
 
     public function scopeLowStock($query)
     {
-        return $query->whereRaw('
-            (CASE 
-                WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock 
-                ELSE current_stock 
-             END) <= COALESCE(yellow_alert_level, min_stock_level)
-        ')->where('is_active', true);
+        return $query->whereRaw(self::totalBaseUnitsRaw() . ' <= COALESCE(yellow_alert_level, min_stock_level)')
+                     ->where('is_active', true);
     }
 
     public function scopeCriticalStock($query)
     {
-        return $query->whereRaw('
-            (CASE 
-                WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock 
-                ELSE current_stock 
-             END) <= COALESCE(red_alert_level, critical_stock_level)
-        ')->where('is_active', true);
+        return $query->whereRaw(self::totalBaseUnitsRaw() . ' <= COALESCE(red_alert_level, critical_stock_level)')
+                     ->where('is_active', true);
     }
 
     public function scopeNearExpiry($query, $days = 30)
