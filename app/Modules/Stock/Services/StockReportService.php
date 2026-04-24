@@ -21,9 +21,8 @@ class StockReportService
         $this->transactionRepository = $transactionRepository;
     }
 
-    public function getStockSummaryReport(int $clinicId = null): array
+    public function getStockSummaryReport(int $companyId, int $clinicId = null): array
     {
-        $companyId = auth()->user()->company_id;
         $thirtyDaysFromNow = now()->addDays(30)->format('Y-m-d');
         $today = now()->format('Y-m-d');
 
@@ -65,10 +64,10 @@ class StockReportService
         ];
     }
 
-    public function getStockMovementReport(Carbon $startDate, Carbon $endDate, int $clinicId = null): array
+    public function getStockMovementReport(int $companyId, Carbon $startDate, Carbon $endDate, int $clinicId = null): array
     {
         $query = $this->transactionRepository->getBaseQuery()
-                    ->where('company_id', auth()->user()->company_id)
+                    ->where('company_id', $companyId)
                     ->whereBetween('transaction_date', [$startDate, $endDate]);
 
         if ($clinicId) {
@@ -97,13 +96,13 @@ class StockReportService
         return $result;
     }
 
-    public function getTopUsedItemsReport(Carbon $startDate, Carbon $endDate, int $limit = 10, int $clinicId = null): array
+    public function getTopUsedItemsReport(int $companyId, Carbon $startDate, Carbon $endDate, int $limit = 10, int $clinicId = null): array
     {
         $query = DB::table('stock_transactions as st')
                     ->join('stocks as s', 'st.stock_id', '=', 's.id')
                     ->whereNull('s.deleted_at')
                     ->where('st.type', 'usage')
-                    ->where('st.company_id', auth()->user()->company_id)
+                    ->where('st.company_id', $companyId)
                     ->whereBetween('st.transaction_date', [$startDate, $endDate]);
 
         if ($clinicId) {
@@ -131,9 +130,8 @@ class StockReportService
     }
 
 
-    public function getExpiryReport(int $days = 30, int $clinicId = null): array
+    public function getExpiryReport(int $companyId, int $days = 30, int $clinicId = null): array
     {
-        $companyId = auth()->user()->company_id;
         $query = $this->stockRepository->getBaseQuery()
                     ->where('company_id', $companyId)
                     ->where('track_expiry', true)
@@ -184,7 +182,7 @@ class StockReportService
         ];
     }
 
-    public function getClinicComparisonReport(): array
+    public function getClinicComparisonReport(int $companyId): array
     {
         return DB::table('clinics as c')
                   ->leftJoin('stocks as s', function($join) {
@@ -200,7 +198,7 @@ class StockReportService
                       SUM(CASE WHEN s.current_stock <= yellow_alert_level THEN 1 ELSE 0 END) as low_stock_count,
                       SUM(CASE WHEN s.current_stock <= red_alert_level THEN 1 ELSE 0 END) as critical_stock_count
                   ')
-                  ->where('c.company_id', auth()->user()->company_id)
+                  ->where('c.company_id', $companyId)
                   ->whereNull('c.deleted_at')
                   ->where('c.is_active', true)
                   ->groupBy('c.id', 'c.name', 'c.code')
@@ -218,7 +216,7 @@ class StockReportService
     }
 
 
-    public function getConsumptionTrend(Carbon $startDate, Carbon $endDate, string $period = 'day', int $clinicId = null): array
+    public function getConsumptionTrend(int $companyId, Carbon $startDate, Carbon $endDate, string $period = 'day', int $clinicId = null): array
     {
         $isSqlite = DB::connection()->getDriverName() === 'sqlite';
         
@@ -229,7 +227,7 @@ class StockReportService
         }
         
         $query = DB::table('stock_transactions')
-            ->where('company_id', auth()->user()->company_id)
+            ->where('company_id', $companyId)
             ->where('type', 'usage')
             ->whereNull('deleted_at')
             ->whereBetween('transaction_date', [$startDate, $endDate]);
@@ -250,10 +248,10 @@ class StockReportService
     }
 
 
-    public function getCategoryDistribution(int $clinicId = null): array
+    public function getCategoryDistribution(int $companyId, int $clinicId = null): array
     {
         $query = DB::table('stocks')
-                    ->where('company_id', auth()->user()->company_id)
+                    ->where('company_id', $companyId)
                     ->whereNull('deleted_at')
                     ->selectRaw('
                         category,
@@ -269,14 +267,14 @@ class StockReportService
         return $query->get()->toArray();
     }
 
-    public function getLowStockForecast(int $clinicId = null): array
+    public function getLowStockForecast(int $companyId, int $clinicId = null, int $days = 30): array
     {
-        // Son 30 günlük ortalama günlük tüketimi hesapla
+        // Ortalama günlük tüketimi hesapla
         $usageData = DB::table('stock_transactions')
-                        ->where('company_id', auth()->user()->company_id)
+                        ->where('company_id', $companyId)
                         ->where('type', 'usage')
-                        ->where('transaction_date', '>=', now()->subDays(30))
-                        ->selectRaw('stock_id, SUM(quantity) / 30 as avg_daily_usage')
+                        ->where('transaction_date', '>=', now()->subDays($days))
+                        ->selectRaw("stock_id, SUM(quantity) / ? as avg_daily_usage", [$days])
                         ->groupBy('stock_id');
 
         $query = DB::table('stocks as s')
@@ -297,7 +295,7 @@ class StockReportService
                             ELSE 999 
                         END as estimated_days_left
                     ')
-                    ->where('s.company_id', auth()->user()->company_id)
+                    ->where('s.company_id', $companyId)
                     ->where('s.is_active', true)
                     ->where('s.current_stock', '>', 0);
 

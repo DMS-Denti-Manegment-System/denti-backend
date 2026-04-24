@@ -25,8 +25,11 @@ class StockReportController extends Controller
     public function summary(Request $request): JsonResponse
     {
         try {
+            $request->validate(['clinic_id' => 'nullable|integer|exists:clinics,id']);
             $clinicId = $request->query('clinic_id');
-            $summary = $this->stockReportService->getStockSummaryReport($clinicId ? (int)$clinicId : null);
+            $companyId = auth()->user()->company_id;
+            
+            $summary = $this->stockReportService->getStockSummaryReport($companyId, $clinicId ? (int)$clinicId : null);
 
             return $this->success($summary);
         } catch (\Exception $e) {
@@ -38,6 +41,12 @@ class StockReportController extends Controller
     public function movements(Request $request): JsonResponse
     {
         try {
+            $request->validate([
+                'clinic_id' => 'nullable|integer|exists:clinics,id',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date'
+            ]);
+
             $startDate = $request->query('start_date')
                 ? Carbon::parse($request->query('start_date'))
                 : now()->subMonth();
@@ -47,8 +56,10 @@ class StockReportController extends Controller
                 : now();
 
             $clinicId = $request->query('clinic_id');
+            $companyId = auth()->user()->company_id;
 
             $movements = $this->stockReportService->getStockMovementReport(
+                $companyId,
                 $startDate, 
                 $endDate, 
                 $clinicId ? (int)$clinicId : null
@@ -68,6 +79,13 @@ class StockReportController extends Controller
     public function topUsedItems(Request $request): JsonResponse
     {
         try {
+            $request->validate([
+                'clinic_id' => 'nullable|integer|exists:clinics,id',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'limit' => 'nullable|integer|min:1|max:100'
+            ]);
+
             $startDate = $request->query('start_date')
                 ? Carbon::parse($request->query('start_date'))
                 : now()->subMonth();
@@ -78,8 +96,10 @@ class StockReportController extends Controller
 
             $limit = (int) $request->query('limit', 10);
             $clinicId = $request->query('clinic_id');
+            $companyId = auth()->user()->company_id;
 
             $items = $this->stockReportService->getTopUsedItemsReport(
+                $companyId,
                 $startDate, 
                 $endDate, 
                 $limit, 
@@ -102,10 +122,16 @@ class StockReportController extends Controller
     public function expiryReport(Request $request): JsonResponse
     {
         try {
+            $request->validate([
+                'clinic_id' => 'nullable|integer|exists:clinics,id',
+                'days' => 'nullable|integer|min:1'
+            ]);
+
             $days = (int) $request->query('days', 30);
             $clinicId = $request->query('clinic_id');
+            $companyId = auth()->user()->company_id;
 
-            $report = $this->stockReportService->getExpiryReport($days, $clinicId ? (int)$clinicId : null);
+            $report = $this->stockReportService->getExpiryReport($companyId, $days, $clinicId ? (int)$clinicId : null);
 
             return $this->success($report, 'Süre dolum raporu', 200, [
                 'days' => $days,
@@ -120,7 +146,8 @@ class StockReportController extends Controller
     public function clinicComparison(): JsonResponse
     {
         try {
-            $comparison = $this->stockReportService->getClinicComparisonReport();
+            $companyId = auth()->user()->company_id;
+            $comparison = $this->stockReportService->getClinicComparisonReport($companyId);
 
             return $this->success($comparison);
         } catch (\Exception $e) {
@@ -132,12 +159,20 @@ class StockReportController extends Controller
     public function trends(Request $request): JsonResponse
     {
         try {
+            $request->validate([
+                'clinic_id' => 'nullable|integer|exists:clinics,id',
+                'start_date' => 'nullable|date',
+                'end_date' => 'nullable|date',
+                'period' => 'nullable|string|in:day,month'
+            ]);
+
             $startDate = $request->query('start_date') ? Carbon::parse($request->query('start_date')) : now()->subDays(30);
             $endDate = $request->query('end_date') ? Carbon::parse($request->query('end_date')) : now();
             $period = $request->query('period', 'day');
             $clinicId = $request->query('clinic_id');
+            $companyId = auth()->user()->company_id;
 
-            $trends = $this->stockReportService->getConsumptionTrend($startDate, $endDate, $period, $clinicId ? (int)$clinicId : null);
+            $trends = $this->stockReportService->getConsumptionTrend($companyId, $startDate, $endDate, $period, $clinicId ? (int)$clinicId : null);
 
             return $this->success($trends);
         } catch (\Exception $e) {
@@ -150,8 +185,11 @@ class StockReportController extends Controller
     public function categories(Request $request): JsonResponse
     {
         try {
+            $request->validate(['clinic_id' => 'nullable|integer|exists:clinics,id']);
             $clinicId = $request->query('clinic_id');
-            $distribution = $this->stockReportService->getCategoryDistribution($clinicId ? (int)$clinicId : null);
+            $companyId = auth()->user()->company_id;
+            
+            $distribution = $this->stockReportService->getCategoryDistribution($companyId, $clinicId ? (int)$clinicId : null);
 
             return $this->success($distribution);
         } catch (\Exception $e) {
@@ -163,8 +201,11 @@ class StockReportController extends Controller
     public function forecast(Request $request): JsonResponse
     {
         try {
+            $request->validate(['clinic_id' => 'nullable|integer|exists:clinics,id']);
             $clinicId = $request->query('clinic_id');
-            $forecast = $this->stockReportService->getLowStockForecast($clinicId ? (int)$clinicId : null);
+            $companyId = auth()->user()->company_id;
+            
+            $forecast = $this->stockReportService->getLowStockForecast($companyId, $clinicId ? (int)$clinicId : null);
 
             return $this->success($forecast);
         } catch (\Exception $e) {

@@ -11,9 +11,13 @@ use App\Http\Controllers\Controller;
 use App\Modules\Stock\Services\ClinicService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Traits\JsonResponseTrait;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ClinicController extends Controller
 {
+    use JsonResponseTrait;
     protected $clinicService;
 
     public function __construct(ClinicService $clinicService)
@@ -21,17 +25,18 @@ class ClinicController extends Controller
         $this->clinicService = $clinicService;
     }
 
-    public function index()
+    public function index(): JsonResponse
     {
-        $clinics = $this->clinicService->getAllClinics();
-
-        return response()->json([
-            'success' => true,
-            'data' => $clinics
-        ]);
+        try {
+            $clinics = $this->clinicService->getAllClinics();
+            return $this->success($clinics);
+        } catch (\Exception $e) {
+            Log::error('Klinikler listelenirken hata oluştu: ' . $e->getMessage());
+            return $this->error('Klinikler listelenirken bir hata oluştu.', 500);
+        }
     }
 
-    public function store(Request $request)
+    public function store(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
@@ -54,46 +59,35 @@ class ClinicController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->error('Validasyon hatası', 422, $validator->errors()->toArray());
         }
 
         try {
             $clinic = $this->clinicService->createClinic($validator->validated());
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Klinik başarıyla oluşturuldu',
-                'data' => $clinic
-            ], 201);
+            return $this->success($clinic, 'Klinik başarıyla oluşturuldu', 201);
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            Log::error('Klinik oluşturulurken hata: ' . $e->getMessage());
+            return $this->error($e->getMessage(), 400);
         }
     }
 
-    public function show($id)
+    public function show($id): JsonResponse
     {
-        $clinic = $this->clinicService->getClinicById($id);
+        try {
+            $clinic = $this->clinicService->getClinicById($id);
 
-        if (!$clinic) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Klinik bulunamadı'
-            ], 404);
+            if (!$clinic) {
+                return $this->error('Klinik bulunamadı', 404);
+            }
+
+            return $this->success($clinic);
+        } catch (\Exception $e) {
+            Log::error('Klinik getirilirken hata: ' . $e->getMessage());
+            return $this->error('Klinik getirilirken bir hata oluştu.', 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $clinic
-        ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): JsonResponse
     {
         $validator = Validator::make($request->all(), [
             'name' => 'sometimes|required|string|max:255',
@@ -116,103 +110,85 @@ class ClinicController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+            return $this->error('Validasyon hatası', 422, $validator->errors()->toArray());
         }
 
         try {
             $clinic = $this->clinicService->updateClinic($id, $validator->validated());
 
             if (!$clinic) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Klinik bulunamadı'
-                ], 404);
+                return $this->error('Klinik bulunamadı', 404);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Klinik başarıyla güncellendi',
-                'data' => $clinic
-            ]);
+            return $this->success($clinic, 'Klinik başarıyla güncellendi');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            Log::error('Klinik güncellenirken hata: ' . $e->getMessage());
+            return $this->error($e->getMessage(), 400);
         }
     }
 
-    public function destroy($id)
+    public function destroy($id): JsonResponse
     {
         try {
             $deleted = $this->clinicService->deleteClinic($id);
 
             if (!$deleted) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Klinik bulunamadı veya silme işlemi başarısız'
-                ], 404);
+                return $this->error('Klinik bulunamadı veya silme işlemi başarısız', 404);
             }
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Klinik başarıyla silindi'
-            ]);
+            return $this->success(null, 'Klinik başarıyla silindi');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
+            Log::error('Klinik silinirken hata: ' . $e->getMessage());
+            return $this->error($e->getMessage(), 400);
         }
     }
 
-    public function getActive()
+    public function getActive(): JsonResponse
     {
-        $clinics = $this->clinicService->getActiveClinics();
-
-        return response()->json([
-            'success' => true,
-            'data' => $clinics
-        ]);
-    }
-
-    public function getStats()
-    {
-        $stats = $this->clinicService->getClinicStats();
-
-        return response()->json([
-            'success' => true,
-            'data' => $stats
-        ]);
-    }
-
-    public function getStocks($id)
-    {
-        $clinic = $this->clinicService->getClinicById($id);
-
-        if (!$clinic) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Klinik bulunamadı'
-            ], 404);
+        try {
+            $clinics = $this->clinicService->getActiveClinics();
+            return $this->success($clinics);
+        } catch (\Exception $e) {
+            Log::error('Aktif klinikler getirilirken hata: ' . $e->getMessage());
+            return $this->error('Aktif klinikler getirilirken hata oluştu.', 500);
         }
-
-        return response()->json([
-            'success' => true,
-            'data' => $clinic->stocks
-        ]);
     }
 
-    public function getSummary($id)
+    public function getStats(): JsonResponse
     {
-        $summary = $this->clinicService->getClinicStockSummary($id);
+        try {
+            $stats = $this->clinicService->getClinicStats();
+            return $this->success($stats);
+        } catch (\Exception $e) {
+            Log::error('Klinik istatistikleri getirilirken hata: ' . $e->getMessage());
+            return $this->error('İstatistikler getirilirken hata oluştu.', 500);
+        }
+    }
 
-        return response()->json([
-            'success' => true,
-            'data' => $summary
-        ]);
+    public function getStocks($id): JsonResponse
+    {
+        try {
+            $clinic = $this->clinicService->getClinicById($id);
+
+            if (!$clinic) {
+                return $this->error('Klinik bulunamadı', 404);
+            }
+
+            return $this->success($clinic->stocks);
+        } catch (\Exception $e) {
+            Log::error('Klinik stokları getirilirken hata: ' . $e->getMessage());
+            return $this->error('Klinik stokları getirilirken hata oluştu.', 500);
+        }
+    }
+
+    public function getSummary($id): JsonResponse
+    {
+        try {
+            $summary = $this->clinicService->getClinicStockSummary($id);
+            return $this->success($summary);
+        } catch (\Exception $e) {
+            Log::error('Klinik özeti getirilirken hata: ' . $e->getMessage());
+            return $this->error('Klinik özeti getirilirken hata oluştu.', 500);
+        }
     }
 }
