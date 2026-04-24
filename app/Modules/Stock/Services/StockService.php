@@ -222,15 +222,13 @@ class StockService
 
     public function forceDeleteStock(int $id): bool
     {
-        $stock = Stock::withTrashed()->find($id);
-        return $stock ? $stock->forceDelete() : false;
+        return $this->stockRepository->forceDelete($id);
     }
 
-    public function getStockStats(int $clinicId = null): array
+    public function getStockStats(int $companyId, int $clinicId = null): array
     {
         // Cache yönetimi artık ClearStockCacheListener üzerinden yapılıyor.
         // Bu metod doğrudan DB sorgusu yapar; listener 5 dk'da bir cache'i yeniler.
-        $companyId = Auth::user()->company_id;
         $cacheKey  = "stock_stats_{$companyId}_" . ($clinicId ?? 'all');
 
         return \Illuminate\Support\Facades\Cache::remember($cacheKey, now()->addMinutes(5), function () use ($clinicId) {

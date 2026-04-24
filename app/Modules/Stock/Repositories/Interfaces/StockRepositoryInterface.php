@@ -13,6 +13,7 @@ interface StockRepositoryInterface
     public function create(array $data): Stock;
     public function update(int $id, array $data): ?Stock;
     public function delete(int $id): bool;
+    public function forceDelete(int $id): bool;
     public function getAllWithFilters(array $filters): Collection;
     public function getLowStockItems(int $clinicId = null): Collection;
     public function getCriticalStockItems(int $clinicId = null): Collection;

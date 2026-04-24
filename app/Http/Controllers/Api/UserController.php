@@ -14,7 +14,7 @@ class UserController extends Controller
 {
     use JsonResponseTrait;
 
-    public function index(): JsonResponse
+    public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         $user = Auth::user();
         
@@ -24,7 +24,17 @@ class UserController extends Controller
             $query->where('company_id', $user->company_id);
         }
 
-        $users = $query->with('roles')->get();
+        // Frontend'den gelen arama (search) parametresi
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
+
+        $perPage = $request->get('per_page', 15);
+        $users = $query->with('roles')->paginate($perPage);
 
         return $this->success($users, 'Users retrieved successfully.');
     }
@@ -34,6 +44,10 @@ class UserController extends Controller
      */
     public function store(\Illuminate\Http\Request $request): JsonResponse
     {
+        if (!Auth::user()->can('manage-users')) {
+            return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
+        }
+
         $validator = \Illuminate\Support\Facades\Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
@@ -94,6 +108,10 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
+        if (!Auth::user()->can('manage-users')) {
+            return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
+        }
+
         $companyId = Auth::user()->company_id;
 
         $user = User::where('company_id', $companyId)->find($id);
@@ -125,6 +143,10 @@ class UserController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
+        if (!Auth::user()->can('manage-users')) {
+            return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
+        }
+
         $currentUser = Auth::user();
         $companyId = $currentUser->company_id;
 

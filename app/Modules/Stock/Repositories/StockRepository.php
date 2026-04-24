@@ -59,6 +59,12 @@ class StockRepository implements StockRepositoryInterface
         return $stock ? $stock->delete() : false;
     }
 
+    public function forceDelete(int $id): bool
+    {
+        $stock = $this->model->withTrashed()->find($id);
+        return $stock ? $stock->forceDelete() : false;
+    }
+
     public function getAllWithFilters(array $filters): Collection
     {
         $query = $this->model->with(['supplier', 'clinic']);

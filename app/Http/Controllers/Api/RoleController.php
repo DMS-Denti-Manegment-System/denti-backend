@@ -62,7 +62,10 @@ class RoleController extends Controller
             'company_id' => auth()->user()->company_id,
         ]);
 
-        $role->syncPermissions($request->permissions);
+        $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
+        $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
+
+        $role->syncPermissions($requestedPermissions);
 
         return $this->success($role->load('permissions'), 'Role created successfully.', 201);
     }
@@ -72,6 +75,10 @@ class RoleController extends Controller
      */
     public function show(Role $role): JsonResponse
     {
+        if ($role->company_id !== null && $role->company_id !== auth()->user()->company_id) {
+            return $this->error('Unauthorized', 403);
+        }
+
         return $this->success($role->load('permissions'), 'Role retrieved successfully.');
     }
 
@@ -80,11 +87,22 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
     {
+        if ($role->company_id !== null && $role->company_id !== auth()->user()->company_id) {
+            return $this->error('Unauthorized', 403);
+        }
+
+        if ($role->company_id === null && !auth()->user()->hasRole('Super Admin')) {
+            return $this->error('System roles cannot be modified.', 403);
+        }
+
         $role->update([
             'name' => $request->name,
         ]);
 
-        $role->syncPermissions($request->permissions);
+        $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
+        $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
+
+        $role->syncPermissions($requestedPermissions);
 
         return $this->success($role->load('permissions'), 'Role updated successfully.');
     }
@@ -94,6 +112,14 @@ class RoleController extends Controller
      */
     public function destroy(Role $role): JsonResponse
     {
+        if ($role->company_id !== null && $role->company_id !== auth()->user()->company_id) {
+            return $this->error('Unauthorized', 403);
+        }
+
+        if ($role->company_id === null) {
+            return $this->error('System roles cannot be deleted.', 403);
+        }
+
         if ($role->name === 'Company Owner' || $role->name === 'Super Admin') {
             return $this->error('System roles cannot be deleted.', 403);
         }

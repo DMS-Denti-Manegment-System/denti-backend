@@ -14,7 +14,7 @@ class Stock extends Model
 {
     use Tenantable, SoftDeletes;
     
-    protected $appends = ['total_base_units', 'stock_status', 'is_expired', 'is_near_expiry', 'days_to_expiry'];
+    protected $appends = [];
 
     protected $fillable = [
         'name', 'code', 'description', 'unit', 'category', 'brand',
@@ -179,22 +179,6 @@ class Stock extends Model
         static::creating(function ($stock) {
             if (!isset($stock->is_active)) {
                 $stock->is_active = true;
-            }
-            if (!isset($stock->status)) {
-                $stock->status = $stock->is_active ? 'active' : 'inactive';
-            }
-            if (!isset($stock->available_stock)) {
-                $stock->available_stock = $stock->current_stock - ($stock->reserved_stock ?? 0);
-            }
-        });
-
-        static::updating(function ($stock) {
-            if ($stock->isDirty('is_active')) {
-                $stock->status = $stock->is_active ? 'active' : 'inactive';
-            }
-
-            if ($stock->isDirty(['current_stock', 'reserved_stock'])) {
-                $stock->available_stock = $stock->current_stock - ($stock->reserved_stock ?? 0);
             }
         });
 

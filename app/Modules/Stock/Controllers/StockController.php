@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
+use App\Modules\Stock\Resources\StockResource;
 
 class StockController extends Controller
 {
@@ -36,10 +37,10 @@ class StockController extends Controller
 
             $stocks = $this->stockService->getAllStocks($filters);
 
-            return $this->success($stocks);
+            return $this->success(StockResource::collection($stocks));
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -52,10 +53,10 @@ class StockController extends Controller
                 return $this->error('Stok bulunamadı', 404);
             }
 
-            return $this->success($stock);
+            return $this->success(new StockResource($stock));
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -74,10 +75,10 @@ class StockController extends Controller
 
             $stock = $this->stockService->createStock($data);
 
-            return $this->success($stock, 'Stok başarıyla oluşturuldu', 201);
+            return $this->success(new StockResource($stock), 'Stok başarıyla oluşturuldu', 201);
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -96,10 +97,10 @@ class StockController extends Controller
                 return $this->error('Stok bulunamadı', 404);
             }
 
-            return $this->success($stock, 'Stok başarıyla güncellendi');
+            return $this->success(new StockResource($stock), 'Stok başarıyla güncellendi');
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -115,7 +116,7 @@ class StockController extends Controller
             return $this->success(null, 'Stok başarıyla silindi');
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -149,14 +150,14 @@ class StockController extends Controller
                 $isSubUnit
             );
 
-            return $this->success($this->stockService->getStockById((int)$id), 'Stok başarıyla düzeltildi');
+            return $this->success(new StockResource($this->stockService->getStockById((int)$id)), 'Stok başarıyla düzeltildi');
         } catch (StockNotFoundException $e) {
             return $this->error($e->getMessage(), 404);
         } catch (InsufficientStockException $e) {
             return $this->error($e->getMessage(), 400);
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -194,14 +195,14 @@ class StockController extends Controller
                 $notes
             );
 
-            return $this->success($this->stockService->getStockById((int)$id), 'Stok kullanımı kaydedildi');
+            return $this->success(new StockResource($this->stockService->getStockById((int)$id)), 'Stok kullanımı kaydedildi');
         } catch (StockNotFoundException $e) {
             return $this->error($e->getMessage(), 404);
         } catch (InsufficientStockException $e) {
             return $this->error($e->getMessage(), 400);
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -211,10 +212,10 @@ class StockController extends Controller
             $clinicId = $request->query('clinic_id');
             $items = $this->stockService->getLowStockItems($clinicId ? (int)$clinicId : null);
 
-            return $this->success($items);
+            return $this->success(StockResource::collection($items));
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -224,10 +225,10 @@ class StockController extends Controller
             $clinicId = $request->query('clinic_id');
             $items = $this->stockService->getCriticalStockItems($clinicId ? (int)$clinicId : null);
 
-            return $this->success($items);
+            return $this->success(StockResource::collection($items));
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -238,10 +239,10 @@ class StockController extends Controller
             $clinicId = $request->query('clinic_id');
             $items = $this->stockService->getExpiringItems((int)$days, $clinicId ? (int)$clinicId : null);
 
-            return $this->success($items);
+            return $this->success(StockResource::collection($items));
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -249,12 +250,14 @@ class StockController extends Controller
     {
         try {
             $clinicId = $request->query('clinic_id');
-            $stats = $this->stockService->getStockStats($clinicId ? (int)$clinicId : null);
+            $companyId = auth()->user()->company_id;
+            
+            $stats = $this->stockService->getStockStats($companyId, $clinicId ? (int)$clinicId : null);
 
             return $this->success($stats);
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -270,7 +273,7 @@ class StockController extends Controller
             return $this->success(null, 'Stok kalıcı olarak silindi');
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -288,10 +291,10 @@ class StockController extends Controller
                 'status' => 'inactive'
             ]);
 
-            return $this->success($updatedStock, 'Stok pasif duruma getirildi');
+            return $this->success(new StockResource($updatedStock), 'Stok pasif duruma getirildi');
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 
@@ -309,10 +312,10 @@ class StockController extends Controller
                 'status' => 'active'
             ]);
 
-            return $this->success($updatedStock, 'Stok tekrar aktif edildi');
+            return $this->success(new StockResource($updatedStock), 'Stok tekrar aktif edildi');
         } catch (\Exception $e) {
             Log::error($e);
-            return $this->error('Sunucu tarafında bir hata oluştu, lütfen daha sonra tekrar deneyin.', 500);
+            return $this->error(__('messages.server_error'), 500);
         }
     }
 }

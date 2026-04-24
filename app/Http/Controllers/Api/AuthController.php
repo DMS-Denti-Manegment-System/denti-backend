@@ -35,9 +35,8 @@ class AuthController extends Controller
             return $this->success([
                 'user'        => $user,
                 'roles'       => $user->getRoleNames(),
-                // getDirectPermissions: sadece kullanıcıya direkt atanan yetkiler
-                // getAllPermissions yerine kullanılıyor — rol üzerinden gelen yükleri düşürür
-                'permissions' => $user->getDirectPermissions()->pluck('name'),
+                // Rol üzerinden gelenler dahil tüm yetkiler
+                'permissions' => $user->getAllPermissions()->pluck('name'),
                 'company'     => $user->company
             ], 'Login successful');
         }
@@ -47,7 +46,9 @@ class AuthController extends Controller
             'ip' => $request->ip()
         ]);
 
-        return $this->error('Invalid credentials', 401);
+        return $this->error('Geçersiz e-posta veya şifre', 422, [
+            'email' => ['Geçersiz e-posta veya şifre girdiniz.']
+        ]);
     }
 
     public function me(Request $request): JsonResponse
@@ -57,7 +58,7 @@ class AuthController extends Controller
         return $this->success([
             'user'        => $user,
             'roles'       => $user->getRoleNames(),
-            'permissions' => $user->getDirectPermissions()->pluck('name'),
+            'permissions' => $user->getAllPermissions()->pluck('name'),
             'company'     => $user->company
         ]);
     }
