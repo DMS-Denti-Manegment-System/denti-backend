@@ -67,7 +67,7 @@ class StockRepository implements StockRepositoryInterface
 
     public function getAllWithFilters(array $filters, int $perPage = 50)
     {
-        $query = $this->model->with(['supplier', 'clinic']);
+        $query = $this->model->with(['supplier', 'clinic', 'alerts']);
 
         if (!empty($filters['clinic_id'])) {
             $query->where('clinic_id', $filters['clinic_id']);

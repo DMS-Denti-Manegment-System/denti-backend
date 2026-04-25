@@ -133,13 +133,18 @@ class StockService
      * @throws StockNotFoundException    Stok bulunamazsa
      * @throws InsufficientStockException Yeterli stok yoksa
      */
-    public function useStock(int $stockId, int $quantity, string $performedBy, string $notes = null): bool
+    public function useStock(int $stockId, int $quantity, string $performedBy, string $notes = null, bool $isFromReserved = false): bool
     {
-        return DB::transaction(function () use ($stockId, $quantity, $performedBy, $notes) {
+        return DB::transaction(function () use ($stockId, $quantity, $performedBy, $notes, $isFromReserved) {
             // 🔒 Pessimistic lock: eşzamanlı kullanımlarda veri bütünlüğünü korur
             $stock = $this->stockRepository->findAndLock($stockId);
             if (!$stock) {
                 throw new StockNotFoundException($stockId);
+            }
+
+            // 🛡️ Eğer rezerve stoktan kullanılıyorsa, reserved_stock kontrolü yap
+            if ($isFromReserved && $stock->reserved_stock < $quantity) {
+                throw new InsufficientStockException($stock->reserved_stock, $quantity, 'Yeterli rezerve stok bulunmamaktadır.');
             }
 
             $isSubUnitUsage = $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
@@ -157,19 +162,31 @@ class StockService
                     throw new InsufficientStockException($stock->total_base_units, $quantity);
                 }
 
+                $newReservedStock = $isFromReserved ? ($stock->reserved_stock - $quantity) : $stock->reserved_stock;
+
                 $updateData = array_merge($newLevels, [
-                    'available_stock'      => $newLevels['current_stock'] - $stock->reserved_stock,
+                    'reserved_stock'       => $newReservedStock,
+                    'available_stock'      => $newLevels['current_stock'] - $newReservedStock,
                     'internal_usage_count' => $stock->internal_usage_count + $quantity
                 ]);
             } else {
-                if ($stock->available_stock < $quantity) {
+                // Rezerve olmayan stok kullanımı için available_stock kontrolü
+                if (!$isFromReserved && $stock->available_stock < $quantity) {
                     throw new InsufficientStockException($stock->available_stock, $quantity);
                 }
 
-                $newMainStock = $stock->current_stock - $quantity;
+                // Rezerve stok kullanımı için total current_stock kontrolü (zaten yukarıda reserved kontrolü yaptık)
+                if ($isFromReserved && $stock->current_stock < $quantity) {
+                    throw new InsufficientStockException($stock->current_stock, $quantity);
+                }
+
+                $newMainStock     = $stock->current_stock - $quantity;
+                $newReservedStock = $isFromReserved ? ($stock->reserved_stock - $quantity) : $stock->reserved_stock;
+
                 $updateData   = [
                     'current_stock'        => $newMainStock,
-                    'available_stock'      => $newMainStock - $stock->reserved_stock,
+                    'reserved_stock'       => $newReservedStock,
+                    'available_stock'      => $newMainStock - $newReservedStock,
                     'internal_usage_count' => $stock->internal_usage_count + $quantity
                 ];
             }
@@ -290,13 +307,10 @@ class StockService
     {
         $date = now()->format('Ymd');
         
-        do {
-            $uuid = strtoupper(substr(Str::uuid()->toString(), 0, 8));
-            $number = 'TXN-' . $date . '-' . $uuid;
-            // Veritabanında çakışma kontrolü (opsiyonel ama güvenlik için iyi)
-            $exists = DB::table('stock_transactions')->where('transaction_number', $number)->exists();
-        } while ($exists);
-
-        return $number;
+        // 🛡️ High Concurrency Fix: Döngü ve Select yerine try-catch veya doğrudan atomik üretim.
+        // Burada select'i kaldırıp sadece üretim yapıyoruz. 
+        // Eğer collision olursa DB Unique Index hata fırlatacak ve bir üst katman (DB::transaction) retry yapacak.
+        $uuid = strtoupper(substr(Str::uuid()->toString(), 0, 8));
+        return 'TXN-' . $date . '-' . $uuid;
     }
 }

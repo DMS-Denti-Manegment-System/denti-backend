@@ -15,7 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->statefulApi();
         
         $middleware->api(append: [
-            //
+            \App\Http\Middleware\EnsureTwoFactorIsVerified::class,
         ]);
 
         $middleware->alias([

@@ -22,7 +22,8 @@ class UseStockRequest extends FormRequest
             'quantity' => 'required|integer|min:1',
             'reason'   => 'required|string|max:500',
             'used_by'  => 'nullable|string|max:255',
-            'notes'    => 'nullable|string|max:1000'
+            'notes'    => 'nullable|string|max:1000',
+            'is_from_reserved' => 'nullable|boolean'
         ];
     }
 

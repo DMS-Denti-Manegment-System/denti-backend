@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Modules\Stock\Resources\StockResource;
+use App\Modules\Stock\Models\Stock;
 
 class StockController extends Controller
 {
@@ -40,6 +41,8 @@ class StockController extends Controller
             // 🛡️ Güvenlik: Sayfalama limitine üst sınır koy (DDoS koruması)
             $perPage = min((int)$request->query('per_page', 50), 100);
 
+            $this->authorize('viewAny', Stock::class);
+
             $stocks = $this->stockService->getAllStocks($filters, $perPage);
 
             return $this->success(StockResource::collection($stocks));
@@ -57,6 +60,8 @@ class StockController extends Controller
             if (!$stock) {
                 return $this->error('Stok bulunamadı', 404);
             }
+
+            $this->authorize('view', $stock);
 
             return $this->success(new StockResource($stock));
         } catch (\Exception $e) {
@@ -78,6 +83,8 @@ class StockController extends Controller
             $data['track_expiry'] = $data['track_expiry'] ?? true;
             $data['track_batch'] = $data['track_batch'] ?? false;
 
+            $this->authorize('create', Stock::class);
+
             $stock = $this->stockService->createStock($data);
 
             return $this->success(new StockResource($stock), 'Stok başarıyla oluşturuldu', 201);
@@ -96,11 +103,14 @@ class StockController extends Controller
                 $data['status'] = $data['is_active'] ? 'active' : 'inactive';
             }
 
-            $stock = $this->stockService->updateStock((int)$id, $data);
-
+            $stock = $this->stockService->getStockById((int)$id);
             if (!$stock) {
                 return $this->error('Stok bulunamadı', 404);
             }
+
+            $this->authorize('update', $stock);
+
+            $stock = $this->stockService->updateStock((int)$id, $data);
 
             return $this->success(new StockResource($stock), 'Stok başarıyla güncellendi');
         } catch (\Exception $e) {
@@ -112,11 +122,14 @@ class StockController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
-            $deleted = $this->stockService->deleteStock((int)$id);
-
-            if (!$deleted) {
+            $stock = $this->stockService->getStockById((int)$id);
+            if (!$stock) {
                 return $this->error('Stok bulunamadı', 404);
             }
+
+            $this->authorize('delete', $stock);
+
+            $deleted = $this->stockService->deleteStock((int)$id);
 
             return $this->success(null, 'Stok başarıyla silindi');
         } catch (\Exception $e) {
@@ -134,6 +147,13 @@ class StockController extends Controller
             
             // 🔒 Güvenlik: Kim yaptı bilgisini asla client'tan alma, oturum'dan al
             $performedBy = auth()->user()->name;
+
+            $stock = $this->stockService->getStockById((int)$id);
+            if (!$stock) {
+                throw new StockNotFoundException($id);
+            }
+
+            $this->authorize('adjust', $stock);
 
             $this->stockService->adjustStock(
                 (int)$id,
@@ -169,11 +189,19 @@ class StockController extends Controller
             // 🔒 Güvenlik: Kim yaptı bilgisini asla client'tan alma, oturum'dan al
             $performedBy = auth()->user()->name;
 
+            $stock = $this->stockService->getStockById((int)$id);
+            if (!$stock) {
+                throw new StockNotFoundException($id);
+            }
+
+            $this->authorize('use', $stock);
+
             $this->stockService->useStock(
                 (int)$id,
                 $data['quantity'],
                 $performedBy,
-                $notes
+                $notes,
+                $data['is_from_reserved'] ?? false
             );
 
             return $this->success(new StockResource($this->stockService->getStockById((int)$id)), 'Stok kullanımı kaydedildi');
@@ -190,6 +218,7 @@ class StockController extends Controller
     public function getLowLevel(Request $request): JsonResponse
     {
         try {
+            $this->authorize('viewAny', Stock::class);
             $clinicId = $request->query('clinic_id');
             $items = $this->stockService->getLowStockItems($clinicId ? (int)$clinicId : null);
 
@@ -203,6 +232,7 @@ class StockController extends Controller
     public function getCriticalLevel(Request $request): JsonResponse
     {
         try {
+            $this->authorize('viewAny', Stock::class);
             $clinicId = $request->query('clinic_id');
             $items = $this->stockService->getCriticalStockItems($clinicId ? (int)$clinicId : null);
 
@@ -216,6 +246,7 @@ class StockController extends Controller
     public function getExpiring(Request $request): JsonResponse
     {
         try {
+            $this->authorize('viewAny', Stock::class);
             $days = $request->query('days', 30);
             $clinicId = $request->query('clinic_id');
             $items = $this->stockService->getExpiringItems((int)$days, $clinicId ? (int)$clinicId : null);
@@ -230,6 +261,7 @@ class StockController extends Controller
     public function getStats(Request $request): JsonResponse
     {
         try {
+            $this->authorize('viewAny', Stock::class);
             $clinicId = $request->query('clinic_id');
             $companyId = auth()->user()->company_id;
             

@@ -28,6 +28,8 @@ class AppServiceProvider extends ServiceProvider
         Event::listen(StockLevelChanged::class, CheckStockAlertsListener::class);
         Event::listen(StockLevelChanged::class, ClearStockCacheListener::class);
 
+        Gate::policy(\App\Modules\Stock\Models\Stock::class, \App\Modules\Stock\Policies\StockPolicy::class);
+
         // Implicitly grant "Super Admin" role all permissions
         // This works in the app by using gate-related functions like auth()->user->can() and @can()
         Gate::before(function ($user, $ability) {
