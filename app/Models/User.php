@@ -18,6 +18,8 @@ class User extends Authenticatable
     const ROLE_SUPER_ADMIN = 'Super Admin';
     const ROLE_OWNER = 'Owner';
 
+    protected $guard_name = 'web';
+
     /**
      * The attributes that are mass assignable.
      *

@@ -41,6 +41,10 @@ class RolesAndPermissionsSeeder extends Seeder
             'manage-users',
             'manage-company',
             'view-audit-logs',
+
+            // Todo yetkileri
+            'view-todos',
+            'manage-todos',
         ];
 
         foreach ($permissions as $permission) {
@@ -61,19 +65,19 @@ class RolesAndPermissionsSeeder extends Seeder
         $manager = Role::findOrCreate('Clinic Manager', 'web');
         $manager->givePermissionTo([
             'view-stocks', 'create-stocks', 'update-stocks', 'adjust-stocks', 'use-stocks',
-            'view-clinics', 'view-reports', 'export-reports', 'manage-users'
+            'view-clinics', 'view-reports', 'export-reports', 'manage-users', 'view-todos', 'manage-todos'
         ]);
 
         // 4. Doctor
         $doctor = Role::findOrCreate('Doctor', 'web');
         $doctor->givePermissionTo([
-            'view-stocks', 'use-stocks', 'view-clinics'
+            'view-stocks', 'use-stocks', 'view-clinics', 'view-todos', 'manage-todos'
         ]);
 
         // 5. Secretary
         $secretary = Role::findOrCreate('Secretary', 'web');
         $secretary->givePermissionTo([
-            'view-stocks', 'use-stocks', 'view-clinics'
+            'view-stocks', 'use-stocks', 'view-clinics', 'view-todos', 'manage-todos'
         ]);
     }
 }
