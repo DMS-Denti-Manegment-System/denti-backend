@@ -139,16 +139,26 @@ class ClinicController extends Controller
     public function destroy($id): JsonResponse
     {
         try {
+            $clinic = $this->clinicService->getClinicById($id);
+            if (!$clinic) {
+                return $this->error('Klinik bulunamadı', 404);
+            }
+
+            // Super Admin değilse kendi şirketinin kliniği mi kontrol et
+            if (!auth()->user()->hasRole('Super Admin') && $clinic->company_id !== auth()->user()->company_id) {
+                return $this->error('Bu işlem için yetkiniz yok.', 403);
+            }
+
             $deleted = $this->clinicService->deleteClinic($id);
 
             if (!$deleted) {
-                return $this->error('Klinik bulunamadı veya silme işlemi başarısız', 404);
+                return $this->error('Klinik silme işlemi başarısız.', 400);
             }
 
             return $this->success(null, 'Klinik başarıyla silindi');
         } catch (\Exception $e) {
             Log::error('Klinik silinirken hata: ' . $e->getMessage());
-            return $this->error($e->getMessage(), 400);
+            return $this->error('Silme hatası: ' . $e->getMessage(), 400);
         }
     }
 

@@ -10,10 +10,11 @@ use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockRequest extends Model
 {
-    use Tenantable;
+    use Tenantable, SoftDeletes;
 
     protected $fillable = [
         'request_number', 'requester_clinic_id', 'requested_from_clinic_id',

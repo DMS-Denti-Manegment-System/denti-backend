@@ -73,10 +73,13 @@ class SupplierRepository implements SupplierRepositoryInterface
     public function delete(int $id): bool
     {
         $supplier = $this->find($id);
-        if ($supplier && $supplier->stocks()->count() === 0) {
+        if (!$supplier) return false;
+
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($supplier) {
+            // Tedarikçi silindiğinde stoklarını da pasif/silinmiş yapalım
+            $supplier->stocks()->delete(); 
             return $supplier->delete();
-        }
-        return false;
+        });
     }
 
     public function getActive(): Collection

@@ -73,10 +73,13 @@ class ClinicRepository implements ClinicRepositoryInterface
     public function delete(int $id): bool
     {
         $clinic = $this->find($id);
-        if ($clinic && $clinic->stocks()->count() === 0) {
+        if (!$clinic) return false;
+
+        return DB::transaction(function () use ($clinic) {
+            // Klinik silindiğinde stoklarını da pasif/silinmiş yapalım
+            $clinic->stocks()->delete(); // Soft delete stocks if they use it
             return $clinic->delete();
-        }
-        return false;
+        });
     }
 
     public function getActive(): Collection

@@ -125,13 +125,29 @@ class SupplierController extends Controller
     public function destroy($id)
     {
         try {
+            $supplier = $this->supplierService->getSupplierById($id);
+            if (!$supplier) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tedarikçi bulunamadı'
+                ], 404);
+            }
+
+            // Ownership check
+            if (!auth()->user()->hasRole('Super Admin') && $supplier->company_id !== auth()->user()->company_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Bu işlem için yetkiniz yok.'
+                ], 403);
+            }
+
             $deleted = $this->supplierService->deleteSupplier($id);
 
             if (!$deleted) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Tedarikçi bulunamadı veya silme işlemi başarısız'
-                ], 404);
+                    'message' => 'Tedarikçi silme işlemi başarısız'
+                ], 400);
             }
 
             return response()->json([
@@ -141,7 +157,7 @@ class SupplierController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => 'Silme hatası: ' . $e->getMessage()
             ], 400);
         }
     }

@@ -10,10 +10,11 @@ use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockAlert extends Model
 {
-    use Tenantable;
+    use Tenantable, SoftDeletes;
 
     protected $fillable = [
         'stock_id', 'clinic_id', 'type', 'title', 'message',
