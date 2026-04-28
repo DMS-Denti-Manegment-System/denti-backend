@@ -98,8 +98,6 @@ class StockController extends Controller
             // Set defaults for batch
             $data['company_id'] = auth()->user()->company_id;
             $data['currency'] = $data['currency'] ?? 'TRY';
-            $data['is_active'] = $data['is_active'] ?? true;
-            $data['status'] = $data['is_active'] ? 'active' : 'inactive';
             $data['track_expiry'] = $data['track_expiry'] ?? true;
 
             $this->authorize('create', Stock::class);

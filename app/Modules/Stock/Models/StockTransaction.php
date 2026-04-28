@@ -76,6 +76,8 @@ class StockTransaction extends Model
             'transfer_in' => 'Transfer Giriş',
             'transfer_out' => 'Transfer Çıkış',
             'adjustment' => 'Düzeltme',
+            'adjustment_increase' => 'Stok Artışı (Düzeltme)',
+            'adjustment_decrease' => 'Stok Azalışı (Düzeltme)',
             'expired' => 'Son Kullanma Tarihi Geçen',
             'damaged' => 'Hasarlı',
             'returned' => 'İade',

@@ -104,13 +104,7 @@ export const StockModals: React.FC<StockModalsProps> = ({
             style={{ marginBottom: 16 }}
           />
 
-          <Form.Item
-            label="İşlemi Yapan"
-            name="performed_by"
-            rules={[{ required: true, message: 'İşlemi yapan kişi gereklidir!' }]}
-          >
-            <Input placeholder="İşlemi yapan kişi adı" />
-          </Form.Item>
+
 
           <Form.Item
             label="İşlem Tipi"
@@ -213,13 +207,7 @@ export const StockModals: React.FC<StockModalsProps> = ({
             style={{ marginBottom: 16 }}
           />
 
-          <Form.Item
-            label="İşlemi Yapan"
-            name="performed_by"
-            rules={[{ required: true, message: 'İşlemi yapan kişi gereklidir!' }]}
-          >
-            <Input placeholder="İşlemi yapan kişi adı" />
-          </Form.Item>
+
 
           <Form.Item
             label={`Kullanılacak Miktar ${selectedStock?.has_sub_unit ? '(' + selectedStock?.sub_unit_name + ' / Doz)' : ''}`}

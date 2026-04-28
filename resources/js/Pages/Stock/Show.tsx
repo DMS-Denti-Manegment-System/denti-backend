@@ -88,9 +88,9 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                 ]} />
             </div>
 
-            <Space direction="vertical" size="large" style={{ width: '100%' }}>
+            <Space orientation="vertical" size="large" style={{ width: '100%' }}>
                 {/* Header Card */}
-                <Card bordered={false} className="premium-card">
+                <Card variant="borderless" className="premium-card">
                     <Row gutter={24} align="middle">
                         <Col flex="auto">
                             <Space align="center" size="middle">
@@ -152,14 +152,14 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                             <Statistic 
                                 title="Minimum Seviye" 
                                 value={data.min_stock_level} 
-                                valueStyle={{ color: '#faad14' }}
+                                styles={{ content: { color: '#faad14' } }}
                             />
                         </Col>
                         <Col span={6}>
                             <Statistic 
                                 title="Kritik Seviye" 
                                 value={data.critical_stock_level} 
-                                valueStyle={{ color: '#ff4d4f' }}
+                                styles={{ content: { color: '#ff4d4f' } }}
                             />
                         </Col>
                     </Row>
@@ -167,13 +167,13 @@ const ProductShow = ({ product: initialProduct }: Props) => {
 
                 {/* Content Tabs */}
                 <Tabs
-                    defaultActiveKey="batches"
+                    defaultActiveKey={data.has_expiration_date ? 'batches' : 'history'}
                     items={[
-                        {
+                        ...(data.has_expiration_date ? [{
                             key: 'batches',
-                            label: <span><DatabaseOutlined /> {data.has_expiration_date ? 'Stok Partileri' : 'Stok Detayları'}</span>,
+                            label: <span><DatabaseOutlined /> Stok Partileri</span>,
                             children: (
-                                <Card bordered={false} className="premium-card">
+                                <Card variant="borderless" className="premium-card">
                                     <StockTable 
                                         stocks={data.batches || []}
                                         loading={isLoading}
@@ -189,12 +189,12 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                                     />
                                 </Card>
                             )
-                        },
+                        }] : []),
                         {
                             key: 'history',
                             label: <span><HistoryOutlined /> İşlem Geçmişi</span>,
                             children: (
-                                <Card bordered={false} className="premium-card">
+                                <Card variant="borderless" className="premium-card">
                                     <Table 
                                         dataSource={transactions || []}
                                         loading={isHistoryLoading}
@@ -214,6 +214,8 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                                                         'purchase': { label: 'Alım', color: 'green' },
                                                         'usage': { label: 'Kullanım', color: 'blue' },
                                                         'adjustment': { label: 'Düzeltme', color: 'orange' },
+                                                        'adjustment_increase': { label: 'Stok Artışı', color: 'green' },
+                                                        'adjustment_decrease': { label: 'Stok Azalışı', color: 'red' },
                                                         'transfer_in': { label: 'Transfer (Gelen)', color: 'cyan' },
                                                         'transfer_out': { label: 'Transfer (Giden)', color: 'magenta' }
                                                     };
@@ -253,7 +255,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                             key: 'report',
                             label: <span><LineChartOutlined /> Grafik / Analiz</span>,
                             children: (
-                                <Card bordered={false} className="premium-card">
+                                <Card variant="borderless" className="premium-card">
                                     <Title level={5}>Stok Değişim Trendi</Title>
                                     {(transactions || []).length > 0 ? (
                                         <div style={{ height: 350, width: '100%', marginTop: 24 }}>
@@ -303,7 +305,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                             key: 'info',
                             label: <span><InfoCircleOutlined /> Ürün Bilgileri</span>,
                             children: (
-                                <Card bordered={false} className="premium-card">
+                                <Card variant="borderless" className="premium-card">
                                     <Row gutter={[32, 24]}>
                                         <Col span={12}>
                                             <Space direction="vertical" size="middle" style={{ width: '100%' }}>
@@ -362,7 +364,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                 onCancel={() => setIsAddBatchModalVisible(false)}
                 footer={null}
                 width={600}
-                destroyOnClose
+                destroyOnHidden
             >
                 <BatchForm 
                     productId={data.id} 

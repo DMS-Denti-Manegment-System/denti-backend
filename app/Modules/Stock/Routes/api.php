@@ -111,15 +111,5 @@ Route::prefix('api')->middleware(['api', 'auth:sanctum'])->group(function () {
         Route::delete('/{id}', [StockAlertController::class, 'destroy'])->middleware('permission:delete-stocks');
     });
 
-    // Stock Reports
-    Route::prefix('stock-reports')->group(function () {
-        Route::get('/summary', [StockReportController::class, 'summary'])->middleware('permission:view-reports');
-        Route::get('/movements', [StockReportController::class, 'movements'])->middleware('permission:view-reports');
-        Route::get('/top-used', [StockReportController::class, 'topUsedItems'])->middleware('permission:view-reports');
-        Route::get('/expiry', [StockReportController::class, 'expiryReport'])->middleware('permission:view-reports');
-        Route::get('/clinic-comparison', [StockReportController::class, 'clinicComparison'])->middleware('permission:view-reports');
-        Route::get('/trends', [StockReportController::class, 'trends'])->middleware('permission:view-reports');
-        Route::get('/categories', [StockReportController::class, 'categories'])->middleware('permission:view-reports');
-        Route::get('/forecast', [StockReportController::class, 'forecast'])->middleware('permission:view-reports');
-    });
+
 });

@@ -34,6 +34,9 @@ class StoreProductRequest extends FormRequest
             'purchase_date' => 'nullable|date',
             'expiry_date' => 'nullable|date',
             'storage_location' => 'nullable|string|max:100',
+            'has_sub_unit' => 'boolean',
+            'sub_unit_name' => 'nullable|string|max:50',
+            'sub_unit_multiplier' => 'nullable|integer|min:1',
         ];
     }
 }

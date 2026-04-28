@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use App\Modules\Stock\Requests\StoreProductRequest;
+use App\Modules\Stock\Resources\StockTransactionResource;
 
 class ProductController extends Controller
 {

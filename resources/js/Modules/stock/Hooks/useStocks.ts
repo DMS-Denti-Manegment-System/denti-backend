@@ -95,6 +95,7 @@ export const useProductDetail = (id: number) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['products', id] })
       queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
+      queryClient.invalidateQueries({ queryKey: ['stocks', id, 'transactions'] })
       message.success('Stok girişi başarıyla yapıldı!')
     },
     onError: handleError('Stok girişi yapılırken hata oluştu!')
@@ -196,6 +197,7 @@ export const useStocks = (filters?: StockFilter) => {
       queryClient.invalidateQueries({ queryKey: ['stocks'] })
       queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
       queryClient.invalidateQueries({ queryKey: ['stock-levels'] })
+      queryClient.invalidateQueries({ queryKey: ['stocks', 'transactions'] })
       message.success('Stok miktarı başarıyla ayarlandı!')
     },
     onError: handleError('Stok ayarlanırken hata oluştu!')
@@ -204,10 +206,13 @@ export const useStocks = (filters?: StockFilter) => {
   const useStockMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: StockUsageRequest }) =>
       stockApi.useStock(id, data),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ['stocks'] })
       queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
       queryClient.invalidateQueries({ queryKey: ['stock-levels'] })
+      // Invalidate specific product transactions if we have the product_id
+      // For now, invalidate all transactions to be safe
+      queryClient.invalidateQueries({ queryKey: ['stocks', 'transactions'] })
       message.success('Stok kullanımı başarıyla kaydedildi!')
     },
     onError: handleError('Stok kullanımı kaydedilirken hata oluştu!')

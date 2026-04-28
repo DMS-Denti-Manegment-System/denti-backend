@@ -36,6 +36,9 @@ class ProductService
                 'storage_location' => $data['storage_location'] ?? null,
                 'min_stock_level' => $data['min_stock_level'] ?? 10,
                 'critical_stock_level' => $data['critical_stock_level'] ?? 5,
+                'has_sub_unit' => $data['has_sub_unit'] ?? false,
+                'sub_unit_name' => $data['sub_unit_name'] ?? null,
+                'sub_unit_multiplier' => $data['sub_unit_multiplier'] ?? null,
             ];
 
             // Product fields only
@@ -59,9 +62,10 @@ class ProductService
                     'min_stock_level' => $stockData['min_stock_level'],
                     'critical_stock_level' => $stockData['critical_stock_level'],
                     'company_id' => $product->company_id,
-                    'is_active' => true,
-                    'status' => 'active',
                     'track_expiry' => $product->has_expiration_date,
+                    'has_sub_unit' => $stockData['has_sub_unit'],
+                    'sub_unit_name' => $stockData['sub_unit_name'],
+                    'sub_unit_multiplier' => $stockData['sub_unit_multiplier'],
                 ]);
             }
 

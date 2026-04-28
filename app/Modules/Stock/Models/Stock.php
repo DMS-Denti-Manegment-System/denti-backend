@@ -130,15 +130,15 @@ class Stock extends Model
     public function scopeNearExpiry($query, $days = null)
     {
         return $query->where('track_expiry', true)
-                    ->where('expiry_date', '<=', now()->addDays($days ?? 30))
-                    ->where('expiry_date', '>', now())
+                    ->where('expiry_date', '<=', today()->addDays($days ?? 30))
+                    ->where('expiry_date', '>', today())
                     ->where('is_active', true);
     }
 
     public function scopeExpired($query)
     {
         return $query->where('track_expiry', true)
-                    ->where('expiry_date', '<', now())
+                    ->where('expiry_date', '<', today())
                     ->where('is_active', true);
     }
 
@@ -169,20 +169,20 @@ class Stock extends Model
 
     public function getIsExpiredAttribute()
     {
-        return $this->track_expiry && $this->expiry_date < now();
+        return $this->track_expiry && $this->expiry_date < today();
     }
 
     public function getIsNearExpiryAttribute()
     {
         return $this->track_expiry &&
-               $this->expiry_date <= now()->addDays($this->expiry_yellow_days ?? 30) &&
-               $this->expiry_date > now();
+               $this->expiry_date <= today()->addDays($this->expiry_yellow_days ?? 30) &&
+               $this->expiry_date > today();
     }
 
     public function getExpiryStatusAttribute()
     {
         if (!$this->track_expiry || !$this->expiry_date) return 'normal';
-        if ($this->expiry_date < now()) return 'expired';
+        if ($this->expiry_date < today()) return 'expired';
         
         $days = $this->days_to_expiry;
         if ($days <= ($this->expiry_red_days ?? 15)) return 'critical';
@@ -201,12 +201,6 @@ class Stock extends Model
     protected static function boot()
     {
         parent::boot();
-
-        static::creating(function ($stock) {
-            if (!isset($stock->is_active)) {
-                $stock->is_active = true;
-            }
-        });
 
         static::deleting(function ($stock) {
             // Soft delete sırasında status'ü güncelle ve uyarılrı sil

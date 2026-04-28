@@ -108,7 +108,7 @@ class StockService
             $this->createTransaction([
                 'stock_id'         => $stockId,
                 'clinic_id'        => $stock->clinic_id,
-                'type'             => 'adjustment',
+                'type'             => $quantity > 0 ? 'adjustment_increase' : 'adjustment_decrease',
                 'quantity'         => abs($quantity),
                 'previous_stock'   => $previousTotal,
                 'new_stock'        => $freshStock->total_base_units,
@@ -231,6 +231,20 @@ class StockService
 
             $stock = $this->stockRepository->create($data);
 
+            // ✅ Başlangıç işlemi oluştur (Satın Alma / Giriş)
+            $this->createTransaction([
+                'stock_id'         => $stock->id,
+                'clinic_id'        => $stock->clinic_id,
+                'type'             => 'purchase',
+                'quantity'         => $stock->current_stock,
+                'previous_stock'   => 0,
+                'new_stock'        => $stock->total_base_units,
+                'description'      => 'İlk stok girişi',
+                'performed_by'     => auth()->user()?->name ?? 'Sistem',
+                'transaction_date' => now(),
+                'is_sub_unit'      => false
+            ]);
+
             DB::afterCommit(function () use ($stock) {
                 // Uyarıları tetikle ve cache temizle
                 StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
@@ -338,17 +352,29 @@ class StockService
             if (!$stock) return false;
 
             // Reverse the quantity
-            $isNegativeEffect = in_array($transaction->type, ['usage', 'damaged', 'expired', 'transfer_out']);
+            $isNegativeEffect = in_array($transaction->type, ['usage', 'damaged', 'expired', 'transfer_out', 'adjustment_decrease']);
             $quantity = $transaction->quantity;
 
-            if ($isNegativeEffect) {
-                $stock->current_stock += $quantity;
-                $stock->available_stock += $quantity;
+            if ($transaction->is_sub_unit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
+                // Use calculator service for sub-unit reversal
+                $newLevels = $this->calculatorService->calculateAdjustment(
+                    $stock->current_stock,
+                    $stock->current_sub_stock,
+                    $isNegativeEffect ? $quantity : -$quantity,
+                    $stock->sub_unit_multiplier
+                );
+                
+                $stock->current_stock = $newLevels['current_stock'];
+                $stock->current_sub_stock = $newLevels['current_sub_stock'];
             } else {
-                $stock->current_stock -= $quantity;
-                $stock->available_stock -= $quantity;
+                if ($isNegativeEffect) {
+                    $stock->current_stock += $quantity;
+                } else {
+                    $stock->current_stock -= $quantity;
+                }
             }
 
+            $stock->available_stock = $stock->current_stock - $stock->reserved_stock;
             $stock->save();
             
             // Dispatch event to update product total
