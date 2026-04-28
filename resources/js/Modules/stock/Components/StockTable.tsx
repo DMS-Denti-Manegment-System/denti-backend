@@ -106,6 +106,16 @@ export const StockTable: React.FC<StockTableProps> = ({
       render: (date) => dayjs(date).format('DD/MM/YYYY')
     },
     {
+      title: '🏥 Klinik',
+      key: 'clinic',
+      width: 150,
+      render: (_, record) => (
+        <Tag color="geekblue">
+          {isBatchMode ? record.clinic?.name : (record as any).clinic_name || '-'}
+        </Tag>
+      )
+    },
+    {
       title: isBatchMode ? '🔢 Parti Stoğu' : '🔢 Toplam Stok',
       key: 'current_stock',
       width: 150,

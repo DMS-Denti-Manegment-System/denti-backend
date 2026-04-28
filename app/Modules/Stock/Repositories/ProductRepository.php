@@ -10,7 +10,7 @@ class ProductRepository
 {
     public function getAllWithFilters(array $filters = [], int $perPage = 50): LengthAwarePaginator
     {
-        $query = Product::query()->with(['batches']);
+        $query = Product::query()->with(['batches', 'clinic']);
 
         if (!empty($filters['search'])) {
             $query->where('name', 'like', '%' . $filters['search'] . '%')
@@ -30,7 +30,7 @@ class ProductRepository
 
     public function find(int $id): ?Product
     {
-        return Product::with(['batches.supplier', 'batches.clinic'])->find($id);
+        return Product::with(['batches.supplier', 'batches.clinic', 'clinic'])->find($id);
     }
 
     public function create(array $data): Product

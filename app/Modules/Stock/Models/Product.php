@@ -17,7 +17,7 @@ class Product extends Model
         'name', 'sku', 'description', 'unit', 'category', 'brand',
         'min_stock_level', 'critical_stock_level',
         'yellow_alert_level', 'red_alert_level',
-        'is_active', 'has_expiration_date', 'company_id'
+        'is_active', 'has_expiration_date', 'company_id', 'clinic_id'
     ];
 
     protected $casts = [
@@ -27,12 +27,18 @@ class Product extends Model
         'critical_stock_level' => 'integer',
         'yellow_alert_level' => 'integer',
         'red_alert_level' => 'integer',
+        'clinic_id' => 'integer',
     ];
 
     // Relationships
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    public function clinic(): BelongsTo
+    {
+        return $this->belongsTo(Clinic::class);
     }
 
     public function batches(): HasMany

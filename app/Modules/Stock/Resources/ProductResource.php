@@ -23,6 +23,8 @@ class ProductResource extends JsonResource
             'code' => $this->sku, // Alias for compatibility
             'status' => $this->stock_status,
             'is_active' => $this->is_active,
+            'clinic_id' => $this->clinic_id,
+            'clinic_name' => $this->clinic?->name,
             'has_expiration_date' => $this->has_expiration_date,
             'batches' => StockResource::collection($this->whenLoaded('batches'))->values(),
             'created_at' => $this->created_at,

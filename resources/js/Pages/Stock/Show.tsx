@@ -371,6 +371,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                     onSubmit={handleAddBatch}
                     onCancel={() => setIsAddBatchModalVisible(false)}
                     isSubmitting={isAddingBatch}
+                    lockedClinicId={data.clinic_id}
                 />
             </Modal>
 

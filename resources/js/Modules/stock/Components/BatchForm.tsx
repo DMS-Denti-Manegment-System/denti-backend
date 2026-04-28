@@ -29,6 +29,7 @@ interface BatchFormProps {
   onCancel?: () => void
   isSubmitting?: boolean
   onSubmit: (values: any) => void
+  lockedClinicId?: number | null
 }
 
 export const BatchForm: React.FC<BatchFormProps> = ({ 
@@ -36,7 +37,8 @@ export const BatchForm: React.FC<BatchFormProps> = ({
   onSuccess, 
   onCancel,
   isSubmitting,
-  onSubmit
+  onSubmit,
+  lockedClinicId
 }) => {
   const [form] = Form.useForm()
   const { suppliers, isLoading: isSuppliersLoading } = useSuppliers()
@@ -64,7 +66,7 @@ export const BatchForm: React.FC<BatchFormProps> = ({
         track_expiry: true,
         expiry_yellow_days: 30,
         expiry_red_days: 10,
-        clinic_id: user?.clinic_id
+        clinic_id: lockedClinicId || user?.clinic_id
       }}
     >
       <Row gutter={16}>
@@ -85,7 +87,11 @@ export const BatchForm: React.FC<BatchFormProps> = ({
             name="clinic_id"
             rules={[{ required: true, message: 'Klinik seçimi gereklidir' }]}
           >
-            <Select placeholder="Klinik seçin" loading={isClinicsLoading}>
+            <Select 
+              placeholder="Klinik seçin" 
+              loading={isClinicsLoading}
+              disabled={!!lockedClinicId}
+            >
               {(clinics ?? []).map(c => <Option key={c.id} value={c.id}>{c.name}</Option>)}
             </Select>
           </Form.Item>
