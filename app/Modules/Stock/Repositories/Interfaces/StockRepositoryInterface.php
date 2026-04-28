@@ -23,4 +23,5 @@ interface StockRepositoryInterface
     public function findByCode(string $code): ?Stock;
     public function getNextSequenceNumber(int $clinicId): int;
     public function getBaseQuery();
+    public function getTransactions(int $stockId): Collection;
 }

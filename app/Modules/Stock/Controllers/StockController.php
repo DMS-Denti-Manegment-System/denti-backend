@@ -17,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use App\Modules\Stock\Resources\StockResource;
+use App\Modules\Stock\Resources\StockTransactionResource;
 use App\Modules\Stock\Models\Stock;
 
 class StockController extends Controller
@@ -64,6 +65,25 @@ class StockController extends Controller
             $this->authorize('view', $stock);
 
             return $this->success(new StockResource($stock));
+        } catch (\Exception $e) {
+            Log::error($e);
+            return $this->error(__('messages.server_error'), 500);
+        }
+    }
+
+    public function transactions($id): JsonResponse
+    {
+        try {
+            $stock = $this->stockService->getStockById((int)$id);
+            if (!$stock) {
+                return $this->error('Stok bulunamadı', 404);
+            }
+
+            $this->authorize('view', $stock);
+
+            $transactions = $this->stockService->getStockTransactions((int)$id);
+
+            return $this->success(StockTransactionResource::collection($transactions));
         } catch (\Exception $e) {
             Log::error($e);
             return $this->error(__('messages.server_error'), 500);

@@ -18,10 +18,10 @@ class Clinic extends Model
     use Tenantable, SoftDeletes;
 
     protected $fillable = [
-        'name', 'code', 'description', 'responsible_person',
+        'name', 'description', 'responsible_person',
         'phone', 'location', 'is_active', 'company_id',
         'email', 'address', 'city', 'district', 'manager_name',
-        'postal_code', 'website', 'opening_hours', 'latitude', 'longitude'
+        'postal_code', 'website', 'opening_hours'
     ];
 
     /**

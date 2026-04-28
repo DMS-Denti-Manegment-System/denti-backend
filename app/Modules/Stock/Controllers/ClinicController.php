@@ -38,12 +38,13 @@ class ClinicController extends Controller
 
     public function store(Request $request): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
             'name' => 'required|string|max:255',
-            'code' => 'nullable|string|max:10|unique:clinics,code',
             'description' => 'nullable|string',
             'responsible_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:50',
             'location' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
@@ -53,9 +54,8 @@ class ClinicController extends Controller
             'postal_code' => 'nullable|string|max:20',
             'website' => 'nullable|string|max:255',
             'opening_hours' => 'nullable|string|max:255',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'company_id' => 'nullable|exists:companies,id'
         ]);
 
         if ($validator->fails()) {
@@ -63,7 +63,16 @@ class ClinicController extends Controller
         }
 
         try {
-            $clinic = $this->clinicService->createClinic($validator->validated());
+            $validatedData = $validator->validated();
+            
+            // 🛡️ Super Admin değilse kendi şirketine zorla
+            if (!auth()->user()->hasRole('Super Admin')) {
+                $validatedData['company_id'] = auth()->user()->company_id;
+            } elseif (!isset($validatedData['company_id'])) {
+                $validatedData['company_id'] = auth()->user()->company_id;
+            }
+
+            $clinic = $this->clinicService->createClinic($validatedData);
             return $this->success($clinic, 'Klinik başarıyla oluşturuldu', 201);
         } catch (\Exception $e) {
             Log::error('Klinik oluşturulurken hata: ' . $e->getMessage());
@@ -89,12 +98,13 @@ class ClinicController extends Controller
 
     public function update(Request $request, $id): JsonResponse
     {
-        $validator = Validator::make($request->all(), [
+        $data = $request->all();
+
+        $validator = Validator::make($data, [
             'name' => 'sometimes|required|string|max:255',
-            'code' => 'sometimes|required|string|max:10|unique:clinics,code,' . $id,
             'description' => 'nullable|string',
             'responsible_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
+            'phone' => 'nullable|string|max:50',
             'location' => 'nullable|string|max:255',
             'email' => 'nullable|email|max:255',
             'address' => 'nullable|string',
@@ -104,9 +114,8 @@ class ClinicController extends Controller
             'postal_code' => 'nullable|string|max:20',
             'website' => 'nullable|string|max:255',
             'opening_hours' => 'nullable|string|max:255',
-            'latitude' => 'nullable|numeric',
-            'longitude' => 'nullable|numeric',
-            'is_active' => 'boolean'
+            'is_active' => 'boolean',
+            'company_id' => 'nullable|exists:companies,id'
         ]);
 
         if ($validator->fails()) {

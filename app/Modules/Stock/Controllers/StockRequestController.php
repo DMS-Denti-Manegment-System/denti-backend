@@ -35,7 +35,31 @@ class StockRequestController extends Controller
 
     public function store(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $user = auth()->user();
+        
+        $data = $request->all();
+        
+        // Auto-fill requester clinic if not provided
+        if (!isset($data['requester_clinic_id']) && $user->clinic_id) {
+            $data['requester_clinic_id'] = $user->clinic_id;
+        }
+
+        // Restrict requester clinic if user is not Super Admin
+        if ($user->clinic_id && isset($data['requester_clinic_id']) && $data['requester_clinic_id'] != $user->clinic_id) {
+            if (!$user->hasRole(\App\Models\User::ROLE_SUPER_ADMIN)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Sadece kendi kliniğiniz için talep oluşturabilirsiniz.'
+                ], 403);
+            }
+        }
+
+        // Auto-fill requester name if not provided
+        if (!isset($data['requested_by'])) {
+            $data['requested_by'] = $user->name;
+        }
+
+        $validator = Validator::make($data, [
             'requester_clinic_id' => 'required|exists:clinics,id',
             'requested_from_clinic_id' => 'required|exists:clinics,id|different:requester_clinic_id',
             'stock_id' => 'required|exists:stocks,id',

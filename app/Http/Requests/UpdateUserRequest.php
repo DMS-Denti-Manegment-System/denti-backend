@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use App\Http\Requests\Traits\UserValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
+use Illuminate\Validation\Rule;
+
 class UpdateUserRequest extends FormRequest
 {
     use UserValidationRules;
@@ -27,6 +29,13 @@ class UpdateUserRequest extends FormRequest
         return array_merge($this->commonRules(), [
             'is_active' => ['sometimes', 'boolean'],
             'role_id' => $this->roleRule($companyId),
+            'clinic_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('clinics', 'id')->where(function ($query) use ($companyId) {
+                    return $query->where('company_id', $companyId);
+                }),
+            ],
         ]);
     }
 }

@@ -5,6 +5,8 @@ namespace App\Http\Requests;
 use App\Http\Requests\Traits\UserValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
 
+use Illuminate\Validation\Rule;
+
 class StoreUserRequest extends FormRequest
 {
     use UserValidationRules;
@@ -25,9 +27,24 @@ class StoreUserRequest extends FormRequest
         $companyId = auth()->user()->company_id;
 
         return array_merge($this->commonRules(), [
-            'email' => 'required|string|email|max:255|unique:users',
+            'username' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('users')->where(function ($query) use ($companyId) {
+                    return $query->where('company_id', $companyId);
+                }),
+            ],
+            'email' => 'nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
             'role_id' => $this->roleRule($companyId),
+            'clinic_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('clinics', 'id')->where(function ($query) use ($companyId) {
+                    return $query->where('company_id', $companyId);
+                }),
+            ],
             'company_id' => 'nullable|integer',
         ]);
     }

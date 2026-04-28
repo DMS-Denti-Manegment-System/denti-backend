@@ -27,9 +27,11 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
         'company_id',
+        'clinic_id',
         'is_active',
         'two_factor_secret',
         'two_factor_recovery_codes',
@@ -77,5 +79,13 @@ class User extends Authenticatable
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
+    }
+
+    /**
+     * Get the clinic that the user belongs to.
+     */
+    public function clinic(): BelongsTo
+    {
+        return $this->belongsTo(\App\Modules\Stock\Models\Clinic::class);
     }
 }

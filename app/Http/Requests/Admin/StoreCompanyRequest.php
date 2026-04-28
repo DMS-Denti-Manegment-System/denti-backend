@@ -15,12 +15,14 @@ class StoreCompanyRequest extends FormRequest
     {
         return [
             'name' => 'required|string|max:255',
+            'code' => 'required|string|max:20|unique:companies,code',
             'domain' => 'nullable|string|max:255|unique:companies,domain',
-            'subscription_plan' => 'required|string|in:free,basic,pro,enterprise',
+            'subscription_plan' => 'required|string|in:basic,standard,premium',
             'max_users' => 'required|integer|min:1',
             'status' => 'required|string|in:active,inactive,suspended',
             'owner_name' => 'required|string|max:255',
-            'owner_email' => 'required|email|unique:users,email',
+            'owner_username' => 'required|string|max:255|unique:users,username',
+            'owner_email' => 'nullable|email|unique:users,email',
         ];
     }
 }

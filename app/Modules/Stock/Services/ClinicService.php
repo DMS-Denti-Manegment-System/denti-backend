@@ -42,11 +42,6 @@ class ClinicService
 
     public function createClinic(array $data): Clinic
     {
-        // Klinik kodu benzersizlik kontrolü
-        if (empty($data['code'])) {
-            $data['code'] = $this->generateClinicCode($data['name']);
-        }
-
         return $this->clinicRepository->create($data);
     }
 
@@ -70,20 +65,4 @@ class ClinicService
         return $this->clinicRepository->getGlobalStats();
     }
 
-    protected function generateClinicCode(string $name): string
-    {
-        // İlk 3 harfi al ve büyük harfe çevir
-        $code = strtoupper(substr($name, 0, 3));
-
-        // Eğer kod zaten varsa, sayı ekle
-        $counter = 1;
-        $originalCode = $code;
-
-        while ($this->clinicRepository->findByCode($code)) {
-            $code = $originalCode . $counter;
-            $counter++;
-        }
-
-        return $code;
-    }
 }

@@ -30,6 +30,7 @@ Route::prefix('api')->middleware(['api', 'auth:sanctum'])->group(function () {
 
         Route::post('/{id}/adjust', [StockController::class, 'adjustStock'])->middleware('permission:adjust-stocks');
         Route::post('/{id}/use', [StockController::class, 'useStock'])->middleware('permission:use-stocks');
+        Route::get('/{id}/transactions', [StockController::class, 'transactions'])->middleware('permission:view-audit-logs');
     });
 
     // Suppliers
@@ -46,7 +47,7 @@ Route::prefix('api')->middleware(['api', 'auth:sanctum'])->group(function () {
     Route::prefix('clinics')->group(function () {
         Route::get('/', [ClinicController::class, 'index'])->middleware('permission:view-clinics');
         Route::post('/', [ClinicController::class, 'store'])->middleware('permission:create-clinics');
-        Route::get('/active/list', [ClinicController::class, 'getActive'])->middleware('permission:view-clinics');
+        Route::get('/active/list', [ClinicController::class, 'getActive'])->middleware('permission:view-stocks');
         Route::get('/stats', [ClinicController::class, 'getStats'])->middleware('permission:view-reports');
         Route::get('/{id}', [ClinicController::class, 'show'])->middleware('permission:view-clinics');
         Route::put('/{id}', [ClinicController::class, 'update'])->middleware('permission:update-clinics');
@@ -60,7 +61,7 @@ Route::prefix('api')->middleware(['api', 'auth:sanctum'])->group(function () {
         Route::get('/', [StockRequestController::class, 'index'])->middleware('permission:view-stocks');
         Route::post('/', [StockRequestController::class, 'store'])->middleware('permission:create-stocks');
         Route::get('/pending/list', [StockRequestController::class, 'getPendingRequests'])->middleware('permission:view-stocks');
-        Route::get('/stats', [StockRequestController::class, 'getStats'])->middleware('permission:view-reports');
+        Route::get('/stats', [StockRequestController::class, 'getStats'])->middleware('permission:view-stocks');
         Route::get('/{id}', [StockRequestController::class, 'show'])->middleware('permission:view-stocks');
         Route::put('/{id}/approve', [StockRequestController::class, 'approve'])->middleware('permission:adjust-stocks');
         Route::put('/{id}/reject', [StockRequestController::class, 'reject'])->middleware('permission:adjust-stocks');

@@ -13,6 +13,7 @@ use App\Http\Controllers\Api\DashboardController;
 
 // Auth Routes (Public)
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/admin/login', [AuthController::class, 'adminLogin']);
 Route::post('/invitations/accept', [UserInvitationController::class, 'accept']);
 
 // Auth Routes (Protected)

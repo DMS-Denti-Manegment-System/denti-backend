@@ -30,12 +30,13 @@ class UserController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('username', 'like', "%{$search}%")
                   ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
         $perPage = $request->get('per_page', 15);
-        $users = $query->with('roles')->paginate($perPage);
+        $users = $query->with(['roles', 'clinic'])->paginate($perPage);
 
         return $this->success($users, 'Users retrieved successfully.');
     }
@@ -50,9 +51,11 @@ class UserController extends Controller
 
         $user = User::create([
             'name' => $request->name,
+            'username' => $request->username,
             'email' => $request->email,
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
             'company_id' => $companyId,
+            'clinic_id' => $request->clinic_id,
             'is_active' => true,
         ]);
 
@@ -106,7 +109,7 @@ class UserController extends Controller
         }
 
         // Update user details
-        $user->update($request->only(['name', 'is_active']));
+        $user->update($request->only(['name', 'is_active', 'clinic_id']));
 
         // Sync roles (Global rolleri de destekle)
         $role = Role::withoutGlobalScopes()

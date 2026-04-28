@@ -41,6 +41,7 @@ class CompanyController extends Controller
                 
                 $user = User::create([
                     'name' => $request->owner_name,
+                    'username' => $request->owner_username,
                     'email' => $request->owner_email,
                     'password' => Hash::make($temporaryPassword),
                     'company_id' => $company->id,
@@ -52,12 +53,13 @@ class CompanyController extends Controller
 
                 return $this->success([
                     'company' => $company,
-                    'owner' => [
+                    'user' => [
                         'name' => $user->name,
+                        'username' => $user->username,
                         'email' => $user->email,
-                        'password_sent_to' => $user->email,
-                    ]
-                ], 'Company and owner created successfully. Password sent to email.', 201);
+                    ],
+                    'password' => $temporaryPassword,
+                ], 'Company and owner created successfully.', 201);
             });
         } catch (\Exception $e) {
             return $this->error('Failed to create company: ' . $e->getMessage());

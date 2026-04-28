@@ -97,6 +97,14 @@ class StockRepository implements StockRepositoryInterface
                 case 'expired':
                     $query->expired();
                     break;
+                case 'near_expiry':
+                    $query->nearExpiry(); // Yellow threshold
+                    break;
+                case 'critical_expiry':
+                    $query->where('track_expiry', true)
+                          ->where('expiry_date', '<=', now()->addDays(15)) // Or use red_days if possible in SQL
+                          ->where('expiry_date', '>', now());
+                    break;
             }
         }
 
@@ -190,5 +198,13 @@ class StockRepository implements StockRepositoryInterface
     public function getBaseQuery()
     {
         return $this->model->newQuery();
+    }
+
+    public function getTransactions(int $stockId): Collection
+    {
+        $stock = $this->find($stockId);
+        if (!$stock) return new Collection();
+
+        return $stock->transactions()->orderBy('transaction_date', 'desc')->get();
     }
 }

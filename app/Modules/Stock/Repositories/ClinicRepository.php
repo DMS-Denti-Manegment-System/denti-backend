@@ -34,7 +34,6 @@ class ClinicRepository implements ClinicRepositoryInterface
             $search = '%' . ($filters['search'] ?? $filters['name']) . '%';
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', $search)
-                  ->orWhere('code', 'like', $search)
                   ->orWhere('city', 'like', $search);
             });
         }
@@ -85,10 +84,6 @@ class ClinicRepository implements ClinicRepositoryInterface
         return $this->model->active()->orderBy('name')->get();
     }
 
-    public function findByCode(string $code): ?Clinic
-    {
-        return $this->model->where('code', $code)->first();
-    }
 
     public function getStockSummary(int $clinicId): array
     {

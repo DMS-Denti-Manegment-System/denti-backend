@@ -23,6 +23,7 @@ class Stock extends Model
         'min_stock_level', 'critical_stock_level',
         'yellow_alert_level', 'red_alert_level',
         'internal_usage_count', 'status', 'is_active', 'track_expiry', 'track_batch',
+        'expiry_yellow_days', 'expiry_red_days',
         'clinic_id', 'storage_location',
         'has_sub_unit', 'sub_unit_name', 'sub_unit_multiplier', 'current_sub_stock',
         'company_id'
@@ -38,6 +39,8 @@ class Stock extends Model
         'has_sub_unit' => 'boolean',
         'sub_unit_multiplier' => 'integer',
         'current_sub_stock' => 'integer',
+        'expiry_yellow_days' => 'integer',
+        'expiry_red_days' => 'integer',
     ];
 
     protected $attributes = [
@@ -120,10 +123,13 @@ class Stock extends Model
                      ->where('is_active', true);
     }
 
-    public function scopeNearExpiry($query, $days = 30)
+    public function scopeNearExpiry($query, $days = null)
     {
         return $query->where('track_expiry', true)
-                    ->where('expiry_date', '<=', now()->addDays($days))
+                    ->where(function ($q) use ($days) {
+                        $q->where('expiry_date', '<=', now()->addDays($days ?? 30)) // Fallback if needed
+                          ->orWhereRaw('expiry_date <= DATE_ADD(NOW(), INTERVAL expiry_yellow_days DAY)');
+                    })
                     ->where('expiry_date', '>', now())
                     ->where('is_active', true);
     }
@@ -165,8 +171,20 @@ class Stock extends Model
     public function getIsNearExpiryAttribute()
     {
         return $this->track_expiry &&
-               $this->expiry_date <= now()->addDays(30) &&
+               $this->expiry_date <= now()->addDays($this->expiry_yellow_days ?? 30) &&
                $this->expiry_date > now();
+    }
+
+    public function getExpiryStatusAttribute()
+    {
+        if (!$this->track_expiry || !$this->expiry_date) return 'normal';
+        if ($this->expiry_date < now()) return 'expired';
+        
+        $days = $this->days_to_expiry;
+        if ($days <= ($this->expiry_red_days ?? 15)) return 'critical';
+        if ($days <= ($this->expiry_yellow_days ?? 30)) return 'warning';
+        
+        return 'normal';
     }
 
     public function getDaysToExpiryAttribute()

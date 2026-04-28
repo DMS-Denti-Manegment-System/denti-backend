@@ -293,6 +293,11 @@ class StockService
         return $this->stockRepository->getExpiringItems($days, $clinicId);
     }
 
+    public function getStockTransactions(int $stockId): Collection
+    {
+        return $this->stockRepository->getTransactions($stockId);
+    }
+
     protected function createTransaction(array $data): void
     {
         $data['transaction_number'] = $this->generateTransactionNumber();
