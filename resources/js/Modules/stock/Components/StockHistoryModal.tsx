@@ -12,7 +12,8 @@ import {
   Area
 } from 'recharts'
 import { Stock } from '../Types/stock.types'
-import { useStockTransactions } from '../Hooks/useStocks'
+import { useStockTransactions, useTransactionActions } from '../Hooks/useStocks'
+import { UndoOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 
 const { Title, Text } = Typography
@@ -78,8 +79,33 @@ export const StockHistoryModal: React.FC<StockHistoryModalProps> = ({
       title: 'İşlemi Yapan',
       dataIndex: 'performed_by',
       key: 'user',
+    },
+    {
+      title: 'Aksiyon',
+      key: 'actions',
+      render: (_: any, record: any) => {
+        const canReverse = ['usage', 'adjustment', 'adjustment_increase', 'adjustment_decrease', 'damaged', 'expired'].includes(record.type)
+        return canReverse ? (
+          <Tag 
+            icon={<UndoOutlined />} 
+            color="red" 
+            style={{ cursor: 'pointer' }}
+            onClick={() => {
+              Modal.confirm({
+                title: 'İşlemi Geri Al',
+                content: 'Bu işlemi geri almak istediğinize emin misiniz? Stok miktarı eski haline dönecektir.',
+                onOk: () => reverseTransaction(record.id)
+              })
+            }}
+          >
+            Geri Al
+          </Tag>
+        ) : null
+      }
     }
   ]
+
+  const { reverseTransaction } = useTransactionActions()
 
   const stats = useMemo(() => {
     if (!transactions) return { added: 0, used: 0 }

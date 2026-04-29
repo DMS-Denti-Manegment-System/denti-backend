@@ -2,7 +2,7 @@
 
 import React from 'react'
 import { Card, Row, Col, Input, Select, Button, Space } from 'antd'
-import { PlusOutlined, TagsOutlined } from '@ant-design/icons'
+import { PlusOutlined, TagsOutlined, BarcodeOutlined } from '@ant-design/icons'
 import { router } from '@inertiajs/react'
 import { StockFilter } from '../Types/stock.types'
 import { useCategories } from '@/Modules/category/Hooks/useCategories'
@@ -15,12 +15,14 @@ interface StockFiltersProps {
   onSearch: (value: string) => void
   onFilterChange: (field: keyof StockFilter, value: string | number | undefined) => void
   onAdd: () => void
+  onScannerOpen: () => void
 }
 
 export const StockFilters: React.FC<StockFiltersProps> = ({
   onSearch,
   onFilterChange,
   onAdd,
+  onScannerOpen,
 }) => {
   
   const { categories, isLoading: isCategoriesLoading } = useCategories()
@@ -114,6 +116,13 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
               onClick={() => router.visit('/stock-categories')}
             >
               Kategoriler
+            </Button>
+            <Button 
+              icon={<BarcodeOutlined />} 
+              onClick={onScannerOpen}
+              style={{ backgroundColor: '#f0f5ff', color: '#1d39c4', borderColor: '#adc6ff' }}
+            >
+              Barkodla Kullanım
             </Button>
             <Button 
               type="primary" 

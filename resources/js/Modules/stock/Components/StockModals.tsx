@@ -112,8 +112,9 @@ export const StockModals: React.FC<StockModalsProps> = ({
             rules={[{ required: true, message: 'İşlem tipi seçimi gereklidir!' }]}
           >
             <Select placeholder="İşlem tipi seçin">
-              <Option value="increase">Artır</Option>
-              <Option value="decrease">Azalt</Option>
+              <Option value="increase">Artır (+)</Option>
+              <Option value="decrease">Azalt (-)</Option>
+              <Option value="sync">Sayım (Mevcut Miktarı Eşitle)</Option>
             </Select>
           </Form.Item>
 
@@ -131,15 +132,27 @@ export const StockModals: React.FC<StockModalsProps> = ({
           )}
 
           <Form.Item
-            label="Miktar"
-            name="quantity"
-            rules={[{ required: true, message: 'Miktar gereklidir!' }]}
+            noStyle
+            shouldUpdate={(prev, curr) => prev.type !== curr.type}
           >
-            <InputNumber 
-              min={1} 
-              style={{ width: '100%' }}
-              placeholder="Ayarlanacak miktar"
-            />
+            {({ getFieldValue }) => {
+              const type = getFieldValue('type');
+              const isSync = type === 'sync';
+              return (
+                <Form.Item
+                  label={isSync ? "Gerçekleşen Sayım (Raftaki miktar)" : "Miktar"}
+                  name="quantity"
+                  rules={[{ required: true, message: 'Miktar gereklidir!' }]}
+                  extra={isSync ? "Sistem aradaki farkı otomatik hesaplayıp zayi/ekleme olarak kaydedecektir." : ""}
+                >
+                  <InputNumber 
+                    min={0} 
+                    style={{ width: '100%' }}
+                    placeholder={isSync ? "Rafta kaç adet/kutu var?" : "Ayarlanacak miktar"}
+                  />
+                </Form.Item>
+              );
+            }}
           </Form.Item>
 
           <Form.Item
@@ -206,6 +219,16 @@ export const StockModals: React.FC<StockModalsProps> = ({
             type="info"
             style={{ marginBottom: 16 }}
           />
+
+          {selectedStock?.expiry_date && new Date(selectedStock.expiry_date) < new Date() && (
+            <Alert
+              message="KRİTİK UYARI: BU ÜRÜNÜN SKT'Sİ GEÇMİŞTİR!"
+              description="Bu ürünün son kullanma tarihi geçmiştir. Hastada kullanılması TIBBİ ve YASAL risk taşır. Lütfen ürünü imha/zayi moduna ayırın."
+              type="error"
+              showIcon
+              style={{ marginBottom: 16 }}
+            />
+          )}
 
 
 
@@ -277,7 +300,13 @@ export const StockModals: React.FC<StockModalsProps> = ({
               <Button onClick={onUseModalClose}>
                 İptal
               </Button>
-              <Button type="primary" htmlType="submit" loading={isUsing}>
+              <Button 
+                type="primary" 
+                htmlType="submit" 
+                loading={isUsing}
+                danger={selectedStock?.expiry_date && new Date(selectedStock.expiry_date) < new Date()}
+                disabled={selectedStock?.expiry_date && new Date(selectedStock.expiry_date) < new Date()}
+              >
                 Kullan
               </Button>
             </Space>

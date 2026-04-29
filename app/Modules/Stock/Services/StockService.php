@@ -143,6 +143,11 @@ class StockService
                 throw new StockNotFoundException($stockId);
             }
 
+            // ⚠️ SKT Kontrolü: Tarihi geçmiş ürünün kullanılmasını engelle
+            if ($stock->expiry_date && $stock->expiry_date->isPast()) {
+                throw new \Exception("Bu stok partisinin son kullanma tarihi (" . $stock->expiry_date->format('d/m/Y') . ") geçmiştir. Kullanılamaz!");
+            }
+
             // 🛡️ Eğer rezerve stoktan kullanılıyorsa, reserved_stock kontrolü yap
             if ($isFromReserved && $stock->reserved_stock < $quantity) {
                 throw new InsufficientStockException($stock->reserved_stock, $quantity, 'Yeterli rezerve stok bulunmamaktadır.');

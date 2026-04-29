@@ -12,6 +12,7 @@ import { StockStats } from './StockStats'
 import { StockAlerts } from './StockAlerts'
 import { StockModals } from './StockModals'
 import { StockHistoryModal } from './StockHistoryModal'
+import { BarcodeScannerModal } from './BarcodeScannerModal'
 
 import { useAuth } from '@/Modules/auth/Hooks/useAuth'
 
@@ -31,6 +32,7 @@ export const StockList: React.FC = () => {
   // Form instances
   const [adjustForm] = Form.useForm()
   const [useForm] = Form.useForm()
+  const [isScannerVisible, setIsScannerVisible] = useState(false)
 
   // Hooks
   const { 
@@ -95,6 +97,7 @@ export const StockList: React.FC = () => {
         onSearch={handleSearch}
         onFilterChange={handleFilterChange}
         onAdd={handleAdd}
+        onScannerOpen={() => setIsScannerVisible(true)}
       />
 
       <Card styles={{ body: { padding: 0 } }}>
@@ -130,6 +133,11 @@ export const StockList: React.FC = () => {
         onUseModalClose={() => {}}
         onUseSubmit={async () => {}}
         isUsing={false}
+      />
+
+      <BarcodeScannerModal 
+        visible={isScannerVisible}
+        onClose={() => setIsScannerVisible(false)}
       />
     </div>
   )

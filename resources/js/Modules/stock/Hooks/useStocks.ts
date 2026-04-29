@@ -243,6 +243,26 @@ export const useStocks = (filters?: StockFilter) => {
   }
 }
 
+export const useTransactionActions = () => {
+  const queryClient = useQueryClient()
+
+  const reverseMutation = useMutation({
+    mutationFn: stockApi.reverseTransaction,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['stocks'] })
+      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
+      message.success('İşlem başarıyla geri alındı!')
+    },
+    onError: handleError('İşlem geri alınırken hata oluştu!')
+  })
+
+  return {
+    reverseTransaction: reverseMutation.mutateAsync,
+    isReversing: reverseMutation.isPending
+  }
+}
+
 // Tekil stok için hook
 export const useStock = (id: number) => {
   return useQuery({

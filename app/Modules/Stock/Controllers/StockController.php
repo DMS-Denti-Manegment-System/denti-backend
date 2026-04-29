@@ -165,16 +165,26 @@ class StockController extends Controller
     {
         try {
             $data        = $request->validated();
-            $quantity    = $data['type'] === 'increase' ? $data['quantity'] : -$data['quantity'];
             $isSubUnit   = $data['is_sub_unit'] ?? false;
             
-            // 🔒 Güvenlik: Kim yaptı bilgisini asla client'tan alma, oturum'dan al
-            $performedBy = auth()->user()->name;
-
             $stock = $this->stockService->getStockById((int)$id);
             if (!$stock) {
                 throw new StockNotFoundException($id);
             }
+
+            if ($data['type'] === 'sync') {
+                $current = $isSubUnit ? $stock->current_sub_stock : $stock->current_stock;
+                $quantity = $data['quantity'] - $current;
+            } else {
+                $quantity = $data['type'] === 'increase' ? $data['quantity'] : -$data['quantity'];
+            }
+            
+            if ($quantity === 0 && $data['type'] === 'sync') {
+                return $this->success(new StockResource($stock), 'Stok miktarı zaten hedeflenen seviyede.');
+            }
+
+            // 🔒 Güvenlik: Kim yaptı bilgisini asla client'tan alma, oturum'dan al
+            $performedBy = auth()->user()->name;
 
             $this->authorize('adjust', $stock);
 
