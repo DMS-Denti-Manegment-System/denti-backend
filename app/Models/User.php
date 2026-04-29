@@ -88,4 +88,17 @@ class User extends Authenticatable
     {
         return $this->belongsTo(\App\Models\Clinic::class);
     }
+
+    /**
+     * Super Admin kontrolü (RAM/Cache üzerinden).
+     * TenantScope'da sonsuz döngüyü kırmak için kullanılır.
+     */
+    public function isSuperAdmin(): bool
+    {
+        static $isSuperAdmin = null;
+        if ($isSuperAdmin === null) {
+            $isSuperAdmin = $this->hasRole(self::ROLE_SUPER_ADMIN);
+        }
+        return $isSuperAdmin;
+    }
 }

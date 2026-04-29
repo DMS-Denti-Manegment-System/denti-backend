@@ -171,14 +171,13 @@ class StockController extends Controller
             }
 
             if ($data['type'] === 'sync') {
-                $current = $isSubUnit ? $stock->current_sub_stock : $stock->current_stock;
-                $quantity = $data['quantity'] - $current;
+                $targetQuantity = $data['quantity'];
+                $adjustmentType = 'sync';
+                $delta = 0; // Service will calculate
             } else {
-                $quantity = $data['type'] === 'increase' ? $data['quantity'] : -$data['quantity'];
-            }
-            
-            if ($quantity === 0 && $data['type'] === 'sync') {
-                return $this->success(new StockResource($stock), 'Stok miktarı zaten hedeflenen seviyede.');
+                $targetQuantity = 0;
+                $adjustmentType = $data['type'];
+                $delta = $data['quantity'];
             }
 
             $performedBy = auth()->user()->name;
@@ -187,10 +186,12 @@ class StockController extends Controller
 
             $this->stockService->adjustStock(
                 (int)$id,
-                $quantity,
+                $delta,
                 $data['reason'],
                 $performedBy,
-                $isSubUnit
+                $isSubUnit,
+                $adjustmentType,
+                $targetQuantity
             );
 
             return $this->success(new StockResource($this->stockService->getStockById((int)$id)), 'Stok başarıyla düzeltildi');

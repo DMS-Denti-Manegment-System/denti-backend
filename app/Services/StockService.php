@@ -59,10 +59,9 @@ class StockService
      * Stok miktarını manuel olarak ayarlar.
      * Race condition'a karşı pessimistic locking (lockForUpdate) kullanır.
      */
-    public function adjustStock(int $stockId, int $quantity, string $reason, string $performedBy, bool $isSubUnit = false): bool
+    public function adjustStock(int $stockId, int $delta, string $reason, string $performedBy, bool $isSubUnit = false, string $type = 'increase', int $targetQuantity = 0): bool
     {
-        return DB::transaction(function () use ($stockId, $quantity, $reason, $performedBy, $isSubUnit) {
-            // 🔒 Pessimistic lock: aynı anda başka bir işlem bu satırı değiştiremez
+        return DB::transaction(function () use ($stockId, $delta, $reason, $performedBy, $isSubUnit, $type, $targetQuantity) {
             $stock = $this->stockRepository->findAndLock($stockId);
             if (!$stock) {
                 throw new StockNotFoundException($stockId);
@@ -70,31 +69,40 @@ class StockService
 
             $previousTotal = $stock->total_base_units;
 
+            // Business Logic: Calculate delta if sync
+            if ($type === 'sync') {
+                $current = $isSubUnit ? $stock->current_sub_stock : $stock->current_stock;
+                $delta = $targetQuantity - $current;
+                if ($delta === 0) return true;
+            } elseif ($type === 'decrease') {
+                $delta = -abs($delta);
+            } else {
+                $delta = abs($delta);
+            }
+
             if ($isSubUnit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
                 $newLevels = $this->calculatorService->calculateAdjustment(
                     $stock->current_stock,
                     $stock->current_sub_stock,
-                    $quantity,
+                    $delta,
                     $stock->sub_unit_multiplier
                 );
 
-                // ✅ Sub-unit hesaplamasi sonrasi negatif stok kontrolu
-                // calculatorService null veya negatif dondururse exception firlatilir
                 if (
                     !$newLevels ||
                     ($newLevels['current_stock'] ?? 0) < 0 ||
                     ($newLevels['current_sub_stock'] ?? 0) < 0
                 ) {
-                    throw new InsufficientStockException($stock->total_base_units, abs($quantity));
+                    throw new InsufficientStockException($stock->total_base_units, abs($delta));
                 }
 
                 $this->stockRepository->update($stockId, array_merge($newLevels, [
                     'available_stock' => $newLevels['current_stock'] - $stock->reserved_stock
                 ]));
             } else {
-                $newStock = $stock->current_stock + $quantity;
+                $newStock = $stock->current_stock + $delta;
                 if ($newStock < 0) {
-                    throw new InsufficientStockException($stock->current_stock, abs($quantity));
+                    throw new InsufficientStockException($stock->current_stock, abs($delta));
                 }
 
                 $this->stockRepository->update($stockId, [
@@ -108,8 +116,8 @@ class StockService
             $this->createTransaction([
                 'stock_id'         => $stockId,
                 'clinic_id'        => $stock->clinic_id,
-                'type'             => $quantity > 0 ? 'adjustment_increase' : 'adjustment_decrease',
-                'quantity'         => abs($quantity),
+                'type'             => $delta > 0 ? 'adjustment_increase' : 'adjustment_decrease',
+                'quantity'         => abs($delta),
                 'previous_stock'   => $previousTotal,
                 'new_stock'        => $freshStock->total_base_units,
                 'description'      => ($isSubUnit ? 'Alt Birim Düzeltme: ' : 'Ana Birim Düzeltme: ') . $reason,
@@ -209,7 +217,15 @@ class StockService
             throw new InsufficientStockException($stock->total_base_units, $quantity);
         }
 
-        $newReservedStock = $isFromReserved ? ($stock->reserved_stock - $quantity) : $stock->reserved_stock;
+        // 🛡️ KRITIK DÜZELTME: Rezerve stok sadece ANA BIRIM üzerinden takip ediliyor.
+        // Alt birim kullanımı durumunda rezerve düşmek istiyorsak, 
+        // ya tam birim düşmeliyiz ya da bu işleme izin vermemeliyiz.
+        // Şimdilik alt birimden rezerve kullanımını engelliyoruz (unit mismatch önlemek için).
+        if ($isFromReserved) {
+             throw new \Exception('Alt birim kullanımı için rezerve stoktan düşüm yapılamaz. Lütfen ana birim üzerinden işlem yapın.');
+        }
+
+        $newReservedStock = $stock->reserved_stock;
 
         return array_merge($newLevels, [
             'reserved_stock'       => $newReservedStock,
@@ -375,14 +391,22 @@ class StockService
                 
                 if (!$stock) return false;
 
-                $isNegativeEffect = in_array($transaction->type, ['usage', 'damaged', 'expired', 'transfer_out', 'adjustment_decrease']);
+                $positiveTypes = ['purchase', 'adjustment_increase', 'transfer_in', 'return_in'];
+                $negativeTypes = ['usage', 'adjustment_decrease', 'transfer_out', 'damaged', 'expired', 'return_out'];
+                
+                $isPositiveEffect = in_array($transaction->type, $positiveTypes);
+                $isNegativeEffect = in_array($transaction->type, $negativeTypes);
+
                 $quantity = $transaction->quantity;
 
                 if ($transaction->is_sub_unit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
+                    // if it was negative (usage), we ADD it back. if positive (purchase), we SUBTRACT.
+                    $delta = $isNegativeEffect ? $quantity : -$quantity;
+                    
                     $newLevels = $this->calculatorService->calculateAdjustment(
                         $stock->current_stock,
                         $stock->current_sub_stock,
-                        $isNegativeEffect ? $quantity : -$quantity,
+                        $delta,
                         $stock->sub_unit_multiplier
                     );
                     
@@ -391,7 +415,7 @@ class StockService
                 } else {
                     if ($isNegativeEffect) {
                         $stock->current_stock += $quantity;
-                    } else {
+                    } elseif ($isPositiveEffect) {
                         $stock->current_stock -= $quantity;
                     }
                 }

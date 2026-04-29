@@ -76,12 +76,10 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
         Route::get('/{id}/transactions', [\App\Http\Controllers\Api\ProductController::class, 'transactions'])->middleware('permission:view-audit-logs');
     });
 
-    // Stocks (now Batches)
+    // Stocks
     Route::prefix('stocks')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index'])->middleware('permission:view-stocks');
+        Route::get('/', [\App\Http\Controllers\Api\StockController::class, 'index'])->middleware('permission:view-stocks');
         Route::post('/', [\App\Http\Controllers\Api\StockController::class, 'store'])->middleware('permission:create-stocks');
-        Route::get('/batches', [\App\Http\Controllers\Api\StockController::class, 'index'])->middleware('permission:view-stocks');
-        Route::post('/batches', [\App\Http\Controllers\Api\StockController::class, 'store'])->middleware('permission:create-stocks');
         Route::get('/stats', [\App\Http\Controllers\Api\StockController::class, 'getStats'])->middleware('permission:view-reports');
         Route::get('/low-level', [\App\Http\Controllers\Api\StockController::class, 'getLowLevel'])->middleware('permission:view-stocks');
         Route::get('/critical-level', [\App\Http\Controllers\Api\StockController::class, 'getCriticalLevel'])->middleware('permission:view-stocks');
