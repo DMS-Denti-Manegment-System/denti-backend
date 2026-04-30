@@ -298,7 +298,7 @@ export const ClinicDetail: React.FC<ClinicDetailProps> = ({
                     title="Toplam Ürün"
                     value={summary.total_products}
                     prefix={<InboxOutlined />}
-                    valueStyle={{ color: '#1890ff' }}
+                    styles={{ content: { color: '#1890ff' } }}
                   />
                 </Col>
                 <Col span={12}>
@@ -307,7 +307,7 @@ export const ClinicDetail: React.FC<ClinicDetailProps> = ({
                     value={summary.total_stock_value || 0}
                     prefix="₺"
                     precision={2}
-                    valueStyle={{ color: '#52c41a' }}
+                    styles={{ content: { color: '#52c41a' } }}
                   />
                 </Col>
                 <Col span={12} style={{ marginTop: 16 }}>
@@ -315,7 +315,7 @@ export const ClinicDetail: React.FC<ClinicDetailProps> = ({
                     title="Düşük Stok"
                     value={summary.low_stock_products}
                     prefix={<ExclamationCircleOutlined />}
-                    valueStyle={{ color: '#faad14' }}
+                    styles={{ content: { color: '#faad14' } }}
                   />
                 </Col>
                 <Col span={12} style={{ marginTop: 16 }}>
@@ -323,7 +323,7 @@ export const ClinicDetail: React.FC<ClinicDetailProps> = ({
                     title="Stok Yok"
                     value={summary.out_of_stock_products}
                     prefix={<CloseCircleOutlined />}
-                    valueStyle={{ color: '#ff4d4f' }}
+                    styles={{ content: { color: '#ff4d4f' } }}
                   />
                 </Col>
               </Row>

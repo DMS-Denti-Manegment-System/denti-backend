@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { message } from 'antd'
 import { stockApi } from '../Services/stockApi'
+import { STOCK_QUERY_KEYS } from '../Constants/queryKeys'
 import { 
   UpdateStockRequest, 
   StockAdjustmentRequest,
@@ -26,17 +27,17 @@ export const useProducts = (filters?: any) => {
     error,
     refetch
   } = useQuery({
-    queryKey: ['products', filters],
+    queryKey: [STOCK_QUERY_KEYS.PRODUCTS, filters],
     queryFn: () => stockApi.getProducts(filters),
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
   })
 
   const createMutation = useMutation({
     mutationFn: stockApi.createProduct,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] })
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.PRODUCTS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
       message.success('Ürün başarıyla oluşturuldu!')
     },
     onError: handleError('Ürün oluşturulurken hata oluştu!')
@@ -46,7 +47,7 @@ export const useProducts = (filters?: any) => {
     mutationFn: ({ id, data }: { id: number; data: any }) =>
       stockApi.updateProduct(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.PRODUCTS] })
       message.success('Ürün başarıyla güncellendi!')
     },
     onError: handleError('Ürün güncellenirken hata oluştu!')
@@ -55,7 +56,7 @@ export const useProducts = (filters?: any) => {
   const deleteMutation = useMutation({
     mutationFn: stockApi.deleteProduct,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.PRODUCTS] })
       message.success('Ürün başarıyla silindi!')
     },
     onError: handleError('Ürün silinirken hata oluştu!')
@@ -83,9 +84,9 @@ export const useProductDetail = (id: number) => {
     isLoading,
     refetch
   } = useQuery({
-    queryKey: ['products', id],
+    queryKey: [STOCK_QUERY_KEYS.PRODUCTS, id],
     queryFn: () => stockApi.getProductById(id),
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     enabled: !!id,
     staleTime: STALE_TIME,
   })
@@ -93,9 +94,9 @@ export const useProductDetail = (id: number) => {
   const addBatchMutation = useMutation({
     mutationFn: stockApi.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', id] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['stocks', id, 'transactions'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.PRODUCTS, id] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS, id, STOCK_QUERY_KEYS.TRANSACTIONS] })
       message.success('Stok girişi başarıyla yapıldı!')
     },
     onError: handleError('Stok girişi yapılırken hata oluştu!')
@@ -119,18 +120,18 @@ export const useStocks = (filters?: StockFilter) => {
     error,
     refetch
   } = useQuery({
-    queryKey: ['stocks', filters],
+    queryKey: [STOCK_QUERY_KEYS.STOCKS, filters],
     queryFn: () => stockApi.getAll(filters),
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
   })
 
   const createMutation = useMutation({
     mutationFn: stockApi.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-levels'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS] })
       message.success('Stok başarıyla oluşturuldu!')
     },
     onError: handleError('Stok oluşturulurken hata oluştu!')
@@ -140,9 +141,9 @@ export const useStocks = (filters?: StockFilter) => {
     mutationFn: ({ id, data }: { id: number; data: UpdateStockRequest }) =>
       stockApi.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-levels'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS] })
       message.success('Stok başarıyla güncellendi!')
     },
     onError: handleError('Stok güncellenirken hata oluştu!')
@@ -151,9 +152,9 @@ export const useStocks = (filters?: StockFilter) => {
   const deleteMutation = useMutation({
     mutationFn: stockApi.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-levels'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS] })
       message.success('Stok başarıyla silindi!')
     },
     onError: handleError('Stok silinirken hata oluştu!')
@@ -162,8 +163,8 @@ export const useStocks = (filters?: StockFilter) => {
   const softDeleteMutation = useMutation({
     mutationFn: stockApi.softDelete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
       message.success('Stok pasif duruma getirildi!')
     },
     onError: handleError('Stok pasif yapılırken hata oluştu!')
@@ -172,9 +173,9 @@ export const useStocks = (filters?: StockFilter) => {
   const hardDeleteMutation = useMutation({
     mutationFn: stockApi.hardDelete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-levels'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS] })
       message.success('Stok kalıcı olarak silindi!')
     },
     onError: handleError('Stok silinirken hata oluştu!')
@@ -183,8 +184,8 @@ export const useStocks = (filters?: StockFilter) => {
   const reactivateMutation = useMutation({
     mutationFn: stockApi.reactivate,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
       message.success('Stok tekrar aktif edildi!')
     },
     onError: handleError('Stok aktif edilirken hata oluştu!')
@@ -194,10 +195,10 @@ export const useStocks = (filters?: StockFilter) => {
     mutationFn: ({ id, data }: { id: number; data: StockAdjustmentRequest }) =>
       stockApi.adjustStock(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-levels'] })
-      queryClient.invalidateQueries({ queryKey: ['stocks', 'transactions'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS, STOCK_QUERY_KEYS.TRANSACTIONS] })
       message.success('Stok miktarı başarıyla ayarlandı!')
     },
     onError: handleError('Stok ayarlanırken hata oluştu!')
@@ -208,36 +209,31 @@ export const useStocks = (filters?: StockFilter) => {
       stockApi.useStock(id, data),
     onMutate: async ({ id, data }) => {
       // 🛡️ Cancel outgoing refetches to avoid race conditions
-      await queryClient.cancelQueries({ queryKey: ['stocks'] })
-      await queryClient.cancelQueries({ queryKey: ['stocks', id] })
+      await queryClient.cancelQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      await queryClient.cancelQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS, id] })
 
       // Snapshot the previous value
-      const previousStocks = queryClient.getQueryData(['stocks'])
-      const previousStock = queryClient.getQueryData(['stocks', id])
-
-      // Optimistic update
-      if (previousStocks) {
-        // ... (optional: can manually update list here for even faster UI)
-      }
+      const previousStocks = queryClient.getQueryData([STOCK_QUERY_KEYS.STOCKS])
+      const previousStock = queryClient.getQueryData([STOCK_QUERY_KEYS.STOCKS, id])
 
       return { previousStocks, previousStock }
     },
     onSuccess: (_, variables) => {
       // Granular invalidation
-      queryClient.invalidateQueries({ queryKey: ['stocks', variables.id] })
-      queryClient.invalidateQueries({ queryKey: ['stocks', variables.id, 'transactions'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS, variables.id] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS, variables.id, STOCK_QUERY_KEYS.TRANSACTIONS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
       
       message.success('Stok kullanımı başarıyla kaydedildi!')
     },
     onError: (error, variables, context) => {
       // 🛡️ Rollback on error
       if (context?.previousStocks) {
-        queryClient.setQueryData(['stocks'], context.previousStocks)
+        queryClient.setQueryData([STOCK_QUERY_KEYS.STOCKS], context.previousStocks)
       }
       if (context?.previousStock) {
-        queryClient.setQueryData(['stocks', variables.id], context.previousStock)
+        queryClient.setQueryData([STOCK_QUERY_KEYS.STOCKS, variables.id], context.previousStock)
       }
       handleError('Stok kullanımı kaydedilirken hata oluştu!')(error)
     },
@@ -274,9 +270,9 @@ export const useTransactionActions = () => {
   const reverseMutation = useMutation({
     mutationFn: stockApi.reverseTransaction,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['stocks'] })
-      queryClient.invalidateQueries({ queryKey: ['products'] })
-      queryClient.invalidateQueries({ queryKey: ['stock-stats'] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCKS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.PRODUCTS] })
+      queryClient.invalidateQueries({ queryKey: [STOCK_QUERY_KEYS.STOCK_STATS] })
       message.success('İşlem başarıyla geri alındı!')
     },
     onError: handleError('İşlem geri alınırken hata oluştu!')
@@ -291,9 +287,9 @@ export const useTransactionActions = () => {
 // Tekil stok için hook
 export const useStock = (id: number) => {
   return useQuery({
-    queryKey: ['stocks', id],
+    queryKey: [STOCK_QUERY_KEYS.STOCKS, id],
     queryFn: () => stockApi.getById(id),
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     enabled: !!id,
     staleTime: STALE_TIME,
   })
@@ -302,27 +298,27 @@ export const useStock = (id: number) => {
 // Kritik ve azalan stoklar için hook'lar
 export const useLowStockItems = () => {
   return useQuery({
-    queryKey: ['stock-levels', 'low'],
+    queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS, 'low'],
     queryFn: stockApi.getLowStockItems,
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
   })
 }
 
 export const useCriticalStockItems = () => {
   return useQuery({
-    queryKey: ['stock-levels', 'critical'],
+    queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS, 'critical'],
     queryFn: stockApi.getCriticalStockItems,
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
   })
 }
 
 export const useExpiringItems = (days?: number) => {
   return useQuery({
-    queryKey: ['stock-levels', 'expiring', days],
+    queryKey: [STOCK_QUERY_KEYS.STOCK_LEVELS, 'expiring', days],
     queryFn: () => stockApi.getExpiringItems(days),
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
   })
 }
@@ -330,9 +326,9 @@ export const useExpiringItems = (days?: number) => {
 // İstatistikler için hook
 export const useStockStats = () => {
   return useQuery({
-    queryKey: ['stock-stats'],
+    queryKey: [STOCK_QUERY_KEYS.STOCK_STATS],
     queryFn: stockApi.getStats,
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
   })
 }
@@ -340,9 +336,9 @@ export const useStockStats = () => {
 // Stok hareketleri için hook
 export const useStockTransactions = (id: number) => {
   return useQuery({
-    queryKey: ['stocks', id, 'transactions'],
+    queryKey: [STOCK_QUERY_KEYS.STOCKS, id, STOCK_QUERY_KEYS.TRANSACTIONS],
     queryFn: () => stockApi.getProductTransactions(id),
-    select: (data) => data.data,
+    select: (response: any) => response.data?.data || response.data,
     enabled: !!id,
     staleTime: 60000,
   })

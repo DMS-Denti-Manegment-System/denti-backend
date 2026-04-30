@@ -18,7 +18,14 @@ class StoreProductRequest extends FormRequest
 
         return [
             'name' => 'required|string|max:255',
-            'sku' => 'nullable|string|max:50',
+            'sku' => [
+                'nullable',
+                'string',
+                'max:50',
+                Rule::unique('products')->where(function ($query) use ($companyId) {
+                    return $query->where('company_id', $companyId);
+                })
+            ],
             'description' => 'nullable|string',
             'unit' => 'required|string|max:20',
             'category' => 'nullable|string|max:50',

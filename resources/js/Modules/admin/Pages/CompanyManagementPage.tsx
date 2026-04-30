@@ -206,7 +206,7 @@ export const CompanyManagementPage: React.FC = () => {
         </Button>
       </div>
 
-      <Card bordered={false} style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
+      <Card variant="borderless" style={{ boxShadow: '0 1px 2px rgba(0,0,0,0.03)' }}>
         <Input
           placeholder="Şirket adı veya domain ile ara..."
           prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}

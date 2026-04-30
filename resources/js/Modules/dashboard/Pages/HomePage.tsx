@@ -31,53 +31,53 @@ export const HomePage: React.FC = () => {
         </Text>
       </div>
 
-      <Divider orientation="left">Genel İstatistikler</Divider>
+      <Divider titlePlacement="left">Genel İstatistikler</Divider>
 
       <Row gutter={[24, 24]}>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="dashboard-card">
+          <Card variant="borderless" className="dashboard-card">
             <Statistic
               title="Toplam Doktor"
               value={stats?.total_doctors}
               prefix={<MedicineBoxOutlined style={{ color: '#1890ff' }} />}
-              valueStyle={{ color: '#1890ff' }}
+              styles={{ content: { color: '#1890ff' } }}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="dashboard-card">
+          <Card variant="borderless" className="dashboard-card">
             <Statistic
               title="Toplam Çalışan"
               value={stats?.total_employees}
               prefix={<UserOutlined style={{ color: '#52c41a' }} />}
-              valueStyle={{ color: '#52c41a' }}
+              styles={{ content: { color: '#52c41a' } }}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="dashboard-card">
+          <Card variant="borderless" className="dashboard-card">
             <Statistic
               title="Toplam Klinik"
               value={stats?.total_clinics}
               prefix={<HomeOutlined style={{ color: '#faad14' }} />}
-              valueStyle={{ color: '#faad14' }}
+              styles={{ content: { color: '#faad14' } }}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} lg={6}>
-          <Card bordered={false} className="dashboard-card">
+          <Card variant="borderless" className="dashboard-card">
             <Statistic
               title="Stok Kalemi"
               value={stats?.total_stock_items}
               prefix={<DatabaseOutlined style={{ color: '#eb2f96' }} />}
-              valueStyle={{ color: '#eb2f96' }}
+              styles={{ content: { color: '#eb2f96' } }}
             />
           </Card>
         </Col>
       </Row>
 
       <div style={{ marginTop: '60px', textAlign: 'center' }}>
-        <Card bordered={false} style={{ background: '#f0f2f5', borderRadius: '16px' }}>
+        <Card variant="borderless" style={{ background: '#f0f2f5', borderRadius: '16px' }}>
           <SmileOutlined style={{ fontSize: '48px', color: '#1890ff', marginBottom: '16px' }} />
           <Title level={3}>Mutlu Gülüşler, Profesyonel Yönetim</Title>
           <Text type="secondary">

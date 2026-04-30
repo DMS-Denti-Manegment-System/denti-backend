@@ -94,23 +94,14 @@ class StockService
                 ) {
                     throw new InsufficientStockException($stock->total_base_units, abs($delta));
                 }
-
-                $this->stockRepository->update($stockId, array_merge($newLevels, [
-                    'available_stock' => $newLevels['current_stock'] - $stock->reserved_stock
-                ]));
+                // Observer handles the balance update via Transaction creation
             } else {
                 $newStock = $stock->current_stock + $delta;
                 if ($newStock < 0) {
                     throw new InsufficientStockException($stock->current_stock, abs($delta));
                 }
-
-                $this->stockRepository->update($stockId, [
-                    'current_stock'   => $newStock,
-                    'available_stock' => $newStock - $stock->reserved_stock
-                ]);
+                // Observer handles the balance update via Transaction creation
             }
-
-            $freshStock = $stock->fresh();
 
             $this->createTransaction([
                 'stock_id'         => $stockId,
@@ -118,16 +109,12 @@ class StockService
                 'type'             => $delta > 0 ? 'adjustment_increase' : 'adjustment_decrease',
                 'quantity'         => abs($delta),
                 'previous_stock'   => $previousTotal,
-                'new_stock'        => $freshStock->total_base_units,
+                'new_stock'        => $previousTotal + $delta,
                 'description'      => ($isSubUnit ? 'Alt Birim Düzeltme: ' : 'Ana Birim Düzeltme: ') . $reason,
                 'performed_by'     => $performedBy,
                 'transaction_date' => now(),
                 'is_sub_unit'      => $isSubUnit
             ]);
-
-            DB::afterCommit(function () use ($freshStock) {
-                StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
-            });
 
             return true;
         });
@@ -163,14 +150,13 @@ class StockService
                 $isSubUnitUsage = $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
                 $previousTotal  = $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock;
 
-                if ($isSubUnitUsage) {
-                    $updateData = $this->handleSubUnitUsage($stock, $quantity, $isFromReserved);
-                } else {
-                    $updateData = $this->handleMainUnitUsage($stock, $quantity, $isFromReserved);
+                // 🛡️ Rezerve stok manuel yonetilir cunku TransactionObserver sadece current_stock'u etkiler.
+                // Rezerve stoktan dusum yapiliyorsa rezerve miktarini azalt.
+                if ($isFromReserved) {
+                    $this->stockRepository->update($stockId, [
+                        'reserved_stock' => $stock->reserved_stock - $quantity,
+                    ]);
                 }
-
-                $this->stockRepository->update($stockId, $updateData);
-                $freshStock = $stock->fresh();
 
                 $this->createTransaction([
                     'stock_id'         => $stockId,
@@ -178,17 +164,13 @@ class StockService
                     'type'             => 'usage',
                     'quantity'         => $quantity,
                     'previous_stock'   => $previousTotal,
-                    'new_stock'        => $isSubUnitUsage ? $freshStock->total_base_units : $freshStock->current_stock,
+                    'new_stock'        => $previousTotal - $quantity,
                     'notes'            => $notes,
                     'performed_by'     => $performedBy,
                     'user_id'          => $userId,
                     'transaction_date' => now(),
                     'is_sub_unit'      => $isSubUnitUsage
                 ]);
-
-                DB::afterCommit(function () use ($freshStock) {
-                    StockLevelChanged::dispatch($freshStock, $freshStock->company_id, $freshStock->clinic_id);
-                });
 
                 return true;
             });
@@ -328,7 +310,7 @@ class StockService
                 $totalUnitsRaw = Stock::totalBaseUnitsRaw();
                 $stats = $baseQuery->join('products', 'stocks.product_id', '=', 'products.id')
                     ->selectRaw("
-                        COUNT(*) as total_items,
+                        COUNT(DISTINCT stocks.product_id) as total_items,
                         SUM(CASE WHEN stocks.is_active = 1 AND {$totalUnitsRaw} <= COALESCE(products.yellow_alert_level, products.min_stock_level) THEN 1 ELSE 0 END) as low_stock_items,
                         SUM(CASE WHEN stocks.is_active = 1 AND {$totalUnitsRaw} <= COALESCE(products.red_alert_level, products.critical_stock_level) THEN 1 ELSE 0 END) as critical_stock_items,
                         SUM(CASE WHEN stocks.is_active = 1 AND stocks.track_expiry = 1 AND stocks.expiry_date <= ? AND stocks.expiry_date > ? THEN 1 ELSE 0 END) as expiring_items,

@@ -125,7 +125,7 @@ export const SupplierForm: React.FC<SupplierFormProps> = ({
           is_active: true
         }}
       >
-        <Divider orientation="left">Temel Bilgiler</Divider>
+        <Divider titlePlacement="left">Temel Bilgiler</Divider>
 
         <Row gutter={16}>
           <Col span={12}>
@@ -227,7 +227,7 @@ export const SupplierForm: React.FC<SupplierFormProps> = ({
           </Col>
         </Row>
 
-        <Divider orientation="left">Ticari Bilgiler</Divider>
+        <Divider titlePlacement="left">Ticari Bilgiler</Divider>
 
         <Row gutter={16}>
           <Col span={8}>

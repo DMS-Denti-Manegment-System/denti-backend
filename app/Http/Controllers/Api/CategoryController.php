@@ -79,7 +79,15 @@ class CategoryController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255|unique:categories,name,' . $id,
+            'name' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('categories')->where(function ($query) {
+                    return $query->where('company_id', auth()->user()->company_id);
+                })->ignore($id)
+            ],
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string|max:500',
             'is_active' => 'sometimes|boolean'

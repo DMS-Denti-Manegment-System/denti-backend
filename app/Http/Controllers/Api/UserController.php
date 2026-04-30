@@ -100,9 +100,15 @@ class UserController extends Controller
             return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
         }
 
-        $companyId = Auth::user()->company_id;
+        $currentUser = Auth::user();
+        $query = User::query();
+        
+        // SECURITY: Non-Super Admins can only update users within their own company
+        if (!$currentUser->hasRole(User::ROLE_SUPER_ADMIN)) {
+            $query->where('company_id', $currentUser->company_id);
+        }
 
-        $user = User::where('company_id', $companyId)->find($id);
+        $user = $query->find($id);
 
         if (!$user) {
             return $this->error('User not found or unauthorized access.', 404);
@@ -112,6 +118,7 @@ class UserController extends Controller
         $user->update($request->only(['name', 'is_active', 'clinic_id']));
 
         // Sync roles (Global rolleri de destekle)
+        $companyId = $user->company_id;
         $role = Role::withoutGlobalScopes()
             ->where(function($q) use ($companyId) {
                 $q->where('company_id', $companyId)->orWhereNull('company_id');

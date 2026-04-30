@@ -86,7 +86,7 @@ export const ClinicForm: React.FC<ClinicFormProps> = ({
       requiredMark={false}
     >
       {/* Temel Bilgiler */}
-      <Divider orientation="left">
+      <Divider titlePlacement="left">
         <Space>
           <ShopOutlined />
           Temel Bilgiler
@@ -129,7 +129,7 @@ export const ClinicForm: React.FC<ClinicFormProps> = ({
       </Form.Item>
 
       {/* İletişim Bilgileri */}
-      <Divider orientation="left">
+      <Divider titlePlacement="left">
         <Space>
           <PhoneOutlined />
           İletişim Bilgileri
@@ -206,7 +206,7 @@ export const ClinicForm: React.FC<ClinicFormProps> = ({
       </Row>
 
       {/* Adres Bilgileri */}
-      <Divider orientation="left">
+      <Divider titlePlacement="left">
         <Space>
           <EnvironmentOutlined />
           Adres Bilgileri
@@ -273,7 +273,7 @@ export const ClinicForm: React.FC<ClinicFormProps> = ({
       </Form.Item>
 
       {/* Ek Bilgiler */}
-      <Divider orientation="left">
+      <Divider titlePlacement="left">
         <Space>
           <ClockCircleOutlined />
           Ek Bilgiler

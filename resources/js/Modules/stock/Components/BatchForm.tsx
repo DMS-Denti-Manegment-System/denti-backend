@@ -178,7 +178,7 @@ export const BatchForm: React.FC<BatchFormProps> = ({
         <Input placeholder="Örn: Raf A-1" />
       </Form.Item>
 
-      <Divider orientation="left" style={{ margin: '8px 0' }}>Birim & Alt Birim Ayarları</Divider>
+      <Divider titlePlacement="left" style={{ margin: '8px 0' }}>Birim & Alt Birim Ayarları</Divider>
       
       <Row gutter={16}>
         <Col span={24}>

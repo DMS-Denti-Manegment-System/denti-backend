@@ -88,9 +88,17 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
+        $throttleKey = 'admin_login|' . $request->username . '|' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
+            $seconds = RateLimiter::availableIn($throttleKey);
+            return $this->error("Çok fazla giriş denemesi. {$seconds} saniye sonra tekrar deneyin.", 429);
+        }
+
         $user = User::where('username', $request->username)->first();
 
         if ($user && $user->hasRole('Super Admin') && \Hash::check($request->password, $user->password)) {
+            RateLimiter::clear($throttleKey);
             if (!$user->is_active) {
                 return $this->error('Hesabınız pasif durumdadır.', 403);
             }
@@ -107,6 +115,8 @@ class AuthController extends Controller
                 'company'     => $user->company
             ], 'Admin login successful');
         }
+
+        RateLimiter::hit($throttleKey, 60);
 
         return $this->error('Geçersiz kullanıcı adı veya şifre', 422);
     }

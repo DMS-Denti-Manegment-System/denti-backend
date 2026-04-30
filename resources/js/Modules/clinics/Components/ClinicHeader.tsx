@@ -97,7 +97,7 @@ export const ClinicHeader: React.FC<ClinicHeaderProps> = ({
                 title="Pasif Klinik"
                 value={totalClinics - activeClinics}
                 prefix={<ShopOutlined />}
-                valueStyle={{ color: '#ff4d4f' }}
+                styles={{ content: { color: '#ff4d4f' } }}
               />
             )}
           </Card>
@@ -112,12 +112,14 @@ export const ClinicHeader: React.FC<ClinicHeaderProps> = ({
                 value={totalClinics > 0 ? Math.round((activeClinics / totalClinics) * 100) : 0}
                 suffix="%"
                 prefix={<ShopOutlined />}
-                valueStyle={{ 
-                  color: totalClinics > 0 && (activeClinics / totalClinics) > 0.8 
-                    ? '#52c41a' 
-                    : totalClinics > 0 && (activeClinics / totalClinics) > 0.5 
-                    ? '#faad14' 
-                    : '#ff4d4f' 
+                styles={{ 
+                  content: {
+                    color: totalClinics > 0 && (activeClinics / totalClinics) > 0.8 
+                      ? '#52c41a' 
+                      : totalClinics > 0 && (activeClinics / totalClinics) > 0.5 
+                      ? '#faad14' 
+                      : '#ff4d4f' 
+                  }
                 }}
               />
             )}

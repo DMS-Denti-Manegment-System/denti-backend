@@ -167,7 +167,7 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
 
         {supplier.additional_info && (
           <>
-            <Divider orientation="left">Ek Bilgiler</Divider>
+            <Divider titlePlacement="left">Ek Bilgiler</Divider>
             <Descriptions column={1} bordered size="small">
               {supplier.additional_info.delivery_time && (
                 <Descriptions.Item label="Teslimat Süresi">
@@ -188,7 +188,7 @@ export const SupplierCard: React.FC<SupplierCardProps> = ({
           </>
         )}
 
-        <Divider orientation="left">Sistem Bilgileri</Divider>
+        <Divider titlePlacement="left">Sistem Bilgileri</Divider>
         <Descriptions column={2} bordered size="small">
           <Descriptions.Item label="Oluşturulma">
             {dayjs(supplier.created_at).format('DD/MM/YYYY HH:mm')}

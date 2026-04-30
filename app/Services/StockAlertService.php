@@ -168,7 +168,18 @@ class StockAlertService
 
     protected function sendAlertNotification(StockAlert $alert): void
     {
-        // ... individual notification if needed ...
+        // Alarma ait ilişkileri yükle
+        $alert->load(['clinic', 'stock.product']);
+
+        // Şirket sahibi ve yöneticileri bul
+        $users = \App\Models\User::where('company_id', $alert->stock->company_id)
+            ->whereHas('roles', function($q) {
+                $q->whereIn('name', ['Owner', 'Admin', 'Stock Manager']);
+            })->get();
+
+        if ($users->isNotEmpty()) {
+            \Illuminate\Support\Facades\Notification::send($users, new \App\Notifications\StockLowLevelNotification($alert));
+        }
     }
 
     public function getActiveAlerts(array $filters = []): Collection

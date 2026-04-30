@@ -23,21 +23,14 @@ import {
     InfoCircleOutlined,
     LineChartOutlined
 } from '@ant-design/icons';
-import { 
-    AreaChart, 
-    Area, 
-    XAxis, 
-    YAxis, 
-    CartesianGrid, 
-    Tooltip as ChartTooltip, 
-    ResponsiveContainer 
-} from 'recharts';
 import { Product, Stock as StockBatch } from '@/Modules/stock/Types/stock.types';
 import { StockTable } from '@/Modules/stock/Components/StockTable';
 import { useProductDetail, useStocks, useStockTransactions } from '@/Modules/stock/Hooks/useStocks';
 import { BatchForm } from '@/Modules/stock/Components/BatchForm';
 import { StockModals } from '@/Modules/stock/Components/StockModals';
-import { Form, Table } from 'antd';
+import { TransactionHistoryTable } from '@/Modules/stock/Components/TransactionHistoryTable';
+import { StockTrendChart } from '@/Modules/stock/Components/StockTrendChart';
+import { Form } from 'antd';
 import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
@@ -195,58 +188,9 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                             label: <span><HistoryOutlined /> İşlem Geçmişi</span>,
                             children: (
                                 <Card variant="borderless" className="premium-card">
-                                    <Table 
-                                        dataSource={transactions || []}
+                                    <TransactionHistoryTable 
+                                        transactions={transactions || []}
                                         loading={isHistoryLoading}
-                                        size="small"
-                                        rowKey="id"
-                                        columns={[
-                                            {
-                                                title: 'Tarih',
-                                                dataIndex: 'transaction_date',
-                                                render: (date) => dayjs(date).format('DD/MM/YYYY HH:mm')
-                                            },
-                                            {
-                                                title: 'İşlem',
-                                                dataIndex: 'type',
-                                                render: (type) => {
-                                                    const types: any = {
-                                                        'purchase': { label: 'Alım', color: 'green' },
-                                                        'usage': { label: 'Kullanım', color: 'blue' },
-                                                        'adjustment': { label: 'Düzeltme', color: 'orange' },
-                                                        'adjustment_increase': { label: 'Stok Artışı', color: 'green' },
-                                                        'adjustment_decrease': { label: 'Stok Azalışı', color: 'red' },
-                                                        'transfer_in': { label: 'Transfer (Gelen)', color: 'cyan' },
-                                                        'transfer_out': { label: 'Transfer (Giden)', color: 'magenta' }
-                                                    };
-                                                    const config = types[type] || { label: type, color: 'default' };
-                                                    return <Tag color={config.color}>{config.label}</Tag>;
-                                                }
-                                            },
-                                            {
-                                                title: 'Miktar',
-                                                dataIndex: 'quantity',
-                                                render: (qty, record) => (
-                                                    <Text strong style={{ color: record.type === 'purchase' || record.type === 'transfer_in' ? '#52c41a' : '#ff4d4f' }}>
-                                                        {record.type === 'purchase' || record.type === 'transfer_in' ? '+' : '-'}{qty}
-                                                    </Text>
-                                                )
-                                            },
-                                            {
-                                                title: 'Yeni Stok',
-                                                dataIndex: 'new_stock',
-                                                render: (val) => <Text strong>{val}</Text>
-                                            },
-                                            {
-                                                title: 'İşlemi Yapan',
-                                                dataIndex: 'performed_by'
-                                            },
-                                            {
-                                                title: 'Açıklama',
-                                                dataIndex: 'description',
-                                                ellipsis: true
-                                            }
-                                        ]}
                                     />
                                 </Card>
                             )
@@ -257,47 +201,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                             children: (
                                 <Card variant="borderless" className="premium-card">
                                     <Title level={5}>Stok Değişim Trendi</Title>
-                                    {(transactions || []).length > 0 ? (
-                                        <div style={{ height: 350, width: '100%', marginTop: 24 }}>
-                                            <ResponsiveContainer width="100%" height="100%">
-                                                <AreaChart
-                                                    data={(transactions || []).slice().reverse().map((t: any) => ({
-                                                        name: dayjs(t.transaction_date).format('DD/MM HH:mm'),
-                                                        stok: t.new_stock,
-                                                        miktar: t.quantity,
-                                                        tip: t.type_text
-                                                    }))}
-                                                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                                                >
-                                                    <defs>
-                                                        <linearGradient id="colorStok" x1="0" y1="0" x2="0" y2="1">
-                                                            <stop offset="5%" stopColor="#1890ff" stopOpacity={0.1}/>
-                                                            <stop offset="95%" stopColor="#1890ff" stopOpacity={0}/>
-                                                        </linearGradient>
-                                                    </defs>
-                                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-                                                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#8c8c8c' }} />
-                                                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#8c8c8c' }} />
-                                                    <ChartTooltip 
-                                                        contentStyle={{ borderRadius: 8, border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                                    />
-                                                    <Area 
-                                                        type="monotone" 
-                                                        dataKey="stok" 
-                                                        stroke="#1890ff" 
-                                                        strokeWidth={2}
-                                                        fillOpacity={1} 
-                                                        fill="url(#colorStok)" 
-                                                        activeDot={{ r: 6, strokeWidth: 0 }}
-                                                    />
-                                                </AreaChart>
-                                            </ResponsiveContainer>
-                                        </div>
-                                    ) : (
-                                        <div style={{ padding: '40px 0', textAlign: 'center' }}>
-                                            <Text type="secondary">Bu ürün için henüz işlem geçmişi bulunmuyor.</Text>
-                                        </div>
-                                    )}
+                                    <StockTrendChart transactions={transactions || []} />
                                 </Card>
                             )
                         },
@@ -342,6 +246,45 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                                                     <div><Text strong>{data.unit}</Text></div>
                                                 </div>
                                             </Space>
+                                        </Col>
+                                        <Col span={24}>
+                                            <Divider style={{ margin: '8px 0' }} />
+                                            <Title level={5} style={{ marginBottom: 16 }}>Finansal Bilgiler</Title>
+                                            <Row gutter={24}>
+                                                <Col span={8}>
+                                                    <Statistic 
+                                                        title="Ağırlıklı Ortalama Alış Fiyatı" 
+                                                        value={(() => {
+                                                            const validBatches = (data.batches || []).filter(b => b.current_stock > 0);
+                                                            if (validBatches.length === 0) return 0;
+                                                            const totalValue = validBatches.reduce((sum, b) => sum + (Number(b.purchase_price) * b.current_stock), 0);
+                                                            const totalQty = validBatches.reduce((sum, b) => sum + b.current_stock, 0);
+                                                            return totalQty > 0 ? (totalValue / totalQty).toFixed(2) : 0;
+                                                        })()} 
+                                                        suffix={data.batches?.[0]?.currency || 'TRY'} 
+                                                    />
+                                                </Col>
+                                                <Col span={8}>
+                                                    <Statistic 
+                                                        title="Mevcut Stok Değeri" 
+                                                        value={(data.batches || []).reduce((sum, b) => sum + (Number(b.purchase_price) * b.current_stock), 0).toFixed(2) || 0} 
+                                                        suffix={data.batches?.[0]?.currency || 'TRY'}
+                                                        styles={{ content: { color: '#52c41a' } }}
+                                                    />
+                                                </Col>
+                                                <Col span={8}>
+                                                    <Statistic 
+                                                        title="Son Alış Fiyatı" 
+                                                        value={(() => {
+                                                            if (!data.batches || data.batches.length === 0) return 0;
+                                                            // Sort by purchase_date descending to find the latest
+                                                            const sorted = [...data.batches].sort((a, b) => dayjs(b.purchase_date).unix() - dayjs(a.purchase_date).unix());
+                                                            return sorted[0]?.purchase_price || 0;
+                                                        })()} 
+                                                        suffix={data.batches?.[0]?.currency || 'TRY'} 
+                                                    />
+                                                </Col>
+                                            </Row>
                                         </Col>
                                         <Col span={24}>
                                             <Divider style={{ margin: '8px 0' }} />

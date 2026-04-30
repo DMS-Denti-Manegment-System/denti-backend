@@ -38,6 +38,10 @@ class StockResource extends JsonResource
             'clinic_id' => $this->clinic_id,
             'clinic_name' => $this->clinic?->name,
             'storage_location' => $this->storage_location,
+            'has_sub_unit' => $this->has_sub_unit,
+            'sub_unit_name' => $this->sub_unit_name,
+            'sub_unit_multiplier' => $this->sub_unit_multiplier,
+            'current_sub_stock' => $this->current_sub_stock,
             'product' => [
                 'id' => $this->product?->id,
                 'name' => $this->product?->name,

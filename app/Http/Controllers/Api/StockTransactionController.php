@@ -27,18 +27,23 @@ class StockTransactionController extends Controller
         $endDate = $request->query('end_date');
         $clinicId = $request->query('clinic_id');
         $type = $request->query('type');
+        $perPage = min((int)$request->query('per_page', 50), 100);
+
+        $query = $this->stockTransactionService->getBaseQuery()->with(['stock', 'clinic', 'stock.product']);
 
         if ($startDate && $endDate) {
-            $transactions = $this->stockTransactionService->getTransactionsByDateRange(
-                Carbon::parse($startDate),
-                Carbon::parse($endDate),
-                $clinicId
-            );
-        } elseif ($type) {
-            $transactions = $this->stockTransactionService->getTransactionsByType($type, $clinicId);
-        } else {
-            $transactions = $this->stockTransactionService->getAllTransactions();
+            $query->whereBetween('transaction_date', [Carbon::parse($startDate), Carbon::parse($endDate)]);
         }
+
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        if ($clinicId) {
+            $query->where('clinic_id', $clinicId);
+        }
+
+        $transactions = $query->orderByDesc('transaction_date')->paginate($perPage);
 
         return response()->json([
             'success' => true,

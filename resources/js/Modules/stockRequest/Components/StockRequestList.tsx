@@ -137,7 +137,7 @@ export const StockRequestList: React.FC<StockRequestListProps> = ({
                   title={stat.title}
                   value={stat.value}
                   prefix={<span style={{ color: stat.color }}>{stat.icon}</span>}
-                  valueStyle={{ color: stat.color }}
+                  styles={{ content: { color: stat.color } }}
                 />
               </Card>
             </Col>

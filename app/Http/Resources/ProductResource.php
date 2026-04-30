@@ -18,6 +18,8 @@ class ProductResource extends JsonResource
             'brand' => $this->brand,
             'min_stock_level' => $this->min_stock_level,
             'critical_stock_level' => $this->critical_stock_level,
+            'yellow_alert_level' => $this->yellow_alert_level,
+            'red_alert_level' => $this->red_alert_level,
             'total_stock' => $this->total_stock,
             'current_stock' => $this->total_stock, // Alias for compatibility
             'code' => $this->sku, // Alias for compatibility
@@ -25,8 +27,9 @@ class ProductResource extends JsonResource
             'is_active' => $this->is_active,
             'clinic_id' => $this->clinic_id,
             'clinic_name' => $this->clinic?->name,
+            'clinics' => $this->batches->pluck('clinic.name')->unique()->filter()->values(),
             'has_expiration_date' => $this->has_expiration_date,
-            'batches' => StockResource::collection($this->whenLoaded('batches'))->values(),
+            'batches' => StockResource::collection($this->whenLoaded('batches')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

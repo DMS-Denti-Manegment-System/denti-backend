@@ -59,19 +59,24 @@ class Product extends Model
     // Accessors
     public function getTotalStockAttribute()
     {
-        return $this->batches()->sum('current_stock');
+        return $this->batches->sum(function($batch) {
+            if (!$batch->has_sub_unit) {
+                return $batch->current_stock;
+            }
+            return ($batch->current_stock * ($batch->sub_unit_multiplier ?? 1)) + $batch->current_sub_stock;
+        });
     }
 
     public function getStockStatusAttribute()
     {
-        if (!$this->is_active) return 'inactive';
+        if (!$this->is_active) return \App\Enums\StockStatus::INACTIVE->value;
         
         $total = $this->total_stock;
         $redLevel = $this->red_alert_level ?? $this->critical_stock_level;
         $yellowLevel = $this->yellow_alert_level ?? $this->min_stock_level;
 
         if ($total <= $redLevel) return 'critical';
-        if ($total <= $yellowLevel) return 'low';
+        if ($total <= $yellowLevel) return \App\Enums\StockStatus::LOW_STOCK->value;
         return 'normal';
     }
 }

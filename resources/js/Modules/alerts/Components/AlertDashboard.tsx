@@ -90,7 +90,7 @@ export const AlertDashboard: React.FC<AlertDashboardProps> = ({ clinicId }) => {
               title="Toplam Aktif Uyarı"
               value={stats?.total_active || 0}
               prefix={<ExclamationCircleOutlined style={{ color: '#fa8c16' }} />}
-              valueStyle={{ color: '#fa8c16' }}
+              styles={{ content: { color: '#fa8c16' } }}
             />
           </Card>
         </Col>
@@ -107,7 +107,7 @@ export const AlertDashboard: React.FC<AlertDashboardProps> = ({ clinicId }) => {
               title="Düşük Stok"
               value={stats?.low_stock || 0}
               prefix={<InfoCircleOutlined style={{ color: '#1890ff' }} />}
-              valueStyle={{ color: '#1890ff' }}
+              styles={{ content: { color: '#1890ff' } }}
             />
           </Card>
         </Col>
@@ -124,7 +124,7 @@ export const AlertDashboard: React.FC<AlertDashboardProps> = ({ clinicId }) => {
               title="Kritik Stok"
               value={stats?.critical_stock || 0}
               prefix={<FireOutlined style={{ color: '#ff4d4f' }} />}
-              valueStyle={{ color: '#ff4d4f' }}
+              styles={{ content: { color: '#ff4d4f' } }}
             />
           </Card>
         </Col>
@@ -143,7 +143,7 @@ export const AlertDashboard: React.FC<AlertDashboardProps> = ({ clinicId }) => {
               title="Son Kullanması Yaklaşan"
               value={stats?.near_expiry || 0}
               prefix={<WarningOutlined style={{ color: '#faad14' }} />}
-              valueStyle={{ color: '#faad14' }}
+              styles={{ content: { color: '#faad14' } }}
             />
           </Card>
         </Col>
@@ -160,7 +160,7 @@ export const AlertDashboard: React.FC<AlertDashboardProps> = ({ clinicId }) => {
               title="Süresi Geçmiş"
               value={stats?.expired || 0}
               prefix={<CloseCircleOutlined style={{ color: '#595959' }} />}
-              valueStyle={{ color: '#595959' }}
+              styles={{ content: { color: '#595959' } }}
             />
           </Card>
         </Col>

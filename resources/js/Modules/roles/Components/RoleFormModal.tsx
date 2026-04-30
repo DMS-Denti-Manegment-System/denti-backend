@@ -86,7 +86,7 @@ export const RoleFormModal: React.FC<RoleFormModalProps> = ({
           <Input placeholder="Örn: Klinik Yöneticisi" />
         </Form.Item>
 
-        <Divider orientation="left">İzinler (Modül Bazlı)</Divider>
+        <Divider titlePlacement="left">İzinler (Modül Bazlı)</Divider>
 
         {isLoadingPermissions ? (
           <Skeleton active />

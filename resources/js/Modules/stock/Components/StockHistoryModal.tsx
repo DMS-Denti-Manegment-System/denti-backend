@@ -150,7 +150,7 @@ export const StockHistoryModal: React.FC<StockHistoryModalProps> = ({
                     title="Toplam Giriş" 
                     value={stats.added} 
                     suffix={stock?.unit}
-                    valueStyle={{ color: '#3f8600' }}
+                    styles={{ content: { color: '#3f8600' } }}
                   />
                 </Card>
               </Col>

@@ -70,18 +70,25 @@ class StockRequestService
      */
     public function approveRequest(int $requestId, int $approvedQuantity, string $approvedBy, string $notes = null): bool
     {
-        // 🔒 Güvenlik: Onaylama yetkisi sadece belirli rollere aittir
+        $request = $this->stockRequestRepository->find($requestId);
+        if (!$request || $request->status !== 'pending') {
+            throw new \Exception('Geçersiz talep veya talep zaten işlenmiş');
+        }
+
+        // 🔒 GÜVENLİK: Sadece ürünü VERECEK olan klinik onaylayabilir.
         $user = Auth::user();
-        if (!$user || !$user->hasAnyRole(['Super Admin', 'Company Owner', 'Stock Manager'])) {
+        $isSuperAdmin = $user->hasRole('Super Admin');
+        
+        if (!$isSuperAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+            throw new AuthorizationException('Bu talebi sadece ürünü gönderecek olan klinik onaylayabilir.');
+        }
+
+        // Yetki kontrolü (Rol bazlı)
+        if (!$isSuperAdmin && !$user->hasAnyRole(['Company Owner', 'Stock Manager', 'Clinic Manager', 'Admin'])) {
             throw new AuthorizationException('Bu talebi onaylama yetkiniz bulunmamaktadır.');
         }
 
-        return DB::transaction(function () use ($requestId, $approvedQuantity, $approvedBy, $notes) {
-            $request = $this->stockRequestRepository->find($requestId);
-            if (!$request || $request->status !== 'pending') {
-                throw new \Exception('Geçersiz talep veya talep zaten işlenmiş');
-            }
-
+        return DB::transaction(function () use ($request, $requestId, $approvedQuantity, $approvedBy, $notes) {
             // Stok kontrol
             if ($request->stock->available_stock < $approvedQuantity) {
                 throw new \Exception('Yetersiz stok miktarı');
@@ -103,27 +110,26 @@ class StockRequestService
         });
     }
 
-    /**
-     * Onaylanmış talebi tamamla (fiziksel transfer).
-     * Sadece Company Owner veya Super Admin rolüne sahip kullanıcılar tamamlayabilir.
-     *
-     * @throws AuthorizationException   Yetki yoksa
-     * @throws \Exception               Talep geçersizse
-     */
     public function completeRequest(int $requestId, string $performedBy): bool
     {
-        // 🔒 Güvenlik: Tamamlama yetkisi sadece belirli rollere aittir
+        $request = $this->stockRequestRepository->find($requestId);
+        if (!$request || $request->status !== 'approved') {
+            throw new \Exception('Talep bulunamadı veya onaylanmamış');
+        }
+
+        // 🔒 GÜVENLİK: Sadece ürünü GÖNDEREN klinik transferi tamamlayabilir.
         $user = Auth::user();
-        if (!$user || !$user->hasAnyRole(['Super Admin', 'Company Owner', 'Stock Manager'])) {
+        $isSuperAdmin = $user->hasRole('Super Admin');
+
+        if (!$isSuperAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+            throw new AuthorizationException('Bu işlemi sadece ürünü gönderen klinik tamamlayabilir.');
+        }
+
+        if (!$isSuperAdmin && !$user->hasAnyRole(['Company Owner', 'Stock Manager', 'Clinic Manager', 'Admin'])) {
             throw new AuthorizationException('Bu talebi tamamlama yetkiniz bulunmamaktadır.');
         }
 
-        return DB::transaction(function () use ($requestId, $performedBy) {
-            $request = $this->stockRequestRepository->find($requestId);
-            if (!$request || $request->status !== 'approved') {
-                throw new \Exception('Talep bulunamadı veya onaylanmamış');
-            }
-
+        return DB::transaction(function () use ($request, $requestId, $performedBy) {
             // Transfer işlemi gerçekleştir
             $this->transferStock($request, $performedBy);
 
@@ -142,6 +148,14 @@ class StockRequestService
         $request = $this->stockRequestRepository->find($requestId);
         if (!$request || $request->status !== 'pending') {
             throw new \Exception('Talep bulunamadı veya zaten işlenmiş');
+        }
+
+        // 🔒 GÜVENLİK: Sadece ürünü VERECEK olan klinik reddedebilir.
+        $user = Auth::user();
+        $isSuperAdmin = $user->hasRole('Super Admin');
+
+        if (!$isSuperAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+            throw new AuthorizationException('Bu talebi sadece ürünü gönderecek olan klinik reddedebilir.');
         }
 
         return (bool) $this->stockRequestRepository->update($requestId, [
@@ -192,7 +206,7 @@ class StockRequestService
         $stockRepository = app(StockRepositoryInterface::class);
         $transactionService = app(StockTransactionService::class);
 
-        // Kaynak klinikten çıkış
+        // Kaynak klinikten çıkış işlemi (Observer current_stock'u düşürecek)
         $transactionService->createTransaction([
             'transaction_number' => $this->generateTransactionNumber(),
             'stock_id' => $sourceStock->id,
@@ -207,17 +221,15 @@ class StockRequestService
             'transaction_date' => now()
         ]);
 
-        // Kaynak stoku güncelle
+        // 🛡️ Sadece rezerve stoku güncelle (Observer sadece current_stock'u yönetir)
         $stockRepository->update($sourceStock->id, [
-            'current_stock' => $sourceStock->current_stock - $quantity,
             'reserved_stock' => $sourceStock->reserved_stock - $quantity,
-            'available_stock' => $sourceStock->current_stock - $quantity - ($sourceStock->reserved_stock - $quantity)
         ]);
 
         // Hedef klinikteki stoku bul veya oluştur
         $targetStock = $this->findOrCreateTargetStock($sourceStock, $request->requester_clinic_id);
 
-        // Hedef kliniğe giriş
+        // Hedef kliniğe giriş işlemi (Observer current_stock'u artıracak)
         $transactionService->createTransaction([
             'transaction_number' => $this->generateTransactionNumber(),
             'stock_id' => $targetStock->id,
@@ -232,11 +244,7 @@ class StockRequestService
             'transaction_date' => now()
         ]);
 
-        // Hedef stoku güncelle
-        $stockRepository->update($targetStock->id, [
-            'current_stock' => $targetStock->current_stock + $quantity,
-            'available_stock' => $targetStock->available_stock + $quantity
-        ]);
+        // Hedef stokta rezerve güncellemesine gerek yok (yeni giriş)
     }
 
     protected function findOrCreateTargetStock($sourceStock, int $targetClinicId)

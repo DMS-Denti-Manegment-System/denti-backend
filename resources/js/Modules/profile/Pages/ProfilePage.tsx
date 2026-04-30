@@ -170,7 +170,7 @@ export const ProfilePage: React.FC = () => {
         <Text type="secondary">Kişisel bilgilerinizi ve hesap güvenliğinizi buradan yönetebilirsiniz.</Text>
       </div>
 
-      <Card bordered={false} className="shadow-sm">
+      <Card variant="borderless" className="shadow-sm">
         <Tabs 
           defaultActiveKey="info" 
           items={items} 

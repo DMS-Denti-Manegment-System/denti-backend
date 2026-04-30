@@ -82,7 +82,15 @@ class SupplierController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'sometimes|required|string|max:255',
+            'name' => [
+                'sometimes',
+                'required',
+                'string',
+                'max:255',
+                \Illuminate\Validation\Rule::unique('suppliers')->where(function ($query) {
+                    return $query->where('company_id', auth()->user()->company_id);
+                })->ignore($id)
+            ],
             'contact_person' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
             'email' => 'nullable|email|max:255',

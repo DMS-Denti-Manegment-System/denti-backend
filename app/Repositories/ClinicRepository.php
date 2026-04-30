@@ -90,16 +90,19 @@ class ClinicRepository implements ClinicRepositoryInterface
 
     public function getStockSummary(int $clinicId): array
     {
+        $companyId = auth()->user()->company_id;
         $summary = DB::table('stocks')
-            ->where('clinic_id', $clinicId)
-            ->where('status', 'active')
-            ->whereNull('deleted_at')
+            ->join('products', 'stocks.product_id', '=', 'products.id')
+            ->where('stocks.clinic_id', $clinicId)
+            ->where('stocks.company_id', $companyId)
+            ->where('stocks.is_active', true)
+            ->whereNull('stocks.deleted_at')
             ->selectRaw('
                 COUNT(*) as total_items,
-                SUM(current_stock) as total_quantity,
-                SUM(current_stock * purchase_price) as total_value,
-                SUM(CASE WHEN current_stock <= yellow_alert_level THEN 1 ELSE 0 END) as low_stock_items,
-                SUM(CASE WHEN current_stock <= red_alert_level THEN 1 ELSE 0 END) as critical_stock_items
+                SUM(stocks.current_stock) as total_quantity,
+                SUM(stocks.current_stock * stocks.purchase_price) as total_value,
+                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.yellow_alert_level, products.min_stock_level, 10) THEN 1 ELSE 0 END) as low_stock_items,
+                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.red_alert_level, products.critical_stock_level, 5) THEN 1 ELSE 0 END) as critical_stock_items
             ')
             ->first();
 
@@ -114,16 +117,19 @@ class ClinicRepository implements ClinicRepositoryInterface
 
     public function getGlobalStats(): array
     {
+        $companyId = auth()->user()->company_id;
         $totalClinics = $this->model->count();
         $activeClinics = $this->model->where('is_active', true)->count();
         
         $stockStats = DB::table('stocks')
-            ->where('status', 'active')
-            ->whereNull('deleted_at')
+            ->join('products', 'stocks.product_id', '=', 'products.id')
+            ->where('stocks.company_id', $companyId)
+            ->where('stocks.is_active', true)
+            ->whereNull('stocks.deleted_at')
             ->selectRaw('
                 COUNT(*) as total_items,
-                SUM(CASE WHEN current_stock <= yellow_alert_level THEN 1 ELSE 0 END) as low_stock_items,
-                SUM(CASE WHEN current_stock <= red_alert_level THEN 1 ELSE 0 END) as critical_stock_items
+                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.yellow_alert_level, products.min_stock_level, 10) THEN 1 ELSE 0 END) as low_stock_items,
+                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.red_alert_level, products.critical_stock_level, 5) THEN 1 ELSE 0 END) as critical_stock_items
             ')
             ->first();
 

@@ -178,13 +178,13 @@ class StockRepository implements StockRepositoryInterface
 
     public function findByClinicAndProduct(int $clinicId, string $name, string $brand = null): ?Stock
     {
-        $query = $this->model->where('clinic_id', $clinicId)->where('name', $name);
-
-        if ($brand) {
-            $query->where('brand', $brand);
-        }
-
-        return $query->first();
+        return $this->model->with('product')->where('clinic_id', $clinicId)
+            ->whereHas('product', function($q) use ($name, $brand) {
+                $q->where('name', $name);
+                if ($brand) {
+                    $q->where('brand', $brand);
+                }
+            })->first();
     }
     public function findByCode(string $code): ?Stock
     {

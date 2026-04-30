@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\StockStatus;
 use App\Http\Controllers\Controller;
 use App\Services\StockService;
 use App\Http\Requests\StoreStockRequest;
@@ -121,7 +122,7 @@ class StockController extends Controller
             $data = $request->validated();
 
             if (isset($data['is_active'])) {
-                $data['status'] = $data['is_active'] ? 'active' : 'inactive';
+                $data['status'] = $data['is_active'] ? StockStatus::ACTIVE : StockStatus::INACTIVE;
             }
 
             $stock = $this->stockService->getStockById((int)$id);
@@ -333,7 +334,7 @@ class StockController extends Controller
 
             $updatedStock = $this->stockService->updateStock($id, [
                 'is_active' => false,
-                'status' => 'inactive'
+                'status' => StockStatus::INACTIVE
             ]);
 
             return $this->success(new StockResource($updatedStock->load('product')), 'Stok pasif duruma getirildi');
@@ -355,7 +356,7 @@ class StockController extends Controller
 
             $updatedStock = $this->stockService->updateStock($id, [
                 'is_active' => true,
-                'status' => 'active'
+                'status' => StockStatus::ACTIVE
             ]);
 
             return $this->success(new StockResource($updatedStock->load('product')), 'Stok başarıyla aktif edildi');

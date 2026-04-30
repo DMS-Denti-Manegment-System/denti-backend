@@ -39,8 +39,8 @@ class StockTransactionObserver
         // entry/adjustment_plus -> Increment (+)
         // usage/loss/adjustment_minus -> Decrement (-)
         $isPositive = match ($transaction->type) {
-            'entry', 'adjustment_plus', 'purchase', 'transfer_in', 'returned' => true,
-            'usage', 'loss', 'adjustment_minus', 'transfer_out', 'expired', 'damaged' => false,
+            'entry', 'adjustment_plus', 'adjustment_increase', 'purchase', 'transfer_in', 'returned', 'return_in' => true,
+            'usage', 'loss', 'adjustment_minus', 'adjustment_decrease', 'transfer_out', 'expired', 'damaged', 'return_out' => false,
             default => null,
         };
 
@@ -75,6 +75,9 @@ class StockTransactionObserver
 
         // Trigger alert check for any stock change
         app(\App\Services\StockAlertService::class)->checkAndCreateAlerts($stock);
+
+        // Dispatch Event for real-time updates
+        \App\Events\Stock\StockLevelChanged::dispatch($stock->fresh(), $stock->company_id, $stock->clinic_id);
     }
 
     /**

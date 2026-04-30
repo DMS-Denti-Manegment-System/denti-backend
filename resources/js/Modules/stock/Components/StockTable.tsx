@@ -1,9 +1,11 @@
 // src/modules/stock/Components/StockTable.tsx
 
 import React from 'react'
-import { Table, Tag, Tooltip, Space, Button, Dropdown, Modal, Typography, Avatar } from 'antd'
+import { Table, Tag, Tooltip, Space, Button, Dropdown, Modal, Typography, Avatar, Progress, Badge } from 'antd'
 
-const { Text } = Typography
+import { router } from '@inertiajs/react'
+
+const { Text, Paragraph } = Typography
 import { 
   EditOutlined,
   DeleteOutlined,
@@ -14,14 +16,14 @@ import {
   PauseOutlined,
   PlayCircleOutlined,
   StopOutlined,
-  LineChartOutlined
+  LineChartOutlined,
+  HistoryOutlined,
+  ShoppingOutlined
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import type { ColumnsType } from 'antd/es/table'
-import type { MenuProps } from 'antd'
 import { Stock } from '../Types/stock.types'
 import { StockLevelBadge } from './StockLevelBadge'
-import { formatStock } from '@/Utils/helpers'
 import { useStockTableLogic } from '../Hooks/useStockTableLogic'
 
 interface StockTableProps {
@@ -56,9 +58,7 @@ export const StockTable: React.FC<StockTableProps> = ({
     setAdvancedModalStock,
     deleteStockId,
     setDeleteStockId,
-    getStockStatus,
     handleDeleteConfirm,
-    handleAdvancedDelete,
     handleStandardDelete,
     handleSoftDeleteAction,
     handleReactivateAction,
@@ -67,247 +67,246 @@ export const StockTable: React.FC<StockTableProps> = ({
 
   const columns: ColumnsType<Stock> = [
     {
-      title: '📦 Ürün / Parti',
-      key: 'name',
+      title: '📦 Ürün Bilgisi',
+      key: 'product_info',
       fixed: 'left',
-      width: 250,
+      width: 280,
       render: (_, record) => (
-        <Space size={12}>
+        <Space size={12} align="start">
           <Avatar 
-            shape="rounded"
-            style={{ backgroundColor: '#e6f7ff', color: '#1890ff', fontWeight: 'bold' }}
-          >
-            {record.name.charAt(0).toUpperCase()}
-          </Avatar>
-          <div>
-            <Text strong style={{ fontSize: 13, display: 'block' }}>{record.name}</Text>
-            {isBatchMode ? (
-              <Text type="secondary" style={{ fontSize: 11 }}>
-                ID: #{record.id} | {record.storage_location || 'Konum yok'}
-              </Text>
-            ) : (
-              record.sku && <Text type="secondary" style={{ fontSize: 11 }}>SKU: {record.sku}</Text>
-            )}
+            shape="square" 
+            size={44}
+            style={{ 
+              backgroundColor: record.is_active ? '#e6f7ff' : '#f5f5f5', 
+              color: record.is_active ? '#1890ff' : '#bfbfbf',
+              borderRadius: '8px',
+              border: '1px solid #d9d9d9'
+            }}
+            icon={<ShoppingOutlined />}
+          />
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <Text strong style={{ fontSize: '14px', color: record.is_active ? '#262626' : '#8c8c8c' }}>
+              {record.name}
+            </Text>
+            <Space size={4} split={<Text type="secondary" style={{ fontSize: '10px' }}>•</Text>}>
+                {!isBatchMode ? (
+                   <Text type="secondary" style={{ fontSize: '12px' }}>{record.category}</Text>
+                ) : (
+                   <Text type="secondary" style={{ fontSize: '12px' }}>ID: #{record.id}</Text>
+                )}
+                {record.sku && <Text type="secondary" style={{ fontSize: '12px' }}>{record.sku}</Text>}
+            </Space>
           </div>
         </Space>
       ),
     },
-    !isBatchMode ? {
-      title: '🗂️ Kategori',
-      dataIndex: 'category',
-      key: 'category',
-      width: 120,
-      render: (cat) => <Tag color="cyan">{cat}</Tag>
-    } : {
-      title: '📅 Giriş Tarihi',
-      dataIndex: 'purchase_date',
-      key: 'purchase_date',
-      width: 120,
-      render: (date) => dayjs(date).format('DD/MM/YYYY')
+    {
+      title: '🏥 Klinik & Konum',
+      key: 'location',
+      width: 180,
+      render: (_, record) => {
+        const clinics = (record as any).clinics || [];
+        return (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {isBatchMode ? (
+              <Tag color="geekblue" style={{ width: 'fit-content', marginBottom: '4px' }}>
+                {record.clinic?.name}
+              </Tag>
+            ) : (
+              <Space direction="vertical" size={2}>
+                {clinics.length > 0 ? (
+                  clinics.map((name: string) => (
+                    <Tag key={name} color="geekblue" style={{ margin: 0 }}>
+                      {name}
+                    </Tag>
+                  ))
+                ) : (
+                  <Tag color="default">-</Tag>
+                )}
+              </Space>
+            )}
+            {isBatchMode && record.storage_location && (
+              <Text type="secondary" style={{ fontSize: '11px', marginTop: '4px' }}>📍 {record.storage_location}</Text>
+            )}
+          </div>
+        )
+      }
     },
     {
-      title: '🏥 Klinik',
-      key: 'clinic',
-      width: 150,
-      render: (_, record) => (
-        <Tag color="geekblue">
-          {isBatchMode ? record.clinic?.name : (record as any).clinic_name || '-'}
-        </Tag>
-      )
+      title: '📊 Stok Durumu',
+      key: 'stock_level',
+      width: 200,
+      render: (_, record) => {
+        const current = isBatchMode ? record.current_stock : (record as any).total_stock;
+        const min = record.min_stock_level || 0;
+        const percent = min > 0 ? Math.min((current / (min * 2)) * 100, 100) : 100;
+        
+        let statusColor = '#52c41a';
+        if (current <= record.critical_stock_level) statusColor = '#f5222d';
+        else if (current <= record.min_stock_level) statusColor = '#faad14';
+
+        return (
+          <div style={{ width: '100%', paddingRight: '20px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <Text strong>{current} {record.unit}</Text>
+              <StockLevelBadge stock={record} />
+            </div>
+            <Progress 
+                percent={percent} 
+                showInfo={false} 
+                strokeColor={statusColor} 
+                size="small" 
+                trailColor="#f0f0f0"
+            />
+          </div>
+        );
+      }
     },
+    ...(isBatchMode ? [
+      {
+        title: '📅 Takip',
+        key: 'tracking',
+        width: 160,
+        render: (_, record: Stock) => (
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
+            {record.expiry_date ? (
+                <Space size={4}>
+                    <Text type={dayjs(record.expiry_date).isBefore(dayjs().add(1, 'month')) ? 'danger' : 'secondary'} style={{ fontSize: '12px' }}>
+                        SKT: {dayjs(record.expiry_date).format('DD/MM/YYYY')}
+                    </Text>
+                    {dayjs(record.expiry_date).isBefore(dayjs()) && <Badge status="error" />}
+                </Space>
+            ) : <Text type="secondary" style={{ fontSize: '12px' }}>SKT Yok</Text>}
+            <Text type="secondary" style={{ fontSize: '11px' }}>Giriş: {dayjs(record.purchase_date).format('DD/MM/YY')}</Text>
+          </div>
+        )
+      }
+    ] : [
+        {
+            title: '📦 Partiler',
+            key: 'batches',
+            width: 100,
+            align: 'center' as const,
+            render: (_, record: any) => (
+                <Badge count={record.batches?.length || 0} color="#1890ff" showZero />
+            )
+        }
+    ]),
     {
-      title: isBatchMode ? '🔢 Parti Stoğu' : '🔢 Toplam Stok',
-      key: 'current_stock',
-      width: 150,
-      render: (_, record) => (
-        <div>
-          <Text strong style={{ fontSize: 14 }}>
-            {isBatchMode ? record.current_stock : (record as any).total_stock} {record.unit}
-          </Text>
-        </div>
-      )
-    },
-    isBatchMode ? {
-      title: '📅 S.K.T',
-      dataIndex: 'expiry_date',
-      key: 'expiry_date',
-      width: 120,
-      render: (date) => date ? dayjs(date).format('DD/MM/YYYY') : '-'
-    } : {
-      title: '📦 Partiler',
-      key: 'batches_count',
-      width: 100,
-      align: 'center',
-      render: (_, record) => <Tag color="blue">{(record as any).batches?.length || 0} Parti</Tag>
-    },
-    {
-      title: '⚡ Durum',
-      key: 'status',
-      width: 120,
-      align: 'center',
-      render: (_, record) => <StockLevelBadge stock={record} />
-    },
-    isBatchMode ? {
-      title: '🏪 Tedarikçi',
-      key: 'supplier',
-      width: 150,
-      render: (_, record) => record.supplier?.name || '-'
-    } : {
-      title: '📉 Min',
-      dataIndex: 'min_stock_level',
-      key: 'min_stock_level',
-      width: 80,
-      align: 'center',
-    },
-    {
-      title: isBatchMode ? '💰 Fiyat' : '⚠️ Kritik',
-      key: 'price_or_critical',
-      width: 120,
-      render: (_, record) => isBatchMode ? (
-        <Text style={{ color: '#52c41a' }}>{record.purchase_price} {record.currency}</Text>
-      ) : (
-        <Text type="danger" strong>{record.critical_stock_level}</Text>
-      )
-    },
-    {
-      title: '⚙️',
+      title: '',
       key: 'actions',
-      width: 120,
-      fixed: 'right',
-      align: 'center',
+      width: 160,
+      fixed: 'right' as const,
+      align: 'right' as const,
       render: (_, record) => (
         <Space>
-          {!isBatchMode && (
+          {isBatchMode ? (
             <Button 
-              type="primary" 
-              size="small" 
-              onClick={() => window.location.href = `/stock/products/${record.id}`}
-            >
-              Detay
-            </Button>
-          )}
-          {isBatchMode && (
-            <Button 
+              type="primary"
               size="small" 
               onClick={() => onUse(record)}
-              disabled={record.current_stock <= 0}
+              disabled={record.current_stock <= 0 || !record.is_active}
+              style={{ borderRadius: '4px' }}
             >
               Kullan
             </Button>
+          ) : (
+            <Button 
+                type="primary" 
+                ghost
+                size="small" 
+                onClick={() => router.visit(`/stock/products/${record.id}`)}
+                style={{ borderRadius: '4px' }}
+            >
+                Yönet
+            </Button>
           )}
+          
           <Dropdown 
             menu={{ 
               items: [
                 { key: 'edit', label: 'Düzenle', icon: <EditOutlined />, onClick: () => onEdit(record) },
+                { key: 'use', label: 'Stok Kullan', icon: <MinusOutlined />, onClick: () => onUse(record) },
+                { key: 'history', label: 'Geçmiş', icon: <HistoryOutlined />, onClick: () => onViewHistory(record) },
+                { key: 'adjust', label: 'Düzeltme Yap', icon: <PlusOutlined />, onClick: () => onAdjust(record) },
+                { type: 'divider' },
                 { key: 'delete', label: 'Sil', icon: <DeleteOutlined />, danger: true, onClick: () => handleDeleteConfirm(record.id) }
               ] 
             }} 
             trigger={['click']}
           >
-            <Button type="text" icon={<MoreOutlined />} />
+            <Button type="text" icon={<MoreOutlined />} shape="circle" />
           </Dropdown>
         </Space>
       )
     },
-  ].filter(Boolean) as ColumnsType<Stock>
+  ]
 
   return (
     <>
     <Table
       columns={columns}
-      scroll={{ x: 1800 }}
+      scroll={{ x: 1000 }} // Width reduced from 1800 to 1000 to prevent extreme sliding
       dataSource={stocks}
       rowKey="id"
       loading={loading}
       pagination={{
         pageSize: 10,
         showSizeChanger: true,
-        showTotal: (total) => `Toplam ${total} ürün`,
+        showTotal: (total) => `Toplam ${total} kayıt`,
       }}
-      size="small"
-      onRow={(record) => {
-        const isInactive = record.is_active === false
-        return {
+      size="middle"
+      onRow={(record) => ({
           style: {
-            backgroundColor: isInactive ? '#fafafa' : '#fff',
-            cursor: 'pointer',
-            borderLeft: isInactive ? '3px solid #faad14' : 'none'
-          },
-          onClick: () => onViewHistory(record)
-        }
-      }}
-      className="premium-table"
-      style={{ borderRadius: '8px', overflow: 'hidden' }}
+            backgroundColor: record.is_active === false ? '#fafafa' : '#fff',
+            cursor: 'default'
+          }
+      })}
+      className="custom-premium-table"
     />
 
     <Modal
       title={
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <Space>
           <ExclamationCircleOutlined style={{ color: '#faad14' }} />
-          <span>Gelişmiş Durum & Güvenlik İşlemleri</span>
-        </div>
+          <span>Gelişmiş İşlemler</span>
+        </Space>
       }
       open={!!advancedModalStock}
       onCancel={() => setAdvancedModalStock(null)}
       footer={null}
-      width={500}
-      destroyOnHidden
+      width={450}
     >
       {advancedModalStock && (
-        <div>
-          <p><strong>Stok:</strong> {advancedModalStock.name}</p>
-          <p><strong>Mevcut Durum:</strong> {
-             advancedModalStock.status === 'deleted' ? '🗑️ Silinmiş' : 
-             advancedModalStock.is_active === false ? '⏸️ Pasif' : 
-             '✅ Aktif'
-          }</p>
+        <Space direction="vertical" style={{ width: '100%' }} size="large">
+          <div>
+            <Text type="secondary">Seçili Kayıt:</Text>
+            <Paragraph strong style={{ fontSize: '16px', margin: 0 }}>{advancedModalStock.name}</Paragraph>
+          </div>
           
-          <div style={{ background: '#fff1f0', padding: 12, borderRadius: 6, margin: '16px 0' }}>
-            <p style={{ margin: 0, fontSize: 13, color: '#cf1322' }}>
-              <strong>⚠️ Zorla Silme (Force Delete):</strong><br/>
-              İşlem geçmişi olan stokları bile zorla siler. Raporlarda tutarsızlığa neden olabilir.
-            </p>
+          <div style={{ background: '#fff1f0', padding: '12px', borderRadius: '8px', border: '1px solid #ffa39e' }}>
+            <Text type="danger" strong>⚠️ Kritik İşlemler</Text>
+            <Paragraph style={{ margin: '8px 0 0', fontSize: '13px' }}>
+              Zorla silme işlemi veritabanı bütünlüğünü etkileyebilir. Lütfen dikkatli olun.
+            </Paragraph>
           </div>
 
-          <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-            <Button onClick={() => setAdvancedModalStock(null)}>İptal</Button>
-            
-            {advancedModalStock.is_active !== false && advancedModalStock.status !== 'deleted' && (
-              <Button 
-                icon={<PauseOutlined />}
-                onClick={handleSoftDeleteAction}
-              >
-                Pasife Al
-              </Button>
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'flex-end' }}>
+            <Button onClick={() => setAdvancedModalStock(null)}>Kapat</Button>
+            {advancedModalStock.is_active !== false && (
+              <Button icon={<PauseOutlined />} onClick={handleSoftDeleteAction}>Pasife Al</Button>
             )}
-
-            {advancedModalStock.is_active === false && advancedModalStock.status !== 'deleted' && (
-              <Button 
-                type="primary"
-                icon={<PlayCircleOutlined />}
-                onClick={handleReactivateAction}
-              >
-                Aktif Et
-              </Button>
+            {advancedModalStock.is_active === false && (
+              <Button type="primary" icon={<PlayCircleOutlined />} onClick={handleReactivateAction}>Aktif Et</Button>
             )}
-
-            {advancedModalStock.status !== 'deleted' && (
-              <Button 
-                type="primary" 
-                danger 
-                icon={<StopOutlined />}
-                onClick={handleHardDeleteAction}
-              >
-                Zorla Sil
-              </Button>
-            )}
-          </Space>
-        </div>
+            <Button type="primary" danger icon={<StopOutlined />} onClick={handleHardDeleteAction}>Kalıcı Sil</Button>
+          </div>
+        </Space>
       )}
     </Modal>
 
     <Modal
-      title="Stoku Silmek İstediğinize Emin Misiniz?"
+      title="Silme Onayı"
       open={!!deleteStockId}
       onCancel={() => setDeleteStockId(null)}
       okText="Evet, Sil"
@@ -315,8 +314,24 @@ export const StockTable: React.FC<StockTableProps> = ({
       okButtonProps={{ danger: true }}
       onOk={handleStandardDelete}
     >
-      <p>Bu işlem, stok kullanım geçmişine göre ürünü ya tamamen siler ya da otomatik olarak pasife alır.</p>
+      <Paragraph>Bu ürünü silmek istediğinize emin misiniz?</Paragraph>
+      <Text type="secondary">Eğer ürünün geçmiş hareketleri varsa, sistem ürünü silmek yerine otomatik olarak pasife alacaktır.</Text>
     </Modal>
+
+    <style dangerouslySetInnerHTML={{ __html: `
+      .custom-premium-table .ant-table-thead > tr > th {
+        background: #fafafa;
+        font-weight: 600;
+        border-bottom: 2px solid #f0f0f0;
+      }
+      .custom-premium-table .ant-table-row:hover > td {
+        background: #f9fbfd !important;
+      }
+      .custom-premium-table .ant-table-cell-fix-right, 
+      .custom-premium-table .ant-table-cell-fix-left {
+        background: inherit !important;
+      }
+    `}} />
     </>
   )
 }

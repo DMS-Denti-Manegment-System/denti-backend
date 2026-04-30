@@ -44,6 +44,7 @@ class Stock extends Model
         'current_sub_stock' => 'integer',
         'expiry_yellow_days' => 'integer',
         'expiry_red_days' => 'integer',
+        'status' => \App\Enums\StockStatus::class,
     ];
 
     protected $attributes = [
@@ -153,7 +154,7 @@ class Stock extends Model
 
     public function getStockStatusAttribute()
     {
-        if (!$this->is_active) return 'inactive';
+        if (!$this->is_active) return \App\Enums\StockStatus::INACTIVE->value;
         
         $product = $this->product;
         if (!$product) return 'normal';
@@ -163,7 +164,7 @@ class Stock extends Model
         $yellowLevel = $product->yellow_alert_level ?? $product->min_stock_level;
 
         if ($total <= $redLevel) return 'critical';
-        if ($total <= $yellowLevel) return 'low';
+        if ($total <= $yellowLevel) return \App\Enums\StockStatus::LOW_STOCK->value;
         return 'normal';
     }
 
@@ -204,7 +205,7 @@ class Stock extends Model
 
         static::deleting(function ($stock) {
             // Soft delete sırasında status'ü güncelle ve uyarılrı sil
-            $stock->status = 'deleted';
+            $stock->status = \App\Enums\StockStatus::DELETED;
             $stock->saveQuietly();
             
             // Bağlı uyarıları sil

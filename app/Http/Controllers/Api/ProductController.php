@@ -23,7 +23,7 @@ class ProductController extends Controller
     public function index(Request $request): JsonResponse
     {
         try {
-            $filters = $request->only(['search', 'category', 'status']);
+            $filters = $request->only(['search', 'category', 'status', 'clinic_id']);
             $perPage = min((int)$request->query('per_page', 50), 100);
 
             $products = $this->productService->getAllProducts($filters, $perPage);

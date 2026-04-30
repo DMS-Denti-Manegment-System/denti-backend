@@ -64,7 +64,7 @@ export const StockStats: React.FC<StockStatsProps> = ({ stats }) => {
           <Statistic 
             title="Kritik Seviye" 
             value={stats.critical_stock_items}
-            valueStyle={{ color: '#ff4d4f' }}
+            styles={{ content: { color: '#ff4d4f' } }}
             prefix={<ExclamationCircleOutlined />}
           />
         </Card>

@@ -2,7 +2,7 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { Card, Form, Typography } from 'antd'
-import { useProducts, useProductDetail } from '../Hooks/useStocks'
+import { useProducts, useStocks, useProductDetail, useStockStats } from '../Hooks/useStocks'
 import { Product as Stock, StockFilter, StockAdjustmentRequest, StockUsageRequest } from '../Types/stock.types'
 
 // Component imports
@@ -43,25 +43,19 @@ export const StockList: React.FC = () => {
     isCreating
   } = useProducts(filters)
 
+  const {
+    adjustStock,
+    useStock: executeStockUsage,
+    isAdjusting,
+    isUsing
+  } = useStocks()
+
+  const { data: globalStats, isLoading: isStatsLoading } = useStockStats()
+
   // Computed data
   const activeStocks = useMemo(() => {
-    if (!stocks) return []
-    return stocks.filter(s => s.status !== 'deleted')
+    return stocks || []
   }, [stocks])
-
-  const stockStats = useMemo(() => {
-    if (!activeStocks) return null
-    return {
-      total_items: activeStocks.length,
-      low_stock_items: activeStocks.filter(s => (s as any).total_stock <= s.min_stock_level).length,
-      critical_stock_items: activeStocks.filter(s => (s as any).total_stock <= s.critical_stock_level).length,
-      expiring_items: 0, // Will be handled via alerts/reports
-      total_value: activeStocks.reduce((sum, p) => {
-        const batchesValue = (p.batches || []).reduce((bSum, b) => bSum + (b.purchase_price * b.current_stock), 0)
-        return sum + batchesValue
-      }, 0)
-    }
-  }, [activeStocks])
 
   const handleSearch = useCallback((value: string) => {
     setFilters(prev => ({ ...prev, search: value }))
@@ -81,6 +75,32 @@ export const StockList: React.FC = () => {
     setIsFormModalVisible(true)
   }, [])
 
+  const handleAdjust = useCallback((stock: any) => {
+    // If it's a product with batches, we need to select a batch. 
+    // For now, if it has batches, take the first one, or redirect.
+    if (stock.batches && stock.batches.length > 0) {
+        setSelectedStock(stock.batches[0])
+        setIsAdjustModalVisible(true)
+    } else {
+        // Redirect to detail to add a batch first
+        window.location.href = `/stock/products/${stock.id}`
+    }
+  }, [])
+
+  const handleUse = useCallback((stock: any) => {
+    if (stock.batches && stock.batches.length > 0) {
+        setSelectedStock(stock.batches[0])
+        setIsUseModalVisible(true)
+    } else {
+        window.location.href = `/stock/products/${stock.id}`
+    }
+  }, [])
+
+  const handleViewHistory = useCallback((stock: any) => {
+    setSelectedStock(stock)
+    setIsHistoryModalVisible(true)
+  }, [])
+
   const onFormSuccess = useCallback(() => {
     setIsFormModalVisible(false)
     setEditingStock(null)
@@ -91,7 +111,7 @@ export const StockList: React.FC = () => {
     <div>
       <Title level={2}>Stok Yönetimi</Title>
       
-      <StockStats stats={stockStats} />
+      <StockStats stats={globalStats} loading={isStatsLoading} />
       
       <StockFilters 
         onSearch={handleSearch}
@@ -105,13 +125,13 @@ export const StockList: React.FC = () => {
           stocks={activeStocks}
           loading={isLoading}
           onEdit={handleEdit}
-          onDelete={() => {}} // TODO: Implement product delete
+          onDelete={() => {}} 
           onSoftDelete={() => {}}
           onHardDelete={() => {}}
           onReactivate={() => {}}
-          onAdjust={() => {}}
-          onUse={() => {}}
-          onViewHistory={() => {}}
+          onAdjust={handleAdjust}
+          onUse={handleUse}
+          onViewHistory={handleViewHistory}
         />
       </Card>
 
@@ -121,18 +141,38 @@ export const StockList: React.FC = () => {
         onFormModalClose={() => setIsFormModalVisible(false)}
         onFormSuccess={onFormSuccess}
         
-        isAdjustModalVisible={false}
-        selectedStock={null}
+        isAdjustModalVisible={isAdjustModalVisible}
+        selectedStock={selectedStock as any}
         adjustForm={adjustForm}
-        onAdjustModalClose={() => {}}
-        onAdjustSubmit={async () => {}}
-        isAdjusting={false}
+        onAdjustModalClose={() => setIsAdjustModalVisible(false)}
+        onAdjustSubmit={async (values) => {
+            if (selectedStock) {
+                await adjustStock({ id: selectedStock.id, data: values })
+                setIsAdjustModalVisible(false)
+                adjustForm.resetFields()
+                refetch()
+            }
+        }}
+        isAdjusting={isAdjusting}
         
-        isUseModalVisible={false}
+        isUseModalVisible={isUseModalVisible}
         useForm={useForm}
-        onUseModalClose={() => {}}
-        onUseSubmit={async () => {}}
-        isUsing={false}
+        onUseModalClose={() => setIsUseModalVisible(false)}
+        onUseSubmit={async (values) => {
+            if (selectedStock) {
+                await executeStockUsage({ id: selectedStock.id, data: values })
+                setIsUseModalVisible(false)
+                useForm.resetFields()
+                refetch()
+            }
+        }}
+        isUsing={isUsing}
+      />
+
+      <StockHistoryModal 
+        visible={isHistoryModalVisible}
+        stock={selectedStock as any}
+        onClose={() => setIsHistoryModalVisible(false)}
       />
 
       <BarcodeScannerModal 

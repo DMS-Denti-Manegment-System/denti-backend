@@ -318,7 +318,7 @@ export const SupplierList: React.FC = () => {
             value={suppliers?.filter(s => 
               dayjs(s.created_at).isAfter(dayjs().startOf('month'))
             ).length || 0}
-            valueStyle={{ color: '#1890ff' }}
+            styles={{ content: { color: '#1890ff' } }}
           />
         </Card>
       </Col>

@@ -13,12 +13,25 @@ class ProductRepository
         $query = Product::query()->with(['batches', 'clinic']);
 
         if (!empty($filters['search'])) {
-            $query->where('name', 'like', '%' . $filters['search'] . '%')
-                  ->orWhere('sku', 'like', '%' . $filters['search'] . '%');
+            $search = '%' . $filters['search'] . '%';
+            $query->where(function($q) use ($search) {
+                $q->where('name', 'like', $search)
+                  ->orWhere('sku', 'like', $search);
+            });
         }
 
         if (!empty($filters['category'])) {
             $query->where('category', $filters['category']);
+        }
+
+        if (!empty($filters['clinic_id'])) {
+            $clinicId = $filters['clinic_id'];
+            $query->where(function($q) use ($clinicId) {
+                $q->where('clinic_id', $clinicId)
+                  ->orWhereHas('batches', function($batchQuery) use ($clinicId) {
+                      $batchQuery->where('clinic_id', $clinicId);
+                  });
+            });
         }
 
         if (!empty($filters['status'])) {
