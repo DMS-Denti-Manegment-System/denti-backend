@@ -2,7 +2,7 @@ import React from 'react';
 import { Head } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
 
-const Welcome = ({ user }) => {
+const Welcome = ({ user }: { user: any }) => {
     return (
         <div className="flex flex-col items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
             <Head title="Ana Sayfa" />
@@ -29,6 +29,6 @@ const Welcome = ({ user }) => {
     );
 };
 
-Welcome.layout = page => <AppLayout children={page} />
+Welcome.layout = (page: React.ReactNode) => <AppLayout children={page} />
 
 export default Welcome;

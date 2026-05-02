@@ -1,7 +1,7 @@
 // src/modules/users/Pages/UserManagementPage.tsx
 
 import React, { useState } from 'react';
-import { Card, Table, Tag, Badge, Button, Input, Space, Typography, Row, Col, Popconfirm, Avatar, App } from 'antd';
+import { Card, Table, Tag, Badge, Button, Input, Space, Typography, Row, Col, Popconfirm, Avatar } from 'antd';
 import { 
   UserOutlined, 
   EditOutlined, 
@@ -22,7 +22,6 @@ import type { ColumnsType } from 'antd/es/table';
 const { Title, Text } = Typography;
 
 export const UserManagementPage: React.FC = () => {
-  const { message } = App.useApp();
   const [searchText, setSearchText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);

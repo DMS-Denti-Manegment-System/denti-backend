@@ -10,8 +10,6 @@ import dayjs from 'dayjs'
 import { 
   ArrowRightOutlined, 
   UserOutlined, 
-  CalendarOutlined,
-  InboxOutlined,
   CommentOutlined
 } from '@ant-design/icons'
 

@@ -279,13 +279,13 @@ export const StockModals: React.FC<StockModalsProps> = ({
             <Input placeholder="Kullanan kişi adı (opsiyonel)" />
           </Form.Item>
 
-          {selectedStock && selectedStock.reserved_stock > 0 && (
+          {selectedStock && (selectedStock.reserved_stock || 0) > 0 && (
             <Form.Item
               name="is_from_reserved"
               valuePropName="checked"
             >
               <Checkbox>
-                Rezerve stoktan kullan ({selectedStock.reserved_stock} {selectedStock.unit} rezerve)
+                Rezerve stoktan kullan ({(selectedStock.reserved_stock || 0)} {selectedStock.unit} rezerve)
               </Checkbox>
             </Form.Item>
           )}
@@ -306,8 +306,8 @@ export const StockModals: React.FC<StockModalsProps> = ({
                 type="primary" 
                 htmlType="submit" 
                 loading={isUsing}
-                danger={selectedStock?.expiry_date && new Date(selectedStock.expiry_date) < new Date()}
-                disabled={selectedStock?.expiry_date && new Date(selectedStock.expiry_date) < new Date()}
+                danger={!!(selectedStock?.expiry_date && new Date(selectedStock.expiry_date) < new Date())}
+                disabled={!!(selectedStock?.expiry_date && new Date(selectedStock.expiry_date) < new Date())}
               >
                 Kullan
               </Button>

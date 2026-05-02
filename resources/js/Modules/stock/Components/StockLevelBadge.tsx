@@ -36,11 +36,11 @@ export const StockLevelBadge: React.FC<StockLevelBadgeProps> = ({ stock }) => {
       ? (stock.total_base_units ?? ((stock.current_stock * (stock.sub_unit_multiplier || 1)) + (stock.current_sub_stock || 0)))
       : current_stock;
 
-    if (stockAmount <= critical_stock_level) {
+    if (stockAmount <= (critical_stock_level || 0)) {
       return { level: 'critical', color: 'red', text: 'Kritik Seviye' }
     }
     
-    if (stockAmount <= min_stock_level) {
+    if (stockAmount <= (min_stock_level || 0)) {
       return { level: 'low', color: 'orange', text: 'Düşük Seviye' }
     }
     

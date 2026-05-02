@@ -30,16 +30,17 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel, i
 
   useEffect(() => {
     if (initialValues) {
+      const vals = initialValues as any;
       const values = {
         ...initialValues,
-        expiry_date: initialValues.expiry_date ? dayjs(initialValues.expiry_date) : null,
-        purchase_date: initialValues.purchase_date ? dayjs(initialValues.purchase_date) : null,
-      }
-      form.setFieldsValue(values)
+        expiry_date: vals.expiry_date ? dayjs(vals.expiry_date) : null,
+        purchase_date: vals.purchase_date ? dayjs(vals.purchase_date) : null,
+      };
+      form.setFieldsValue(values);
     } else {
-      form.resetFields()
+      form.resetFields();
     }
-  }, [initialValues, form])
+  }, [initialValues, form]);
 
   const onFinish = async (values: any) => {
     if (values.expiry_date && typeof values.expiry_date !== 'string') {
@@ -88,7 +89,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ onSuccess, onCancel, i
             <Col span={8}>
               <Form.Item name="category" label="Kategori">
                 <Select loading={isCategoriesLoading}>
-                  {categories?.map(cat => <Select.Option key={cat.id} value={cat.name}>{cat.name}</Select.Option>)}
+                  {categories?.map((cat: any) => <Select.Option key={cat.id} value={cat.name}>{cat.name}</Select.Option>)}
                 </Select>
               </Form.Item>
             </Col>

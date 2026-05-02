@@ -45,10 +45,14 @@ export interface Stock {
   category?: string
   sku?: string
   unit?: string
+  brand?: string
+  description?: string
   min_stock_level?: number
   critical_stock_level?: number
   yellow_alert_level?: number
   red_alert_level?: number
+  expiry_yellow_days?: number
+  expiry_red_days?: number
   total_stock?: number
   
   // Batch specific

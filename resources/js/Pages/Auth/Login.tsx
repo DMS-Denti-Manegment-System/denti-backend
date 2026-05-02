@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, Modal, Space } from 'antd';
-import { UserOutlined, LockOutlined, SafetyOutlined, BankOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, Typography } from 'antd';
+import { UserOutlined, LockOutlined, BankOutlined } from '@ant-design/icons';
 import { Head, useForm } from '@inertiajs/react';
 
 const { Title, Text } = Typography;
@@ -13,7 +12,7 @@ export default function Login() {
         remember: true,
     });
 
-    const onFinish = (values: any) => {
+    const onFinish = () => {
         post('/login');
     };
 

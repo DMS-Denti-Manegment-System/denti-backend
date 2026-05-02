@@ -1,7 +1,7 @@
 // src/modules/stock/Components/StockTable.tsx
 
 import React, { useState, useMemo } from 'react'
-import { Table, Tag, Tooltip, Space, Button, Dropdown, Modal, Typography, Avatar, Progress, Badge, Switch } from 'antd'
+import { Table, Tag, Space, Button, Dropdown, Modal, Typography, Avatar, Progress, Badge, Switch } from 'antd'
 
 import { router } from '@inertiajs/react'
 
@@ -11,13 +11,10 @@ import {
   DeleteOutlined,
   MoreOutlined,
   MinusOutlined,
-  PlusOutlined,
   ExclamationCircleOutlined,
   PauseOutlined,
   PlayCircleOutlined,
   StopOutlined,
-  LineChartOutlined,
-  HistoryOutlined,
   ShoppingOutlined
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
@@ -49,9 +46,7 @@ export const StockTable: React.FC<StockTableProps> = ({
   onSoftDelete,
   onHardDelete,
   onReactivate,
-  onAdjust,
   onUse,
-  onViewHistory,
 }) => {
   const {
     advancedModalStock,
@@ -87,7 +82,7 @@ export const StockTable: React.FC<StockTableProps> = ({
       key: 'product_info',
       fixed: 'left',
       width: 280,
-      render: (_, record) => (
+      render: (_unused: unknown, record) => (
         <Space size={12} align="start">
           <Avatar 
             shape="square" 
@@ -120,7 +115,7 @@ export const StockTable: React.FC<StockTableProps> = ({
       title: '🏥 Klinik & Konum',
       key: 'location',
       width: 180,
-      render: (_, record) => {
+      render: (_unused: unknown, record) => {
         const clinics = (record as any).clinics || [];
         return (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -152,19 +147,20 @@ export const StockTable: React.FC<StockTableProps> = ({
       title: '📊 Stok Durumu',
       key: 'stock_level',
       width: 200,
-      render: (_, record) => {
-        const current = isBatchMode ? record.current_stock : (record as any).total_stock;
+      render: (_unused: unknown, record) => {
+        const current = (isBatchMode ? record.current_stock : (record as any).total_stock) || 0;
         const min = record.min_stock_level || 0;
+        const critical = record.critical_stock_level || 0;
         const percent = min > 0 ? Math.min((current / (min * 2)) * 100, 100) : 100;
         
         let statusColor = '#52c41a';
-        if (current <= record.critical_stock_level) statusColor = '#f5222d';
-        else if (current <= record.min_stock_level) statusColor = '#faad14';
+        if (current <= critical) statusColor = '#f5222d';
+        else if (current <= min) statusColor = '#faad14';
 
         return (
           <div style={{ width: '100%', paddingRight: '20px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-              <Text strong>{current} {record.unit}</Text>
+              <Text strong>{current} {record.unit || ''}</Text>
               <StockLevelBadge stock={record} />
             </div>
             <Progress 
@@ -183,7 +179,7 @@ export const StockTable: React.FC<StockTableProps> = ({
         title: '📅 Takip',
         key: 'tracking',
         width: 160,
-        render: (_, record: Stock) => (
+        render: (_unused: unknown, record: Stock) => (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {record.expiry_date ? (
                 <Space size={4}>
@@ -203,7 +199,7 @@ export const StockTable: React.FC<StockTableProps> = ({
             key: 'batches',
             width: 100,
             align: 'center' as const,
-            render: (_, record: any) => (
+            render: (_unused: unknown, record: any) => (
                 <Badge count={record.batches?.length || 0} color="#1890ff" showZero />
             )
         }
@@ -214,7 +210,7 @@ export const StockTable: React.FC<StockTableProps> = ({
       width: 160,
       fixed: 'right' as const,
       align: 'right' as const,
-      render: (_, record) => (
+      render: (_unused: unknown, record) => (
         <Space>
           {isBatchMode ? (
             <Button 

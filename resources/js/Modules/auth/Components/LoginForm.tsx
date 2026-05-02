@@ -1,9 +1,8 @@
 // src/modules/auth/Components/LoginForm.tsx
 
 import React, { useState } from 'react';
-import { Form, Input, Button, Card, Typography, Modal, Space } from 'antd';
+import { Form, Input, Button, Card, Typography, Modal } from 'antd';
 import { UserOutlined, LockOutlined, SafetyOutlined, BankOutlined } from '@ant-design/icons';
-import { router } from '@inertiajs/react';
 import { useAuth } from '../Hooks/useAuth';
 
 const { Title, Text } = Typography;
@@ -18,11 +17,8 @@ export const LoginForm: React.FC = () => {
   };
 
   const on2faFinish = async (values: { code: string }) => {
-    const success = await verify2fa(values);
-    if (success) {
-      setShow2faModal(false);
-      router.visit('/');
-    }
+    await verify2fa(values);
+    setShow2faModal(false);
   };
 
   return (

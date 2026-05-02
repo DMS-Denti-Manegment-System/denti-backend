@@ -73,7 +73,7 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
             loading={isCategoriesLoading}
             onChange={(value) => onFilterChange('category', value)}
           >
-            {(categories ?? []).map(option => (
+            {(categories ?? []).map((option: any) => (
               <Option key={option.id} value={option.name}>
                 {option.name}
               </Option>
@@ -88,7 +88,7 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
             allowClear
             onChange={(value) => onFilterChange('level', value)}
           >
-            {levelOptions.map(option => (
+            {levelOptions.map((option: any) => (
               <Option key={option.value} value={option.value}>
                 {option.label}
               </Option>

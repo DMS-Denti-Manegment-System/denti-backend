@@ -57,11 +57,15 @@ export const SupplierList: React.FC = () => {
   } = useSuppliers(filters)
 
   const handleSearch = (value: string) => {
-    setFilters(prev => ({ ...prev, search: value }))
+    setFilters(prev => ({ ...prev, name: value }))
   }
 
-  const handleFilterChange = (field: keyof SupplierFilter, value: string | boolean | undefined) => {
-    setFilters(prev => ({ ...prev, [field]: value }))
+  const handleFilterChange = (field: keyof SupplierFilter, value: any) => {
+    let mappedValue = value;
+    if (field === 'is_active') {
+      mappedValue = value === 'active' ? true : value === 'inactive' ? false : undefined;
+    }
+    setFilters(prev => ({ ...prev, [field]: mappedValue }))
   }
 
   const handleAdd = () => {
@@ -341,7 +345,7 @@ export const SupplierList: React.FC = () => {
             placeholder="Durum"
             style={{ width: '100%' }}
             allowClear
-            onChange={(value) => handleFilterChange('status', value)}
+            onChange={(value) => handleFilterChange('is_active', value)}
           >
             <Option value="active">Aktif</Option>
             <Option value="inactive">Pasif</Option>

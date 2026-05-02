@@ -1,12 +1,7 @@
-import React from 'react';
 import { Head } from '@inertiajs/react';
 import { AcceptInvitationPage } from '@/Modules/auth/Pages/AcceptInvitationPage';
 
-interface Props {
-    token: string;
-}
-
-const AcceptInvitation = ({ token }: Props) => {
+const AcceptInvitation = () => {
     return (
         <>
             <Head title="Daveti Kabul Et" />

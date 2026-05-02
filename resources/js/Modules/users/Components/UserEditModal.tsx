@@ -1,7 +1,7 @@
 // src/modules/users/Components/UserEditModal.tsx
 
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Select, Switch, Space, Typography } from 'antd';
+import { Modal, Form, Input, Select, Switch, Typography } from 'antd';
 import { User, UpdateUserPayload } from '../Types/user.types';
 import { useRoles } from '../../roles/Hooks/useRoles';
 import { useClinics } from '@/Modules/clinics/Hooks/useClinics';
@@ -76,7 +76,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
             placeholder="Klinik seçin" 
             loading={isClinicsLoading}
           >
-            {clinics?.map(clinic => (
+            {clinics?.map((clinic: any) => (
               <Select.Option key={clinic.id} value={clinic.id}>
                 {clinic.name}
               </Select.Option>
@@ -93,7 +93,7 @@ export const UserEditModal: React.FC<UserEditModalProps> = ({
             placeholder="Rol seçin" 
             loading={isRolesLoading}
           >
-            {roles.map(role => (
+            {roles.map((role: any) => (
               <Select.Option key={role.id} value={role.id}>
                 {role.name}
               </Select.Option>

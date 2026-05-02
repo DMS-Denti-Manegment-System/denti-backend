@@ -1,7 +1,7 @@
 // src/modules/roles/Components/RoleFormModal.tsx
 
 import React, { useEffect } from 'react';
-import { Modal, Form, Input, Card, Checkbox, Row, Col, Divider, Button, Skeleton, Space } from 'antd';
+import { Modal, Form, Input, Card, Checkbox, Row, Col, Divider, Skeleton, Space } from 'antd';
 import { Role, PermissionGroup, RoleStorePayload } from '../Types/role.types';
 
 interface RoleFormModalProps {

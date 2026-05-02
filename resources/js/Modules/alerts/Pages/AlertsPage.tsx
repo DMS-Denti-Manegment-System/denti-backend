@@ -7,12 +7,9 @@ interface AlertsPageProps {
   currentUser?: string
 }
 
-export const AlertsPage: React.FC<AlertsPageProps> = ({ 
-  currentUser = 'Sistem Kullanıcısı' 
-}) => {
+export const AlertsPage: React.FC<AlertsPageProps> = () => {
   return (
     <AlertList 
-      currentUser={currentUser}
       showDashboard={true}
     />
   )

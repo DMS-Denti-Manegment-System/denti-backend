@@ -79,6 +79,7 @@ export interface Alert {
   
   export interface ResolveAlertRequest {
     resolution_notes?: string
+    resolved_by?: string
   }
   
   export interface AlertFilters {
@@ -94,11 +95,31 @@ export interface Alert {
   }
   
   export interface AlertStats {
-    total_active: number
-    low_stock: number
-    critical_stock: number
-    expired: number
-    near_expiry: number
+    total: number
+    active: number
+    resolved: number
+    dismissed: number
+    critical: number
+    warning: number
+    info: number
+    by_severity: {
+      low: number
+      medium: number
+      high: number
+      critical: number
+    }
+    by_type: {
+      low_stock: number
+      critical_stock: number
+      out_of_stock: number
+      expiry_warning: number
+      expiry_critical: number
+      expired: number
+      near_expiry?: number
+      stock_request: number
+      stock_transfer: number
+      system: number
+    }
   }
   
   export interface AlertSettings {

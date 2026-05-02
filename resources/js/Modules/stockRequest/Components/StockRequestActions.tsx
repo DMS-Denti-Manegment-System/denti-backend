@@ -28,12 +28,14 @@ interface StockRequestActionsProps {
   request: StockRequest
   currentUser: string // Şu anki kullanıcı adı
   size?: 'small' | 'default'
+  onSuccess?: () => void
 }
 
 export const StockRequestActions: React.FC<StockRequestActionsProps> = ({ 
   request, 
   currentUser,
-  size = 'default' 
+  size = 'default',
+  onSuccess
 }) => {
   const { 
     approveStockRequest, 
@@ -61,6 +63,7 @@ export const StockRequestActions: React.FC<StockRequestActionsProps> = ({
       })
       setApproveModalVisible(false)
       approveForm.resetFields()
+      onSuccess?.()
     } catch (error) {
       console.error('Approve error:', error)
     }
@@ -77,6 +80,7 @@ export const StockRequestActions: React.FC<StockRequestActionsProps> = ({
       })
       setRejectModalVisible(false)
       rejectForm.resetFields()
+      onSuccess?.()
     } catch (error) {
       console.error('Reject error:', error)
     }
@@ -90,6 +94,7 @@ export const StockRequestActions: React.FC<StockRequestActionsProps> = ({
           performed_by: currentUser
         }
       })
+      onSuccess?.()
     } catch (error) {
       console.error('Complete error:', error)
     }

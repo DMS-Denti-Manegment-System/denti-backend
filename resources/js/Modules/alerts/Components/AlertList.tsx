@@ -18,26 +18,23 @@ import {
   Affix,
   Table,
   Tag,
-  Tooltip,
-  Spin
+  Tooltip
 } from 'antd'
 import { Link, router } from '@inertiajs/react'
 import { 
   FilterOutlined,
-  ReloadOutlined,
   BellOutlined,
-  DeleteOutlined,
   CheckOutlined,
   CloseOutlined,
   ExclamationCircleOutlined,
   EyeOutlined
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
-import { useAlerts, useAlertStats } from '../Hooks/useAlerts'
+import { useAlerts } from '../Hooks/useAlerts'
 import { useClinics } from '@/Modules/clinics/Hooks/useClinics'
 import { AlertDashboard } from './AlertDashboard'
 import { AlertSeverityBadge } from './AlertSeverityBadge'
-import { AlertFilters, AlertType, AlertSeverity, Alert } from '../Types/alert.types'
+import { AlertFilters, AlertType, AlertSeverity } from '../Types/alert.types'
 
 const { Search } = Input
 const { Option } = Select
@@ -47,13 +44,11 @@ const { TextArea } = Input
 
 interface AlertListProps {
   defaultClinicId?: number
-  currentUser: string
   showDashboard?: boolean
 }
 
 export const AlertList: React.FC<AlertListProps> = ({ 
   defaultClinicId,
-  currentUser,
   showDashboard = true 
 }) => {
   const [filters, setFilters] = useState<AlertFilters>({
@@ -68,16 +63,11 @@ export const AlertList: React.FC<AlertListProps> = ({
   const { 
     alerts, 
     isLoading, 
-    refetch,
     bulkResolveAlerts,
     bulkDismissAlerts,
-    isBulkProcessing,
-    resolveAlert,
-    dismissAlert,
-    deleteAlert
+    isBulkProcessing
   } = useAlerts(filters)
   
-  const { data: stats } = useAlertStats(filters.clinic_id)
   const { clinics } = useClinics()
 
   const activeClinics = useMemo(() => {
@@ -85,17 +75,35 @@ export const AlertList: React.FC<AlertListProps> = ({
     return clinics.filter((clinic) => clinic.is_active)
   }, [clinics])
 
+  const alertTypeOptions: { value: AlertType; label: string }[] = [
+    { value: 'low_stock', label: 'Düşük Stok' },
+    { value: 'critical_stock', label: 'Kritik Stok' },
+    { value: 'expired', label: 'Süresi Geçmiş' },
+    { value: 'near_expiry', label: 'Son Kullanma Yaklaşıyor' },
+    { value: 'out_of_stock', label: 'Stok Bitti' },
+    { value: 'stock_request', label: 'Stok Talebi' },
+    { value: 'stock_transfer', label: 'Stok Transferi' },
+    { value: 'system', label: 'Sistem' }
+  ]
+
+  const severityOptions: { value: AlertSeverity; label: string }[] = [
+    { value: 'low', label: 'Düşük' },
+    { value: 'medium', label: 'Orta' },
+    { value: 'high', label: 'Yüksek' },
+    { value: 'critical', label: 'Kritik' }
+  ]
+
   // 🔥 Table columns - useMemo ile optimize edildi
   const tableColumns = useMemo(() => [
     {
       title: 'Önem',
       dataIndex: 'severity',
       width: 100,
-      render: (sev: any) => <AlertSeverityBadge severity={sev} />
+      render: (sev: AlertSeverity) => <AlertSeverityBadge severity={sev} />
     },
     {
       title: 'Ürün / Mesaj',
-      render: (_: any, record: any) => (
+      render: (_unused: unknown, record: any) => (
         <Link 
           href={`/stock?product_id=${record.product?.id || record.stock?.product?.id || record.product_id}`}
           className="alert-product-link"
@@ -126,7 +134,7 @@ export const AlertList: React.FC<AlertListProps> = ({
     {
       title: 'İşlemler',
       width: 100,
-      render: (_: any, record: any) => (
+      render: (_unused: unknown, record: any) => (
         <Tooltip title="Ürünü Gör">
           <Link href={`/stock?product_id=${record.product?.id || record.stock?.product?.id || record.product_id}`}>
             <Button size="small" type="primary" ghost icon={<EyeOutlined />} />
@@ -134,7 +142,7 @@ export const AlertList: React.FC<AlertListProps> = ({
         </Tooltip>
       )
     }
-  ], [deleteAlert])
+  ], [])
 
   const handleFilterChange = (key: keyof AlertFilters, value: any) => {
     setFilters(prev => ({ ...prev, [key]: value }))
@@ -181,24 +189,6 @@ export const AlertList: React.FC<AlertListProps> = ({
       console.error('Bulk action error:', error)
     }
   }
-
-  const alertTypeOptions: { value: AlertType; label: string }[] = [
-    { value: 'low_stock', label: 'Düşük Stok' },
-    { value: 'critical_stock', label: 'Kritik Stok' },
-    { value: 'expired', label: 'Süresi Geçmiş' },
-    { value: 'near_expiry', label: 'Son Kullanma Yaklaşıyor' },
-    { value: 'out_of_stock', label: 'Stok Bitti' },
-    { value: 'stock_request', label: 'Stok Talebi' },
-    { value: 'stock_transfer', label: 'Stok Transferi' },
-    { value: 'system', label: 'Sistem' }
-  ]
-
-  const severityOptions: { value: AlertSeverity; label: string }[] = [
-    { value: 'low', label: 'Düşük' },
-    { value: 'medium', label: 'Orta' },
-    { value: 'high', label: 'Yüksek' },
-    { value: 'critical', label: 'Kritik' }
-  ]
 
   return (
     <div>

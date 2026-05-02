@@ -5,7 +5,6 @@ import {
   Select, 
   Space, 
   Button,
-  Tooltip,
   Typography
 } from 'antd'
 import { 
@@ -17,21 +16,24 @@ import {
   Area, 
   AreaChart, 
   Line, 
+  LineChart,
   Bar, 
+  BarChart,
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip as ChartTooltip, 
   Legend, 
   ResponsiveContainer, 
-  ComposedChart 
+  ComposedChart,
+  Cell
 } from 'recharts'
 import dayjs from 'dayjs'
 import { useStockTransactions } from '../Hooks/useStocks'
 
 const { RangePicker } = DatePicker
 const { Option } = Select
-const { Title, Text } = Typography
+const { Text } = Typography
 
 interface StockTrendChartProps {
   stockId: number
@@ -192,10 +194,13 @@ export const StockTrendChart: React.FC<StockTrendChartProps> = ({
               <Legend />
               <Bar 
                 dataKey="change" 
-                fill={data => data.change >= 0 ? '#52c41a' : '#ff4d4f'}
                 name="Stok Değişimi"
                 radius={[4, 4, 0, 0]}
-              />
+              >
+                {chartData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.change >= 0 ? '#52c41a' : '#ff4d4f'} />
+                ))}
+              </Bar>
               <Line 
                 type="monotone" 
                 dataKey="stockLevel" 

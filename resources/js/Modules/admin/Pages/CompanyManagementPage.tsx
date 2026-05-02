@@ -179,7 +179,7 @@ export const CompanyManagementPage: React.FC = () => {
     },
   ];
 
-  const filteredCompanies = companies.filter(c => 
+  const filteredCompanies = companies.filter((c: Company) => 
     c.name.toLowerCase().includes(searchText.toLowerCase()) || 
     c.domain.toLowerCase().includes(searchText.toLowerCase())
   );

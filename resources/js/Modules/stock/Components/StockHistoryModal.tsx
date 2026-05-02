@@ -1,8 +1,6 @@
 import React, { useMemo } from 'react'
 import { Modal, Table, Tag, Typography, Empty, Skeleton, Row, Col, Card, Statistic } from 'antd'
 import { 
-  LineChart, 
-  Line, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -109,7 +107,7 @@ export const StockHistoryModal: React.FC<StockHistoryModalProps> = ({
 
   const stats = useMemo(() => {
     if (!transactions) return { added: 0, used: 0 }
-    return transactions.reduce((acc, t) => {
+    return transactions.reduce((acc: { added: number; used: number }, t: any) => {
       if (t.type === 'purchase' || (t.type === 'adjustment' && t.quantity > 0)) {
         acc.added += t.quantity
       } else if (t.type === 'usage' || (t.type === 'adjustment' && t.quantity < 0)) {

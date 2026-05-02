@@ -31,7 +31,6 @@ import { StockModals } from '@/Modules/stock/Components/StockModals';
 import { TransactionHistoryTable } from '@/Modules/stock/Components/TransactionHistoryTable';
 import { StockTrendChart } from '@/Modules/stock/Components/StockTrendChart';
 import { Form } from 'antd';
-import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
@@ -201,7 +200,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                             children: (
                                 <Card variant="borderless" className="premium-card">
                                     <Title level={5}>Stok Değişim Trendi</Title>
-                                    <StockTrendChart transactions={transactions || []} />
+                                    <StockTrendChart stockId={data.id} transactions={transactions || []} />
                                 </Card>
                             )
                         },

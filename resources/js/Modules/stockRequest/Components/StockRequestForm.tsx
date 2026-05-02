@@ -60,7 +60,7 @@ export const StockRequestForm: React.FC<StockRequestFormProps> = ({
   // Hedef klinik seçildiğinde o klinikteki stokları filtrele
   useEffect(() => {
     if (selectedTargetClinic && allStocks) {
-      const clinicStocks = allStocks.filter(stock => 
+      const clinicStocks = allStocks.filter((stock: any) => 
         stock.clinic_id === selectedTargetClinic && 
         stock.current_stock > 0
       )
@@ -146,16 +146,13 @@ export const StockRequestForm: React.FC<StockRequestFormProps> = ({
                 showSearch
                 optionFilterProp="children"
                 onChange={setSelectedRequesterClinic}
-                disabled={Boolean(user?.clinic_id && !user?.roles?.some(r => r.name === 'Super Admin'))}
+                disabled={Boolean(user?.clinic_id && !user?.roles?.some((r: any) => r.name === 'Super Admin'))}
               >
                 {activeClinics.map(clinic => (
                   <Option key={clinic.id} value={clinic.id}>
                     <Space>
                       <ShopOutlined />
                       <span>{clinic.name}</span>
-                      {clinic.specialty_code && (
-                        <Tag color="blue">{clinic.specialty_code}</Tag>
-                      )}
                     </Space>
                   </Option>
                 ))}
@@ -184,9 +181,6 @@ export const StockRequestForm: React.FC<StockRequestFormProps> = ({
                     <Space>
                       <ShopOutlined />
                       <span>{clinic.name}</span>
-                      {clinic.specialty_code && (
-                        <Tag color="green">{clinic.specialty_code}</Tag>
-                      )}
                     </Space>
                   </Option>
                 ))}
@@ -201,11 +195,11 @@ export const StockRequestForm: React.FC<StockRequestFormProps> = ({
             <Col>
               <Space align="center" size="large">
                 <Tag color="green" icon={<ShopOutlined />}>
-                  {activeClinics.find(c => c.id === selectedTargetClinic)?.name}
+                  {activeClinics.find((c: any) => c.id === selectedTargetClinic)?.name}
                 </Tag>
                 <SwapOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
                 <Tag color="blue" icon={<ShopOutlined />}>
-                  {activeClinics.find(c => c.id === selectedRequesterClinic)?.name}
+                  {activeClinics.find((c: any) => c.id === selectedRequesterClinic)?.name}
                 </Tag>
               </Space>
             </Col>

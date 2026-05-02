@@ -86,7 +86,7 @@ export const TodoForm: React.FC<TodoFormProps> = ({ todo, onSuccess }) => {
             placeholder="Kategori seçin (opsiyonel)"
             allowClear
           >
-            {categories?.map(category => (
+            {categories?.map((category: any) => (
               <Option key={category.id} value={category.id}>
                 {category.name}
               </Option>

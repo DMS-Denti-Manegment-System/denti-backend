@@ -2,24 +2,20 @@
 
 import React, { useState, useCallback, useMemo } from 'react'
 import { Card, Form, Typography } from 'antd'
-import { useProducts, useStocks, useProductDetail, useStockStats } from '../Hooks/useStocks'
-import { Product as Stock, StockFilter, StockAdjustmentRequest, StockUsageRequest } from '../Types/stock.types'
+import { useProducts, useStocks, useStockStats } from '../Hooks/useStocks'
+import { Product as Stock, StockFilter } from '../Types/stock.types'
 
 // Component imports
 import { StockTable } from './StockTable'
 import { StockFilters } from './StockFilters'
 import { StockStats } from './StockStats'
-import { StockAlerts } from './StockAlerts'
 import { StockModals } from './StockModals'
 import { StockHistoryModal } from './StockHistoryModal'
 import { BarcodeScannerModal } from './BarcodeScannerModal'
 
-import { useAuth } from '@/Modules/auth/Hooks/useAuth'
-
 const { Title } = Typography
 
 export const StockList: React.FC = () => {
-  const { user } = useAuth()
   // State management
   const [filters, setFilters] = useState<StockFilter>({})
   const [editingStock, setEditingStock] = useState<Stock | null>(null)
@@ -38,9 +34,7 @@ export const StockList: React.FC = () => {
   const { 
     products: stocks, 
     isLoading, 
-    refetch, 
-    createProduct,
-    isCreating
+    refetch
   } = useProducts(filters)
 
   const {
@@ -51,14 +45,10 @@ export const StockList: React.FC = () => {
     hardDeleteStock,
     reactivateStock,
     isAdjusting,
-    isUsing,
-    isDeleting,
-    isSoftDeleting,
-    isHardDeleting,
-    isReactivating
+    isUsing
   } = useStocks()
 
-  const { data: globalStats, isLoading: isStatsLoading } = useStockStats()
+  const { data: globalStats } = useStockStats()
 
   // Computed data
   const activeStocks = useMemo(() => {
@@ -66,7 +56,7 @@ export const StockList: React.FC = () => {
   }, [stocks])
 
   const handleSearch = useCallback((value: string) => {
-    setFilters(prev => ({ ...prev, search: value }))
+    setFilters(prev => ({ ...prev, name: value }))
   }, [])
 
   const handleFilterChange = useCallback((field: keyof StockFilter, value: string | number | undefined) => {
@@ -78,7 +68,7 @@ export const StockList: React.FC = () => {
     setIsFormModalVisible(true)
   }, [])
 
-  const handleEdit = useCallback((stock: Stock) => {
+  const handleEdit = useCallback((stock: any) => {
     setEditingStock(stock)
     setIsFormModalVisible(true)
   }, [])
@@ -119,7 +109,7 @@ export const StockList: React.FC = () => {
     <div>
       <Title level={2}>Stok Yönetimi</Title>
       
-      <StockStats stats={globalStats} loading={isStatsLoading} />
+      <StockStats stats={globalStats} />
       
       <StockFilters 
         onSearch={handleSearch}

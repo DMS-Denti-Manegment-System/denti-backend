@@ -1,10 +1,10 @@
 // src/modules/stock/Components/BarcodeScannerModal.tsx
 
 import React, { useState, useRef, useEffect } from 'react'
-import { Modal, Input, Typography, Space, Alert, List, Tag, Button, Spin } from 'antd'
-import { BarcodeOutlined, ScanOutlined, CloseCircleOutlined } from '@ant-design/icons'
-import { useStocks } from '../Hooks/useStocks'
-import { formatStock } from '@/Utils/helpers'
+import { Modal, Input, Typography, Space, Alert, Button, Spin } from 'antd'
+import { BarcodeOutlined, ScanOutlined } from '@ant-design/icons'
+import { useStocks, useProducts } from '../Hooks/useStocks'
+import { useAuth } from '@/Modules/auth/Hooks/useAuth'
 
 const { Text, Title } = Typography
 
@@ -20,7 +20,9 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({ visibl
   const [isProcessing, setIsProcessing] = useState(false)
   const inputRef = useRef<any>(null)
   
-  const { products, useStockMutation } = useStocks()
+  const { user } = useAuth()
+  const { products } = useProducts()
+  const { useStock } = useStocks()
 
   useEffect(() => {
     if (visible) {
@@ -37,7 +39,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({ visibl
 
     try {
       // Find product by SKU
-      const product = products?.find(p => p.sku === barcode || p.barcode === barcode)
+      const product = products?.find((p: any) => p.sku === barcode || p.barcode === barcode)
       
       if (!product) {
         setError(`Ürün bulunamadı: ${barcode}`)
@@ -46,7 +48,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({ visibl
       }
 
       // Find first available batch (not expired, has stock)
-      const batch = product.batches?.find(b => 
+      const batch = product.stocks?.find((b: any) => 
         b.current_stock > 0 && 
         (!b.expiry_date || new Date(b.expiry_date) > new Date())
       )
@@ -58,12 +60,13 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({ visibl
       }
 
       // Use 1 unit
-      await useStockMutation.mutateAsync({
+      await useStock({
         id: batch.id,
         data: {
           quantity: 1,
           reason: 'treatment',
-          notes: 'Barkod ile hızlı tüketim'
+          notes: 'Barkod ile hızlı tüketim',
+          performed_by: user?.name || 'Sistem'
         }
       })
 

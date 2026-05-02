@@ -31,10 +31,11 @@ export const useAuth = () => {
   return {
     login,
     adminLogin,
+    verify2fa,
     logout,
     user,
     isAuthenticated,
-    loading: false, // Inertia loading state can be handled globally or per-request
+    loading: false,
     isSessionValidated: true,
     permissions: user?.permissions || []
   };

@@ -38,11 +38,8 @@ import { Stock as BaseStock } from '../../stock/Types/stock.types'
 import { useClinicStocks, useClinicSummary } from '../Hooks/useClinics'
 
 // Extend the base Stock interface with required fields
-interface Stock extends BaseStock {
-  min_stock: number
-  name: string
-  category: string
-  quantity: number
+interface LocalStock extends BaseStock {
+  unit_price?: number
 }
 
 const { Title, Text, Paragraph } = Typography
@@ -85,28 +82,28 @@ export const ClinicDetail: React.FC<ClinicDetailProps> = ({
     },
     {
       title: 'Stok Miktarı',
-      dataIndex: 'quantity',
-      key: 'quantity',
-      render: (quantity: number, record: Stock) => {
+      dataIndex: 'current_stock',
+      key: 'current_stock',
+      render: (quantity: number, record: LocalStock) => {
         const qty = quantity || 0
-        const minStock = record?.min_stock || 0
+        const minStock = record?.min_stock_level || 0
         return (
           <Tag color={qty > minStock ? 'green' : qty > 0 ? 'orange' : 'red'}>
-            {qty}
+            {qty} {record.unit || ''}
           </Tag>
         )
       }
     },
     {
       title: 'Min. Stok',
-      dataIndex: 'min_stock',
-      key: 'min_stock',
+      dataIndex: 'min_stock_level',
+      key: 'min_stock_level',
       render: (minStock: number) => minStock || 0
     },
     {
       title: 'Birim Fiyat',
-      dataIndex: 'unit_price',
-      key: 'unit_price',
+      dataIndex: 'purchase_price',
+      key: 'purchase_price',
       render: (price: number) => {
         if (price === null || price === undefined || isNaN(price)) {
           return <span style={{ color: '#999' }}>Fiyat yok</span>
@@ -377,7 +374,7 @@ export const ClinicDetail: React.FC<ClinicDetailProps> = ({
             showIcon 
           />
         ) : stocks && stocks.length > 0 ? (
-          <Table<Stock>
+          <Table<LocalStock>
             columns={stockColumns}
             dataSource={stocks}
             rowKey="id"

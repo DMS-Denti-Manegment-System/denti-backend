@@ -13,7 +13,6 @@ import {
   LogoutOutlined,
   SettingOutlined,
   SafetyCertificateOutlined,
-  AppstoreOutlined,
   DashboardOutlined,
   CheckSquareOutlined,
   TagsOutlined,
@@ -23,7 +22,6 @@ import type { MenuProps } from 'antd'
 import { usePendingAlertCount } from '@/Modules/alerts/Hooks/useAlerts'
 import { useAuth } from '@/Modules/auth/Hooks/useAuth'
 import { usePermissions } from '@/Hooks/usePermissions'
-import { DebugInfo } from '@/Components/DebugInfo'
 
 const { Header, Sider, Content } = Layout
 const { Title } = Typography
@@ -36,7 +34,7 @@ export const AppLayout: React.FC<Props> = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false)
   const { url } = usePage()
   const { user, logout } = useAuth()
-  const { isSuperAdmin, isCompanyOwner, hasPermission, isAdmin } = usePermissions()
+  const { hasPermission, isAdmin } = usePermissions()
   
   // Bekleyen uyarı sayısını çek
   const { data: pendingAlertCount } = usePendingAlertCount()

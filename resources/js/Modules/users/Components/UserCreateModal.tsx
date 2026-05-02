@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Modal, Form, Input, Select, Switch } from 'antd';
-import { UserOutlined, MailOutlined, LockOutlined, BankOutlined } from '@ant-design/icons';
+import { UserOutlined, MailOutlined, LockOutlined } from '@ant-design/icons';
 import { useRoles } from '../../roles/Hooks/useRoles';
 import { useClinics } from '@/Modules/clinics/Hooks/useClinics';
 
@@ -88,7 +88,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
             placeholder="Klinik seçin" 
             loading={isClinicsLoading}
           >
-            {clinics?.map(clinic => (
+            {clinics?.map((clinic: any) => (
               <Select.Option key={clinic.id} value={clinic.id}>
                 {clinic.name}
               </Select.Option>
@@ -105,7 +105,7 @@ export const UserCreateModal: React.FC<UserCreateModalProps> = ({
             placeholder="Rol seçin" 
             loading={isRolesLoading}
           >
-            {roles.map(role => (
+            {roles.map((role: any) => (
               <Select.Option key={role.id} value={role.id}>
                 {role.name}
               </Select.Option>

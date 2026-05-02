@@ -44,7 +44,7 @@ export const ClinicFilters: React.FC<ClinicFiltersProps> = ({
   const handleSortChange = (sortBy: string) => {
     onFiltersChange({ 
       ...filters, 
-      sort_by: sortBy === 'default' ? undefined : sortBy as 'name' | 'code' | 'city' | 'created_at'
+      sort_by: sortBy === 'default' ? undefined : sortBy as 'name' | 'city' | 'created_at'
     })
   }
 
@@ -124,7 +124,6 @@ export const ClinicFilters: React.FC<ClinicFiltersProps> = ({
           >
             <Option value="default">Varsayılan</Option>
             <Option value="name">İsme Göre</Option>
-            <Option value="code">Koda Göre</Option>
             <Option value="city">Şehre Göre</Option>
             <Option value="created_at">Oluşturma Tarihine Göre</Option>
           </Select>

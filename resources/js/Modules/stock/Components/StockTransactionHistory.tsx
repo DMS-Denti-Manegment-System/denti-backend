@@ -7,22 +7,18 @@ import {
   Button, 
   DatePicker, 
   Select, 
-  Input,
   Tooltip,
   Badge
 } from 'antd'
+
 import { 
-  ReloadOutlined,
-  FilterOutlined,
-  SearchOutlined,
-  EyeOutlined
+  ReloadOutlined
 } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { useStockTransactions } from '../Hooks/useStocks'
 
 const { RangePicker } = DatePicker
 const { Option } = Select
-const { Search } = Input
 
 interface StockTransactionHistoryProps {
   stockId: number
@@ -212,9 +208,9 @@ export const StockTransactionHistory: React.FC<StockTransactionHistoryProps> = (
           total: transactions?.total || 0,
           showSizeChanger: true,
           showQuickJumper: true,
-          showTotal: (total, range) => 
+          showTotal: (total: number, range: [number, number]) => 
             `${range[0]}-${range[1]} / ${total} işlem`,
-          onChange: (page, pageSize) => {
+          onChange: (_unusedPage: number, pageSize: number) => {
             handleFilterChange('per_page', pageSize)
           }
         }}

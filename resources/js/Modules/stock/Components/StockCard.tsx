@@ -99,8 +99,8 @@ export const StockCard: React.FC<StockCardProps> = ({
         style={{ 
           width: '100%',
           borderLeft: `4px solid ${
-            stockAmount <= stock.critical_stock_level ? '#ff4d4f' :
-            stockAmount <= stock.min_stock_level ? '#faad14' : '#52c41a'
+            stockAmount <= (stock.critical_stock_level || 0) ? '#ff4d4f' :
+            stockAmount <= (stock.min_stock_level || 0) ? '#faad14' : '#52c41a'
           }`
         }}
         actions={[
@@ -221,7 +221,7 @@ export const StockCard: React.FC<StockCardProps> = ({
               <Text strong>
                 {formatStock(
                   stock.current_stock,
-                  stock.unit,
+                  stock.unit as string,
                   stock.has_sub_unit,
                   stock.current_sub_stock,
                   stock.sub_unit_name

@@ -12,14 +12,11 @@ import {
   Divider,
   Space
 } from 'antd'
-import { 
-  PlusOutlined
-} from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { useAuthStore } from '@/Stores/authStore'
 import { useSuppliers } from '../../supplier/Hooks/useSuppliers'
 import { useClinics } from '../../clinics/Hooks/useClinics'
-import { UNIT_OPTIONS, CURRENCY_OPTIONS } from '../constants/stockConstants'
+import { CURRENCY_OPTIONS } from '../constants/stockConstants'
 
 const { Option } = Select
 
@@ -34,7 +31,6 @@ interface BatchFormProps {
 
 export const BatchForm: React.FC<BatchFormProps> = ({ 
   productId, 
-  onSuccess, 
   onCancel,
   isSubmitting,
   onSubmit,
