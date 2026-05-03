@@ -243,29 +243,38 @@ class StockService
     {
         return DB::transaction(function () use ($data) {
             $data['company_id'] = $data['company_id'] ?? auth()->user()?->company_id;
-            $data['available_stock'] = ($data['current_stock'] ?? 0) - ($data['reserved_stock'] ?? 0);
+            
+            $initialQuantity = $data['current_stock'] ?? 0;
+            
+            // Başlangıç stoğunu 0 olarak kaydediyoruz, çünkü StockTransaction oluşturulduğunda
+            // StockTransactionObserver otomatik olarak stoğu olması gereken değere yükseltecek.
+            // Böylece stok iki kere (çift) sayılmamış olacak.
+            $data['current_stock'] = 0;
+            $data['available_stock'] = 0;
             $data['current_sub_stock'] = $data['current_sub_stock'] ?? 0;
             
             $stock = $this->stockRepository->create($data);
 
-            $this->createTransaction([
-                'stock_id'         => $stock->id,
-                'clinic_id'        => $stock->clinic_id,
-                'type'             => 'purchase',
-                'quantity'         => $stock->current_stock,
-                'previous_stock'   => 0,
-                'new_stock'        => $stock->total_base_units,
-                'description'      => 'İlk stok girişi',
-                'performed_by'     => auth()->user()?->name ?? 'Sistem',
-                'transaction_date' => now(),
-                'is_sub_unit'      => false
-            ]);
+            if ($initialQuantity > 0) {
+                $this->createTransaction([
+                    'stock_id'         => $stock->id,
+                    'clinic_id'        => $stock->clinic_id,
+                    'type'             => 'purchase',
+                    'quantity'         => $initialQuantity,
+                    'previous_stock'   => 0,
+                    'new_stock'        => $initialQuantity,
+                    'description'      => 'İlk stok girişi',
+                    'performed_by'     => auth()->user()?->name ?? 'Sistem',
+                    'transaction_date' => now(),
+                    'is_sub_unit'      => false
+                ]);
+            } else {
+                DB::afterCommit(function () use ($stock) {
+                    StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
+                });
+            }
 
-            DB::afterCommit(function () use ($stock) {
-                StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
-            });
-
-            return $stock;
+            return $stock->fresh();
         });
     }
 
