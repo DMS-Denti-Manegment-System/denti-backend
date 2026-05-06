@@ -1,4 +1,4 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 @section('title', 'Profil - Denti')
 @section('page-title', 'Profil')
 @section('page-subtitle', 'Hesap ozeti')

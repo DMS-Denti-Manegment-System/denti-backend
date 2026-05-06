@@ -1,6 +1,6 @@
 <div class="aside-menu flex-column-fluid px-4">
     <!--begin::Aside Menu-->
-    <div class="hover-scroll-overlay-y mh-100 my-5" id="kt_aside_menu_wrapper" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-height="auto" data-kt-scroll-dependencies="{default: '#kt_aside_footer', lg: '#kt_header, #kt_aside_footer'}" data-kt-scroll-wrappers="#kt_aside, #kt_aside_menu" data-kt-scroll-offset="{default: '5px', lg: '75px'}">
+    <div class="aside-menu-scroll" id="kt_aside_menu_wrapper">
         <!--begin::Menu-->
         <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="kt_aside_menu" data-kt-menu="true">
             
@@ -21,7 +21,7 @@
                 <div class="menu-content"><span class="menu-heading fw-bold text-uppercase fs-7">Envanter</span></div>
             </div>
 
-            <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->is('stocks*') || request()->is('stock-categories*') || request()->is('suppliers*') ? 'here show' : '' }}">
+            <div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('stocks.*') || request()->routeIs('categories.*') || request()->routeIs('suppliers.*') ? 'here show' : '' }}">
                 <span class="menu-link">
                     <span class="menu-icon">
                         <i class="ki-duotone ki-package fs-2">
@@ -33,19 +33,19 @@
                 </span>
                 <div class="menu-sub menu-sub-accordion">
                     <div class="menu-item">
-                        <a class="menu-link {{ request()->is('stocks*') ? 'active' : '' }}" href="{{ url('/stocks') }}">
+                        <a class="menu-link {{ request()->routeIs('stocks.*') ? 'active' : '' }}" href="{{ route('stocks.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                             <span class="menu-title">Stok Listesi</span>
                         </a>
                     </div>
                     <div class="menu-item">
-                        <a class="menu-link {{ request()->is('stock-categories*') ? 'active' : '' }}" href="{{ url('/stock-categories') }}">
+                        <a class="menu-link {{ request()->routeIs('categories.*') ? 'active' : '' }}" href="{{ route('categories.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                             <span class="menu-title">Kategoriler</span>
                         </a>
                     </div>
                     <div class="menu-item">
-                        <a class="menu-link {{ request()->is('suppliers*') ? 'active' : '' }}" href="{{ url('/suppliers') }}">
+                        <a class="menu-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}" href="{{ route('suppliers.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
                             <span class="menu-title">Tedarikçiler</span>
                         </a>
@@ -59,7 +59,7 @@
             </div>
 
             <div class="menu-item">
-                <a class="menu-link {{ request()->is('clinics*') ? 'active' : '' }}" href="{{ url('/clinics') }}">
+                <a class="menu-link {{ request()->routeIs('clinics.*') ? 'active' : '' }}" href="{{ route('clinics.index') }}">
                     <span class="menu-icon">
                         <i class="ki-duotone ki-hospital fs-2">
                             <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
@@ -70,7 +70,7 @@
             </div>
 
             <div class="menu-item">
-                <a class="menu-link {{ request()->is('stock-requests*') ? 'active' : '' }}" href="{{ url('/stock-requests') }}">
+                <a class="menu-link {{ request()->routeIs('stock-requests.*') ? 'active' : '' }}" href="{{ route('stock-requests.index') }}">
                     <span class="menu-icon">
                         <i class="ki-duotone ki-swap fs-2">
                             <span class="path1"></span><span class="path2"></span><span class="path3"></span>
@@ -81,7 +81,7 @@
             </div>
 
             <div class="menu-item">
-                <a class="menu-link {{ request()->is('alerts*') ? 'active' : '' }}" href="{{ url('/alerts') }}">
+                <a class="menu-link {{ request()->routeIs('alerts.*') ? 'active' : '' }}" href="{{ route('alerts.index') }}">
                     <span class="menu-icon">
                         <i class="ki-duotone ki-notification-on fs-2">
                             <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>
@@ -97,7 +97,7 @@
             </div>
 
             <div class="menu-item">
-                <a class="menu-link {{ request()->is('reports*') ? 'active' : '' }}" href="{{ url('/reports') }}">
+                <a class="menu-link {{ request()->routeIs('reports.*') ? 'active' : '' }}" href="{{ route('reports.index') }}">
                     <span class="menu-icon">
                         <i class="ki-duotone ki-chart-line-star fs-2">
                             <span class="path1"></span><span class="path2"></span><span class="path3"></span>
@@ -113,7 +113,7 @@
             </div>
 
             <div class="menu-item">
-                <a class="menu-link {{ request()->is('employees*') ? 'active' : '' }}" href="{{ url('/employees') }}">
+                <a class="menu-link {{ request()->routeIs('employees.*') ? 'active' : '' }}" href="{{ route('employees.index') }}">
                     <span class="menu-icon">
                         <i class="ki-duotone ki-people fs-2">
                             <span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span>

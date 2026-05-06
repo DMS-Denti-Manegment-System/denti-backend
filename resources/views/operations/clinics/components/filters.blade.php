@@ -12,6 +12,6 @@
         </select>
     </div>
     <div class="col-md-3 col-lg-2 ms-auto">
-        <a href="{{ route('clinics.create') }}" class="btn btn-primary w-100">Yeni Klinik</a>
+        <a href="{{ route('clinics.create') }}" class="btn btn-primary w-100" data-module-create>Yeni Klinik</a>
     </div>
 </x-page-toolbar>

@@ -1,7 +1,11 @@
-<div class="app-table-container">
+<div class="app-stock-table-card">
+    <div class="app-stock-table-card__header">
+        <div class="app-stock-table-card__title">Stok Listesi</div>
+        <div class="app-stock-table-card__meta">Toplam {{ $products->total() }} kayıt</div>
+    </div>
     <div class="pt-0">
         <div class="table-responsive">
-            <table class="table align-middle fs-6 gy-4">
+            <table class="table align-middle fs-6 gy-4 app-stock-table">
                 <thead>
                     <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                         <th>Ürün Bilgisi</th>
@@ -17,59 +21,57 @@
                             $latestBatch = $product->batches->first();
                             $status = $product->stock_status;
                             $statusClass = $status === 'critical' ? 'danger' : ($status === 'low_stock' ? 'warning' : 'success');
-                            $statusLabel = $status === 'critical' ? 'Kritik' : ($status === 'low_stock' ? 'Düşük' : 'Normal');
+                            $statusLabel = $status === 'critical' ? 'Kritik Seviye' : ($status === 'low_stock' ? 'Düşük Seviye' : 'Normal');
+                            $progressWidth = $status === 'critical' ? 20 : ($status === 'low_stock' ? 45 : 100);
                         @endphp
                         <tr>
                             <td>
-                                <div class="d-flex align-items-center gap-3">
-                                    <div class="symbol symbol-40px symbol-circle bg-light-primary">
-                                        <span class="symbol-label text-primary fw-bold">
-                                            <i class="ki-duotone ki-package fs-2">
-                                                <span class="path1"></span><span class="path2"></span><span class="path3"></span>
-                                            </i>
-                                        </span>
+                                <div class="d-flex align-items-center gap-3 min-w-225px">
+                                    <div class="app-stock-table__avatar">
+                                        <i class="ki-duotone ki-package fs-2 text-primary">
+                                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                                        </i>
                                     </div>
                                     <div class="d-flex flex-column">
                                         <a href="{{ route('products.show', $product->id) }}" class="text-gray-900 fw-bold text-hover-primary fs-6">{{ $product->name }}</a>
-                                        <span class="text-muted fs-7">{{ $product->category ?: 'Kategori Yok' }} @if($product->sku) • {{ $product->sku }} @endif</span>
+                                        <span class="text-muted fs-7">{{ $product->category ?: 'Kategori Yok' }}</span>
                                     </div>
                                 </div>
                             </td>
                             <td>
                                 <div class="d-flex flex-column">
                                     <span class="badge badge-light-primary align-self-start">{{ $product->clinic?->name ?: ($latestBatch?->clinic?->name ?: 'Genel Stok') }}</span>
-                                    <span class="text-muted fs-8 mt-1">{{ $latestBatch?->storage_location ?: 'Konum Yok' }}</span>
+                                    <span class="text-muted fs-8 mt-1">{{ $latestBatch?->storage_location ?: 'Konum bilgisi yok' }}</span>
                                 </div>
                             </td>
                             <td>
-                                <div class="d-flex flex-column min-w-150px">
-                                    <div class="d-flex justify-content-between mb-1">
-                                        <span class="text-gray-900 fw-bold">{{ $product->total_stock }} {{ $product->unit }}</span>
+                                <div class="app-stock-level min-w-225px">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="text-gray-900 fw-bold">{{ $product->total_stock }} adet</span>
                                         <span class="badge badge-light-{{ $statusClass }} fs-8">{{ $statusLabel }}</span>
                                     </div>
-                                    <div class="progress h-6px w-100 bg-light-{{ $statusClass }}">
-                                        <div class="progress-bar bg-{{ $statusClass }}" role="progressbar" style="width: {{ min(100, ($product->total_stock / max(1, ($product->yellow_alert_level ?? 20) * 2)) * 100) }}%"></div>
+                                    <div class="progress h-6px w-100 bg-light">
+                                        <div class="progress-bar bg-{{ $statusClass }}" role="progressbar" style="width: {{ $progressWidth }}%"></div>
                                     </div>
                                 </div>
                             </td>
                             <td>
-                                <div class="symbol-group symbol-hover">
-                                    <div class="symbol symbol-30px symbol-circle" data-bs-toggle="tooltip" title="{{ $product->batches_count }} Parti">
-                                        <span class="symbol-label bg-light-info text-info fs-8 fw-bold">{{ $product->batches_count }}</span>
-                                    </div>
-                                </div>
+                                <span class="app-stock-table__counter">{{ $product->batches_count }}</span>
                             </td>
                             <td class="text-end">
-                                <div class="d-flex justify-content-end gap-2">
-                                    <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-icon btn-light-primary" title="Detay">
-                                        <i class="ki-duotone ki-eye fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                    </a>
-                                    <button type="button" class="btn btn-sm btn-icon btn-light-info" data-stock-edit="{{ $product->id }}" title="Düzenle">
-                                        <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-icon btn-light-danger" data-stock-delete="{{ $product->id }}" title="Sil">
-                                        <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span></i>
-                                    </button>
+                                <div class="d-flex justify-content-end align-items-center gap-2">
+                                    <button type="button" class="btn btn-sm btn-light-primary px-4" data-stock-detail="{{ $product->id }}">Yönet</button>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-icon btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="ki-duotone ki-dots-vertical fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="{{ route('products.show', $product->id) }}">Detay</a></li>
+                                            <li><button class="dropdown-item" type="button" data-stock-edit="{{ $product->id }}">Düzenle</button></li>
+                                            <li><button class="dropdown-item" type="button" data-stock-adjust="{{ $product->id }}">Stok Hareketi</button></li>
+                                            <li><button class="dropdown-item text-danger" type="button" data-stock-delete="{{ $product->id }}">Sil</button></li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </td>
                         </tr>
@@ -82,6 +84,8 @@
             </table>
         </div>
 
-        <x-pager :paginator="$products" />
+        <div class="px-6 pb-6">
+            <x-pager :paginator="$products" />
+        </div>
     </div>
 </div>

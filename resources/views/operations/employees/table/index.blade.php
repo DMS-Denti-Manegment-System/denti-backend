@@ -20,9 +20,9 @@
                             <td><span class="badge {{ $employee->is_active ? 'badge-light-success' : 'badge-light-danger' }}">{{ $employee->is_active ? 'Aktif' : 'Pasif' }}</span></td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-light-primary">Duzenle</a>
+                                    <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a>
                                     @if($employee->id !== auth()->id())
-                                        <form method="POST" action="{{ route('employees.destroy', $employee) }}" onsubmit="return confirm('Personel silinsin mi?');">
+                                        <form method="POST" action="{{ route('employees.destroy', $employee) }}" data-module-action>
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-light-danger">Sil</button>

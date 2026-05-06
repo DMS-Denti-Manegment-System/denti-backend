@@ -288,6 +288,210 @@ body.app-body--sidebar-open {
     font-size: 12px;
 }
 
+.app-stock-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.app-stock-kpi-card {
+    background: #fff;
+    border: 1px solid #e9edf3;
+    border-radius: 10px;
+    min-height: 96px;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+}
+
+.app-stock-kpi-card--critical {
+    border-color: rgba(255, 82, 82, 0.75);
+    box-shadow: 0 6px 18px rgba(255, 82, 82, 0.1);
+}
+
+.app-stock-kpi-card__label {
+    color: #8c95a6;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 8px;
+}
+
+.app-stock-kpi-card__value {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #2c313a;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.app-stock-filter-card {
+    background: #fff;
+    border: 1px solid #e9edf3;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    padding: 14px 16px;
+}
+
+.app-stock-filter-bar {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.app-stock-filter-bar__fields {
+    display: grid;
+    grid-template-columns: minmax(280px, 1.6fr) repeat(4, minmax(150px, 1fr));
+    gap: 10px;
+    align-items: center;
+}
+
+.app-stock-filter-bar__actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.app-stock-search {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 52px;
+    gap: 0;
+}
+
+.app-stock-search .form-control {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.app-stock-search .btn {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border: 1px solid #dfe5ef;
+    border-left: 0;
+}
+
+.app-stock-table-card {
+    background: #fff;
+    border: 1px solid #e9edf3;
+    border-radius: 10px;
+    box-shadow: 0 4px 16px rgba(15, 23, 42, 0.04);
+    overflow: hidden;
+}
+
+.app-stock-table-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.app-stock-table-card__title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2c313a;
+}
+
+.app-stock-table-card__meta {
+    font-size: 12px;
+    color: #8c95a6;
+}
+
+.app-stock-table thead th {
+    background: #fafbfd;
+    color: #6f7787;
+    font-size: 12px;
+    font-weight: 700;
+    border-bottom: 1px solid #eef2f7;
+    padding-top: 14px;
+    padding-bottom: 14px;
+}
+
+.app-stock-table tbody td {
+    padding-top: 14px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.app-stock-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.app-stock-level .progress {
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.app-stock-level .progress-bar.bg-success {
+    background-color: #53c41a !important;
+}
+
+.app-stock-analytics-list {
+    display: grid;
+    gap: 14px;
+}
+
+.app-stock-analytics-row {
+    display: grid;
+    grid-template-columns: 90px minmax(0, 1fr) 56px;
+    align-items: center;
+    gap: 12px;
+}
+
+.app-stock-analytics-row__label,
+.app-stock-analytics-row__value {
+    font-size: 12px;
+    color: #5f6980;
+    font-weight: 600;
+}
+
+.app-stock-analytics-row__value {
+    text-align: right;
+    color: #2c313a;
+}
+
+.app-stock-analytics-row__bar {
+    height: 10px;
+    border-radius: 999px;
+    background: #eef2f7;
+    overflow: hidden;
+}
+
+.app-stock-analytics-row__bar span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+
+@media (max-width: 1199.98px) {
+    .app-stock-kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .app-stock-filter-bar__fields {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
+    .app-stock-kpi-grid,
+    .app-stock-filter-bar__fields {
+        grid-template-columns: 1fr;
+    }
+
+    .app-stock-filter-bar__actions,
+    .app-stock-table-card__header {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+}
+
 .app-stock-detail-card {
     border-radius: 20px;
     border: 1px solid rgba(18, 30, 22, 0.08);
@@ -1218,42 +1422,52 @@ textarea {
     }
 }
 
-/* Metronic layout alignment with requested mockup */
+/* Active Blade + Metronic shell */
 .app-metronic-match {
-    --kt-app-header-height: 58px;
+    --app-header-height: 58px;
+    --app-aside-width: 265px;
     background: #f5f7fb;
 }
 
-.app-metronic-match .page {
+.app-metronic-match .page,
+.app-metronic-match #kt_wrapper,
+.app-metronic-match #kt_content,
+.app-metronic-match #kt_post {
+    min-width: 0;
     background: #f5f7fb;
 }
 
 .app-metronic-match .aside {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 var(--app-aside-width);
+    width: var(--app-aside-width);
+    background: #fff;
     border-right: 1px solid #e7ebf3;
-    background: #ffffff;
     box-shadow: none;
 }
 
 .app-metronic-match .aside-logo {
-    height: var(--kt-app-header-height);
+    height: var(--app-header-height);
+    padding: 0 18px;
     border-bottom: 1px solid #e7ebf3;
-    padding-inline: 18px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-}
-
-.app-metronic-match .aside-logo .logo {
-    height: 28px !important;
-    width: auto;
+    flex: 0 0 var(--app-header-height);
 }
 
 .app-metronic-match .aside-menu {
     padding-inline: 12px;
 }
 
+.app-metronic-match .aside-menu-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 16px 0 24px;
+}
+
 .app-metronic-match .aside .menu-item.pt-5 {
-    padding-top: 1.15rem !important;
+    padding-top: 1rem !important;
 }
 
 .app-metronic-match .aside .menu-heading {
@@ -1263,14 +1477,23 @@ textarea {
 }
 
 .app-metronic-match .aside .menu-link {
-    border-radius: 10px;
+    width: 100%;
     min-height: 42px;
-    color: #4b5675;
     margin-bottom: 3px;
+    border-radius: 10px;
+    color: #4b5675;
+    overflow: hidden;
 }
 
 .app-metronic-match .aside .menu-link:hover {
     background: #f2f5fb;
+}
+
+.app-metronic-match .aside .menu-title {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .app-metronic-match .aside .menu-link.active,
@@ -1284,13 +1507,24 @@ textarea {
     color: #3e97ff !important;
 }
 
+.app-metronic-match #kt_wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 100vh;
+}
+
 .app-metronic-match .header {
+    position: sticky;
+    top: 0;
+    z-index: 60;
+    height: var(--app-header-height);
     background: #10131a;
     border-bottom: 1px solid #1c2130;
 }
 
 .app-metronic-match .header .container-fluid {
-    min-height: var(--kt-app-header-height);
+    min-height: var(--app-header-height);
     padding-inline: 22px;
 }
 
@@ -1304,84 +1538,66 @@ textarea {
     background-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-.app-metronic-match #kt_content {
-    background: #f5f7fb;
+.app-metronic-match .content {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding-top: 0;
 }
 
-.app-metronic-match #kt_toolbar {
-    background: transparent;
+.app-metronic-match .toolbar {
+    padding: 18px 0 10px;
+    margin-bottom: 12px;
+}
+
+.app-metronic-match .page-title {
+    min-height: 48px;
+    margin-bottom: 0 !important;
 }
 
 .app-metronic-match #kt_toolbar_container,
-.app-metronic-match #kt_content_container {
+.app-metronic-match #kt_content_container,
+.app-metronic-match #kt_footer .container-fluid {
     max-width: 100%;
     padding-inline: 24px;
+}
+
+.app-metronic-match #kt_post {
+    padding-bottom: 32px;
 }
 
 .app-metronic-match .footer {
     background: transparent;
 }
 
-@media (max-width: 991.98px) {
-    .app-metronic-match .header .container-fluid {
-        padding-inline: 14px;
-    }
-
-    .app-metronic-match #kt_toolbar_container,
-    .app-metronic-match #kt_content_container {
-        padding-inline: 14px;
-    }
-}
-
-/* Layout Compensation for Fixed Aside & Header */
 @media (min-width: 992px) {
-    .app-metronic-match .aside {
-        width: 265px !important;
-        background: #ffffff !important;
-        position: fixed !important;
+    .app-metronic-match #kt_aside {
+        position: sticky;
         top: 0;
-        bottom: 0;
-        left: 0;
-        z-index: 100 !important;
-        border-right: 1px solid #e7ebf3 !important;
-    }
-
-    /* When aside is enabled and fixed, push the wrapper to the right */
-    .app-metronic-match.aside-enabled.aside-fixed .wrapper {
-        padding-left: 265px !important;
-        transition: padding-left 0.3s ease;
-    }
-
-    /* When header is fixed, offset it from the left and set width */
-    .app-metronic-match.header-fixed .header {
-        left: 265px !important;
-        right: 0 !important;
-        position: fixed !important;
-        z-index: 97 !important;
-        background: #10131a !important;
-        transition: left 0.3s ease;
-    }
-
-    /* Handle Minimized Sidebar State */
-    body.app-metronic-match[data-kt-aside-minimize="on"] .aside {
-        width: 70px !important;
-    }
-
-    body.app-metronic-match[data-kt-aside-minimize="on"] .wrapper {
-        padding-left: 70px !important;
-    }
-
-    body.app-metronic-match[data-kt-aside-minimize="on"] .header {
-        left: 70px !important;
+        height: 100vh;
+        align-self: flex-start;
+        z-index: 50;
     }
 }
 
-.app-metronic-match .content {
-    padding-top: 20px !important;
-    background: #f5f7fb !important;
-}
+@media (max-width: 991.98px) {
+    .app-metronic-match .page {
+        display: block;
+    }
 
-.app-metronic-match .toolbar {
-    padding: 20px 0;
-    margin-bottom: 20px;
+    .app-metronic-match .aside {
+        width: auto;
+        border-right: 0;
+    }
+
+    .app-metronic-match #kt_header {
+        z-index: 100;
+    }
+
+    .app-metronic-match .header .container-fluid,
+    .app-metronic-match #kt_toolbar_container,
+    .app-metronic-match #kt_content_container,
+    .app-metronic-match #kt_footer .container-fluid {
+        padding-inline: 14px;
+    }
 }

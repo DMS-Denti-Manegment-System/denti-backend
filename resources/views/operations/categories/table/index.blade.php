@@ -18,7 +18,7 @@
                             <td><span class="badge text-white" style="background: {{ $category->color ?: '#6c757d' }}">{{ $category->color ?: '#6c757d' }}</span></td>
                             <td>{{ $category->todos_count }}</td>
                             <td><span class="badge {{ $category->is_active ? 'badge-light-success' : 'badge-light-danger' }}">{{ $category->is_active ? 'Aktif' : 'Pasif' }}</span></td>
-                            <td><a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-light-primary">Duzenle</a></td>
+                            <td><a href="{{ route('categories.edit', $category) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a></td>
                         </tr>
                     @empty
                         <tr>

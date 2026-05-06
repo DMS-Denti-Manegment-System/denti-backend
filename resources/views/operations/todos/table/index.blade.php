@@ -20,13 +20,13 @@
                             <td>{{ optional($todo->created_at)->format('d.m.Y') }}</td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    <a href="{{ route('todos.edit', $todo) }}" class="btn btn-sm btn-light-primary">Duzenle</a>
-                                    <form method="POST" action="{{ route('todos.toggle', $todo) }}">
+                                    <a href="{{ route('todos.edit', $todo) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a>
+                                    <form method="POST" action="{{ route('todos.toggle', $todo) }}" data-module-action>
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-light-warning">{{ $todo->completed ? 'Ac' : 'Bitir' }}</button>
                                     </form>
                                     @unless($todo->completed)
-                                        <form method="POST" action="{{ route('todos.destroy', $todo) }}" onsubmit="return confirm('Todo silinsin mi?');">
+                                        <form method="POST" action="{{ route('todos.destroy', $todo) }}" data-module-action>
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-sm btn-light-danger">Sil</button>

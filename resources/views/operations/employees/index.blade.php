@@ -1,18 +1,31 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 @section('title', 'Personel - Denti')
 @section('page-title', 'Personel Yonetimi')
 @section('page-subtitle', 'Kullanici, rol ve klinik bilgileri')
 @section('content')
-    <div class="app-module-shell">
+    <div id="employeesModule" class="app-module-shell" data-index-url="{{ route('employees.index') }}">
         @include('operations.employees.components.filters')
-        @include('operations.employees.table.index')
+        <div id="employeesTableContainer" data-module-table>
+            @include('operations.employees.table.index')
+        </div>
     </div>
 @endsection
 
 @push('modals')
-    @include('operations.employees.modal.form')
+    <div id="employeeModalHost">
+        @include('operations.employees.modal.form')
+    </div>
 @endpush
 
 @push('scripts')
-    @include('operations.employees.components.scripts')
+    <script>
+        $(function () {
+            window.EmployeeModule = window.DentiUI.createModule({
+                name: 'employees',
+                root: '#employeesModule',
+                indexUrl: @json(route('employees.index')),
+                modalHost: '#employeeModalHost',
+            });
+        });
+    </script>
 @endpush

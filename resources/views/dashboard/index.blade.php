@@ -1,4 +1,4 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 
 @section('title', 'Dashboard - Denti')
 @section('page-title', $stats['company_name'] ?? 'Dashboard')

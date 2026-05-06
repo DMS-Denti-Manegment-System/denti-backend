@@ -1,18 +1,31 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 @section('title', 'Stok Talepleri - Denti')
 @section('page-title', 'Stok Talepleri')
 @section('page-subtitle', 'Klinikler arasi talep akisi')
 @section('content')
-    <div class="app-module-shell">
+    <div id="stockRequestsModule" class="app-module-shell" data-index-url="{{ route('stock-requests.index') }}">
         @include('operations.stock-requests.components.filters')
-        @include('operations.stock-requests.table.index')
+        <div id="stockRequestsTableContainer" data-module-table>
+            @include('operations.stock-requests.table.index')
+        </div>
     </div>
 @endsection
 
 @push('modals')
-    @include('operations.stock-requests.modal.form')
+    <div id="stockRequestModalHost">
+        @include('operations.stock-requests.modal.form')
+    </div>
 @endpush
 
 @push('scripts')
-    @include('operations.stock-requests.components.scripts')
+    <script>
+        $(function () {
+            window.StockRequestModule = window.DentiUI.createModule({
+                name: 'stock-requests',
+                root: '#stockRequestsModule',
+                indexUrl: @json(route('stock-requests.index')),
+                modalHost: '#stockRequestModalHost',
+            });
+        });
+    </script>
 @endpush

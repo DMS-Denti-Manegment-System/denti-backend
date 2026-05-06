@@ -1,18 +1,31 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 @section('title', 'Todo - Denti')
 @section('page-title', 'Todo Listesi')
 @section('page-subtitle', 'Takip ve yapilacaklar')
 @section('content')
-    <div class="app-module-shell">
+    <div id="todosModule" class="app-module-shell" data-index-url="{{ route('todos.index') }}">
         @include('operations.todos.components.filters')
-        @include('operations.todos.table.index')
+        <div id="todosTableContainer" data-module-table>
+            @include('operations.todos.table.index')
+        </div>
     </div>
 @endsection
 
 @push('modals')
-    @include('operations.todos.modal.form')
+    <div id="todoModalHost">
+        @include('operations.todos.modal.form')
+    </div>
 @endpush
 
 @push('scripts')
-    @include('operations.todos.components.scripts')
+    <script>
+        $(function () {
+            window.TodoModule = window.DentiUI.createModule({
+                name: 'todos',
+                root: '#todosModule',
+                indexUrl: @json(route('todos.index')),
+                modalHost: '#todoModalHost',
+            });
+        });
+    </script>
 @endpush

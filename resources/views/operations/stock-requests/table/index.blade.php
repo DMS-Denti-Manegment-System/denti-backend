@@ -23,23 +23,23 @@
                             <td>
                                 <div class="d-flex flex-wrap gap-2">
                                     @if($requestItem->status === 'pending')
-                                        <form method="POST" action="{{ route('stock-requests.approve', $requestItem) }}" class="d-flex gap-2">
+                                        <form method="POST" action="{{ route('stock-requests.approve', $requestItem) }}" class="d-flex gap-2" data-module-action>
                                             @csrf
                                             <input type="hidden" name="approved_quantity" value="{{ $requestItem->requested_quantity }}" />
                                             <button type="submit" class="btn btn-sm btn-light-success">Onayla</button>
                                         </form>
-                                        <form method="POST" action="{{ route('stock-requests.reject', $requestItem) }}">
+                                        <form method="POST" action="{{ route('stock-requests.reject', $requestItem) }}" data-module-action>
                                             @csrf
                                             <input type="hidden" name="rejection_reason" value="Web panel uzerinden reddedildi." />
                                             <button type="submit" class="btn btn-sm btn-light-danger">Reddet</button>
                                         </form>
                                     @elseif($requestItem->status === 'approved')
-                                        <form method="POST" action="{{ route('stock-requests.ship', $requestItem) }}">
+                                        <form method="POST" action="{{ route('stock-requests.ship', $requestItem) }}" data-module-action>
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-light-primary">Sevk Et</button>
                                         </form>
                                     @elseif($requestItem->status === 'in_transit')
-                                        <form method="POST" action="{{ route('stock-requests.complete', $requestItem) }}">
+                                        <form method="POST" action="{{ route('stock-requests.complete', $requestItem) }}" data-module-action>
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-light-success">Tamamla</button>
                                         </form>

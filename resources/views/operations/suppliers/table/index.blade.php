@@ -20,7 +20,7 @@
                             <td>{{ $supplier->phone ?: '-' }}</td>
                             <td>{{ $supplier->email ?: '-' }}</td>
                             <td><span class="badge {{ $supplier->is_active ? 'badge-light-success' : 'badge-light-danger' }}">{{ $supplier->is_active ? 'Aktif' : 'Pasif' }}</span></td>
-                            <td><a href="{{ route('suppliers.edit', $supplier) }}" class="btn btn-sm btn-light-primary">Duzenle</a></td>
+                            <td><a href="{{ route('suppliers.edit', $supplier) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a></td>
                         </tr>
                     @empty
                         <tr>

@@ -12,6 +12,6 @@
         </select>
     </div>
     <div class="col-md-3 col-lg-2 ms-auto">
-        <a href="{{ route('suppliers.create') }}" class="btn btn-primary w-100">Yeni Tedarikci</a>
+        <a href="{{ route('suppliers.create') }}" class="btn btn-primary w-100" data-module-create>Yeni Tedarikci</a>
     </div>
 </x-page-toolbar>

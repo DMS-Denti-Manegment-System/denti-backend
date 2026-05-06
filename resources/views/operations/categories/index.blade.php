@@ -1,18 +1,31 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 @section('title', 'Kategoriler - Denti')
 @section('page-title', 'Kategori Yonetimi')
 @section('page-subtitle', 'Todo kategorileri')
 @section('content')
-    <div class="app-module-shell">
+    <div id="categoriesModule" class="app-module-shell" data-index-url="{{ route('categories.index') }}">
         @include('operations.categories.components.filters')
-        @include('operations.categories.table.index')
+        <div id="categoriesTableContainer" data-module-table>
+            @include('operations.categories.table.index')
+        </div>
     </div>
 @endsection
 
 @push('modals')
-    @include('operations.categories.modal.form')
+    <div id="categoryModalHost">
+        @include('operations.categories.modal.form')
+    </div>
 @endpush
 
 @push('scripts')
-    @include('operations.categories.components.scripts')
+    <script>
+        $(function () {
+            window.CategoryModule = window.DentiUI.createModule({
+                name: 'categories',
+                root: '#categoriesModule',
+                indexUrl: @json(route('categories.index')),
+                modalHost: '#categoryModalHost',
+            });
+        });
+    </script>
 @endpush

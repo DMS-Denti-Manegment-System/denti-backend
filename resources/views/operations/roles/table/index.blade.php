@@ -24,7 +24,7 @@
                             <td>{{ $role->permissions->pluck('name')->take(4)->implode(', ') ?: '-' }}</td>
                             <td>
                                 @if(!is_null($role->company_id) || auth()->user()->isSuperAdmin())
-                                    <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-light-primary">Duzenle</a>
+                                    <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a>
                                 @endif
                             </td>
                         </tr>

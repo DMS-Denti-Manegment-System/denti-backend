@@ -1,6 +1,6 @@
 <div id="kt_header" class="header">
     <!--begin::Container-->
-    <div class="container-fluid d-flex flex-stack">		
+        <div class="container-fluid d-flex flex-stack">		
         <!--begin::Brand-->
         <div class="d-flex align-items-center me-5">
             <!--begin::Aside toggle-->
@@ -9,87 +9,21 @@
             </div>
             <!--end::Aside  toggle-->
 
-            <!--begin::Logo-->
             <div class="d-flex align-items-center d-lg-none">
                 <a href="{{ route('dashboard') }}">
-                    <img alt="Logo" src="{{ asset('metronic/assets/media/logos/default-small.svg') }}" class="h-25px h-lg-30px">
+                    <img alt="Logo" src="{{ asset('ui-kit/media/logos/default-small.svg') }}" class="h-25px h-lg-30px">
                 </a>
             </div>
-            <!--end::Logo-->
-
-            <!--begin::Nav-->
-            <div class="ms-5 ms-md-10">
-                <!--begin::Toggle-->
-                <button type="button" class="btn btn-flex btn-active-color-white align-items-center justify-content-center justify-content-md-between align-items-lg-center flex-md-content-between bg-white bg-opacity-10 btn-color-white px-0 ps-md-6 pe-md-5 h-30px w-30px h-md-35px w-md-200px" data-kt-menu-trigger="click" data-kt-menu-placement="bottom-start">
-                    <span class="d-none d-md-inline">Dashboard</span>
-                    <i class="ki-duotone ki-down fs-4 ms-2 ms-md-3 me-0"></i>
-                </button>
-                <!--end::Toggle-->
-
-                <!--begin::Menu-->
-                <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-800 menu-state-bg fw-semibold w-200px pb-3" data-kt-menu="true">
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <div class="menu-content fs-7 text-gray-900 fw-bold px-3 py-4">Hızlı Erişim:</div>
-                    </div>
-                    <!--end::Menu item-->
-
-                    <!--begin::Menu separator-->
-                    <div class="separator mb-3 opacity-75"></div>
-                    <!--end::Menu separator-->
-
-                    <!--begin::Menu item-->
-                    <div class="menu-item px-3">
-                        <a href="{{ url('/stocks') }}" class="menu-link px-3">Stoklar</a>
-                    </div>
-                    <div class="menu-item px-3">
-                        <a href="{{ url('/clinics') }}" class="menu-link px-3">Klinikler</a>
-                    </div>
-                </div>
-                <!--end::Menu-->
-            </div>
-            <!--end::Nav-->	
         </div>
         <!--end::Brand-->		 
 
         <!--begin::Topbar-->
         <div class="d-flex align-items-center flex-shrink-0">
-            
-            <!--begin::Search-->
-            <div id="kt_header_search" class="header-search d-flex align-items-stretch" data-kt-search-keypress="true" data-kt-search-min-length="2" data-kt-search-enter="enter" data-kt-search-layout="menu" data-kt-menu-trigger="auto" data-kt-menu-overflow="false" data-kt-menu-permanent="true" data-kt-menu-placement="bottom-end" data-kt-search="true">
-
-                <!--begin::Search toggle-->
-                <div class="d-flex align-items-center" data-kt-search-element="toggle" id="kt_header_search_toggle">
-                    <div class="btn btn-icon btn-color-white bg-hover-white bg-hover-opacity-10 w-30px h-30px h-40px w-40px">
-                        <i class="ki-duotone ki-magnifier fs-1"><span class="path1"></span><span class="path2"></span></i>
-                    </div>
-                </div>
-                <!--end::Search toggle-->
-
-                <!--begin::Menu-->
-                <div data-kt-search-element="content" class="menu menu-sub menu-sub-dropdown p-7 w-325px w-md-375px" data-kt-menu="true">  
-                    <!--begin::Wrapper-->
-                    <div data-kt-search-element="wrapper">
-                        <!--begin::Form-->
-                        <form data-kt-search-element="form" class="w-100 position-relative mb-3" autocomplete="off">	
-                            <i class="ki-duotone ki-magnifier fs-2 text-gray-500 position-absolute top-50 translate-middle-y ms-0"><span class="path1"></span><span class="path2"></span></i>
-                            <input type="text" class="search-input form-control form-control-flush ps-10" name="search" value="" placeholder="Search..." data-kt-search-element="input">
-                        </form>
-                        <!--end::Form-->
-
-                        <!--begin::Separator-->
-                        <div class="separator border-gray-200 mb-6"></div>
-                        <!--end::Separator-->
-                        
-                        <div data-kt-search-element="main">
-                            <span class="text-muted fs-7">Arama yapmak için en az 2 karakter giriniz.</span>
-                        </div>
-                    </div>
-                    <!--end::Wrapper-->
-                </div>
-                <!--end::Menu-->
+            <div class="d-flex align-items-center ms-1">
+                <a href="{{ route('stocks.index') }}" class="btn btn-icon btn-color-white bg-hover-white bg-hover-opacity-10 w-30px h-30px h-40px w-40px" aria-label="Stok listesine git" title="Stok listesi">
+                    <i class="ki-duotone ki-magnifier fs-1"><span class="path1"></span><span class="path2"></span></i>
+                </a>
             </div>
-            <!--end::Search-->
 
             <!--begin::Theme mode-->
             <div class="d-flex align-items-center ms-1">

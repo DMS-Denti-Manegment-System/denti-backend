@@ -32,6 +32,8 @@ Route::middleware(['auth'])->group(function () {
     Route::put('/stocks/{product}', [OperationsPageController::class, 'stockUpdate'])->name('stocks.update');
     Route::get('/stock/products/{id}', [OperationsPageController::class, 'stockShow'])->name('products.show');
     Route::post('/stock/products/{product}/adjust', [OperationsPageController::class, 'stockAdjust'])->name('products.adjust-stock');
+    Route::post('/stock/products/{product}/batches', [OperationsPageController::class, 'stockBatchStore'])->name('stocks.batches.store');
+    Route::post('/stock/batches/{stock}/use', [OperationsPageController::class, 'stockUse'])->name('stocks.use');
     Route::get('/stock-categories', [OperationsPageController::class, 'categories'])->name('categories.index');
     Route::get('/stock-categories/create', [OperationsPageController::class, 'categoryCreate'])->name('categories.create');
     Route::post('/stock-categories', [OperationsPageController::class, 'categoryStore'])->name('categories.store');

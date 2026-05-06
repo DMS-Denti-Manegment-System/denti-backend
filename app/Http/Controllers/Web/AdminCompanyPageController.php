@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\UpdateCompanyRequest;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -17,11 +18,19 @@ use Illuminate\Http\RedirectResponse;
 
 class AdminCompanyPageController extends Controller
 {
-    public function __invoke(Request $request): View
+    public function __invoke(Request $request): View|JsonResponse
     {
         abort_unless(Auth::user()?->isSuperAdmin(), 403);
 
         $companies = Company::withCount('users')
+            ->when($request->filled('search'), function ($query) use ($request) {
+                $search = $request->string('search');
+                $query->where(function ($inner) use ($search) {
+                    $inner->where('name', 'like', "%{$search}%")
+                        ->orWhere('code', 'like', "%{$search}%")
+                        ->orWhere('domain', 'like', "%{$search}%");
+                });
+            })
             ->latest()
             ->get();
 
@@ -30,12 +39,21 @@ class AdminCompanyPageController extends Controller
             $editingCompany = Company::findOrFail($request->integer('edit'));
         }
 
-        return view('admin.companies.index', [
+        $viewData = [
             'companies' => $companies,
             'user' => Auth::user(),
             'modalMode' => $request->query('modal'),
             'editingCompany' => $editingCompany,
-        ]);
+        ];
+
+        if ($request->ajax()) {
+            return response()->json([
+                'tableHtml' => view('admin.companies.table.index', $viewData)->render(),
+                'modalHtml' => view('admin.companies.modal.form', $viewData)->render(),
+            ]);
+        }
+
+        return view('admin.companies.index', $viewData);
     }
 
     public function create(): RedirectResponse
@@ -43,7 +61,7 @@ class AdminCompanyPageController extends Controller
         return redirect()->route('admin.companies', ['modal' => 'create']);
     }
 
-    public function store(StoreCompanyRequest $request): RedirectResponse
+    public function store(StoreCompanyRequest $request): RedirectResponse|JsonResponse
     {
         abort_unless(Auth::user()?->isSuperAdmin(), 403);
 
@@ -68,6 +86,13 @@ class AdminCompanyPageController extends Controller
             session()->flash('status', "Sirket olusturuldu. Gecici sifre: {$temporaryPassword}");
         });
 
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => session('status', 'Sirket olusturuldu.'),
+            ]);
+        }
+
         return redirect()->route('admin.companies');
     }
 
@@ -76,11 +101,18 @@ class AdminCompanyPageController extends Controller
         return redirect()->route('admin.companies', ['modal' => 'edit', 'edit' => $company->id]);
     }
 
-    public function update(UpdateCompanyRequest $request, Company $company): RedirectResponse
+    public function update(UpdateCompanyRequest $request, Company $company): RedirectResponse|JsonResponse
     {
         abort_unless(Auth::user()?->isSuperAdmin(), 403);
 
         $company->update($request->validated());
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Sirket bilgileri guncellendi.',
+            ]);
+        }
 
         return redirect()->route('admin.companies')->with('status', 'Sirket bilgileri guncellendi.');
     }

@@ -1,4 +1,4 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 
 @section('title', $product->name . ' - Ürün Detayı')
 @section('page-title', 'Ürün Detayı')
@@ -6,8 +6,7 @@
 
 @section('content')
 <div class="d-flex flex-column gap-7 gap-lg-10">
-    <!-- Action Toolbar -->
-    <div class="d-flex justify-content-between align-items-center">
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
         <a href="{{ route('stocks.index') }}" class="btn btn-sm btn-light-primary">
             <i class="ki-duotone ki-arrow-left fs-3"><span class="path1"></span><span class="path2"></span></i>
             Listeye Dön
@@ -23,243 +22,276 @@
             </button>
         </div>
     </div>
-    <div class="d-flex flex-column flex-xl-row gap-7 gap-lg-10">
-        <!-- Overview -->
-        <div class="flex-column flex-lg-row-auto w-100 w-xl-350px">
-            <div class="card mb-5 mb-xl-8">
-                <div class="card-body pt-15">
-                    <div class="d-flex flex-center flex-column mb-5">
-                        <div class="symbol symbol-100px symbol-circle mb-7 bg-light-primary">
+
+    @if($errors->has('stock_use'))
+        <div class="alert alert-danger">{{ $errors->first('stock_use') }}</div>
+    @endif
+
+    <div class="row g-7">
+        <div class="col-xl-4">
+            <div class="card card-flush app-stock-detail-card h-100">
+                <div class="card-body p-8">
+                    <div class="d-flex align-items-center gap-4 mb-8">
+                        <div class="symbol symbol-80px symbol-circle bg-light-primary">
                             <span class="symbol-label text-primary fw-bold fs-1">
-                                <i class="ki-duotone ki-package fs-3x">
+                                <i class="ki-duotone ki-package fs-2x">
                                     <span class="path1"></span><span class="path2"></span><span class="path3"></span>
                                 </i>
                             </span>
                         </div>
-                        <a href="#" class="fs-3 text-gray-800 text-hover-primary fw-bold mb-1">{{ $product->name }}</a>
-                        <div class="fs-5 fw-semibold text-muted mb-6">{{ $product->category ?: 'Kategori Yok' }}</div>
-                        
-                        <div class="d-flex flex-wrap flex-center">
-                            <div class="border border-gray-300 border-dashed rounded py-3 px-3 mb-3">
-                                <div class="fs-4 fw-bold text-gray-700">
-                                    <span class="w-75px">{{ $product->total_stock }}</span>
-                                </div>
-                                <div class="fw-semibold text-muted">{{ $product->unit }}</div>
+                        <div>
+                            <div class="fs-2 fw-bold text-gray-900">{{ $product->name }}</div>
+                            <div class="text-muted">{{ $product->category ?: 'Kategori Yok' }}</div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4 mb-8">
+                        <div class="col-6">
+                            <div class="border border-gray-300 border-dashed rounded px-4 py-4">
+                                <div class="text-muted fs-7 mb-1">Mevcut Stok</div>
+                                <div class="fs-3 fw-bold text-gray-900">{{ $product->total_stock }} {{ $product->unit }}</div>
                             </div>
-                            <div class="border border-gray-300 border-dashed rounded py-3 px-3 mx-4 mb-3">
-                                <div class="fs-4 fw-bold text-gray-700">
-                                    <span class="w-75px">{{ number_format($stockStats['total_value'], 2) }}</span>
-                                </div>
-                                <div class="fw-semibold text-muted">TL Değer</div>
+                        </div>
+                        <div class="col-6">
+                            <div class="border border-gray-300 border-dashed rounded px-4 py-4">
+                                <div class="text-muted fs-7 mb-1">Toplam Değer</div>
+                                <div class="fs-3 fw-bold text-gray-900">{{ number_format($stockStats['total_value'], 2) }} TL</div>
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex flex-stack fs-4 py-3">
-                        <div class="fw-bold rotate collapsible" data-bs-toggle="collapse" href="#kt_product_view_details" role="button" aria-expanded="false" aria-controls="kt_product_view_details">Detaylar 
-                        <span class="ms-2 rotate-180">
-                            <i class="ki-duotone ki-down fs-3"></i>
-                        </span></div>
-                    </div>
-                    <div class="separator separator-dashed my-3"></div>
-                    <div id="kt_product_view_details" class="collapse show">
-                        <div class="pb-5 fs-6">
-                            <div class="fw-bold mt-5">SKU</div>
-                            <div class="text-gray-600">{{ $product->sku ?: '-' }}</div>
-                            
-                            <div class="fw-bold mt-5">Marka</div>
-                            <div class="text-gray-600">{{ $product->brand ?: '-' }}</div>
-                            
-                            <div class="fw-bold mt-5">Klinik</div>
-                            <div class="text-gray-600">{{ $product->clinic?->name ?: 'Genel' }}</div>
-
-                            <div class="fw-bold mt-5">Kritik Seviye (Sarı/Kırmızı)</div>
-                            <div class="text-gray-600">
-                                <span class="badge badge-light-warning">{{ $product->yellow_alert_level ?? 10 }}</span>
-                                <span class="badge badge-light-danger">{{ $product->red_alert_level ?? 5 }}</span>
+                    <div class="mb-8">
+                        <div class="fw-bold text-gray-900 fs-5 mb-4">Ürün Bilgileri</div>
+                        <div class="d-flex flex-column gap-4">
+                            <div>
+                                <div class="text-muted fs-7">SKU</div>
+                                <div class="text-gray-800 fw-semibold">{{ $product->sku ?: '-' }}</div>
                             </div>
+                            <div>
+                                <div class="text-muted fs-7">Marka</div>
+                                <div class="text-gray-800 fw-semibold">{{ $product->brand ?: '-' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-muted fs-7">Klinik</div>
+                                <div class="text-gray-800 fw-semibold">{{ $product->clinic?->name ?: 'Genel' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-muted fs-7">Uyarı Seviyesi</div>
+                                <div class="d-flex gap-2">
+                                    <span class="badge badge-light-warning">{{ $product->yellow_alert_level ?? 10 }}</span>
+                                    <span class="badge badge-light-danger">{{ $product->red_alert_level ?? 5 }}</span>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="text-muted fs-7">Açıklama</div>
+                                <div class="text-gray-800 fw-semibold">{{ $product->description ?: 'Açıklama bulunmuyor.' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="border-top pt-6">
+                        <div class="fw-bold text-gray-900 fs-5 mb-4">Stok İşlemleri</div>
+                        <div class="d-flex flex-wrap gap-3">
+                            @if(!$hasExpiryTracking)
+                                @if($defaultUsageBatch)
+                                    <button
+                                        type="button"
+                                        class="btn btn-danger"
+                                        data-stock-use-trigger
+                                        data-stock-use-action="{{ route('stocks.use', $defaultUsageBatch) }}"
+                                        data-stock-use-batch="#{{ $defaultUsageBatch->id }} / {{ $product->name }}"
+                                        data-stock-use-max="{{ $defaultUsageBatch->current_stock }}"
+                                        data-stock-use-reason="Ürün Detay Kullanımı"
+                                    >
+                                        Stok Kullan
+                                    </button>
+                                @else
+                                    <div class="text-muted">Kullanılabilir aktif stok bulunmuyor.</div>
+                                @endif
+                            @endif
+
+                            @if($hasExpiryTracking)
+                                <button type="button" class="btn btn-primary" data-batch-create-trigger>
+                                    Yeni Parti Ekle
+                                </button>
+                            @endif
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tabs Content -->
-        <div class="flex-lg-row-fluid">
-            <ul class="nav nav-custom nav-tabs nav-line-tabs nav-line-tabs-2x border-0 fs-4 fw-semibold mb-8">
-                <li class="nav-item">
-                    <a class="nav-link text-active-primary pb-4 active" data-bs-toggle="tab" href="#kt_product_view_batches_tab">Stok Partileri</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_product_view_overview_tab">Genel Bakış</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link text-active-primary pb-4" data-bs-toggle="tab" href="#kt_product_view_history_tab">İşlem Geçmişi</a>
-                </li>
-            </ul>
-
-            <div class="tab-content" id="myTabContent">
-                <!-- Batches Tab -->
-                <div class="tab-pane fade show active" id="kt_product_view_batches_tab" role="tabpanel">
-                    <div class="card card-flush mb-6 mb-xl-9">
-                        <div class="card-header mt-6">
-                            <div class="card-title flex-column">
-                                <h2 class="mb-1">Stok Partileri</h2>
-                                <div class="fs-6 fw-semibold text-muted">Aktif ve tükenmiş tüm partiler</div>
+        <div class="col-xl-8">
+            <div class="card card-flush app-stock-detail-card mb-7">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2 class="mb-0">Stok Özeti</h2>
+                    </div>
+                </div>
+                <div class="card-body pt-2">
+                    <div class="row g-5">
+                        <div class="col-md-4">
+                            <div class="bg-light-success rounded p-6 h-100">
+                                <div class="fs-2tx fw-bold text-success mb-2">{{ $stockStats['total_usage'] }}</div>
+                                <div class="fs-6 fw-semibold text-gray-600">Toplam Kullanım</div>
                             </div>
                         </div>
-                        <div class="card-body p-9 pt-4">
-                            <div class="table-responsive">
-                                <table class="table align-middle table-row-dashed fs-6 gy-5">
-                                    <thead>
-                                        <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                            <th>Parti No / SKU</th>
-                                            <th>Tedarikçi</th>
-                                            <th>Stok</th>
-                                            <th>Maliyet</th>
-                                            <th>Miyat (SKT)</th>
-                                            <th>Konum</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-gray-600 fw-semibold">
-                                        @forelse($product->batches as $batch)
-                                        <tr>
-                                            <td>
-                                                <div class="d-flex flex-column">
-                                                    <span class="text-gray-800 fw-bold">#{{ $batch->id }}</span>
-                                                    <span class="fs-8 text-muted">{{ $batch->batch_number ?: 'Parti No Yok' }}</span>
-                                                </div>
-                                            </td>
-                                            <td>{{ $batch->supplier?->name ?: '-' }}</td>
-                                            <td>
-                                                <span class="fw-bold {{ $batch->current_stock <= 0 ? 'text-danger' : 'text-gray-800' }}">
-                                                    {{ $batch->current_stock }} {{ $product->unit }}
-                                                </span>
-                                            </td>
-                                            <td>{{ number_format($batch->purchase_price, 2) }} {{ $batch->currency }}</td>
-                                            <td>
-                                                @if($batch->expiry_date)
-                                                    <span class="badge badge-light-{{ $batch->expiry_date->isPast() ? 'danger' : ($batch->expiry_date->diffInDays() < 30 ? 'warning' : 'success') }}">
-                                                        {{ $batch->expiry_date->format('d/m/Y') }}
-                                                    </span>
-                                                @else
-                                                    -
-                                                @endif
-                                            </td>
-                                            <td>{{ $batch->storage_location ?: '-' }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="6" class="text-center py-10 text-muted">Bu ürüne ait stok partisi bulunamadı.</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
+                        <div class="col-md-4">
+                            <div class="bg-light-info rounded p-6 h-100">
+                                <div class="fs-2tx fw-bold text-info mb-2">{{ $stockStats['batch_count'] }}</div>
+                                <div class="fs-6 fw-semibold text-gray-600">Aktif Parti Sayısı</div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="bg-light-primary rounded p-6 h-100">
+                                <div class="fs-2tx fw-bold text-primary mb-2">{{ $product->total_stock }}</div>
+                                <div class="fs-6 fw-semibold text-gray-600">Mevcut Stok</div>
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Overview Tab -->
-                <div class="tab-pane fade" id="kt_product_view_overview_tab" role="tabpanel">
-                    <div class="card card-flush mb-6 mb-xl-9">
-                        <div class="card-header mt-6">
-                            <div class="card-title flex-column">
-                                <h2 class="mb-1">Stok Özeti</h2>
-                                <div class="fs-6 fw-semibold text-muted">Ürünün güncel durumu ve kullanımı</div>
-                            </div>
+            <div class="card card-flush app-stock-detail-card mb-7">
+                <div class="card-header align-items-center">
+                    <div class="card-title">
+                        <h2 class="mb-0">Stok Partileri</h2>
+                    </div>
+                    @if($hasExpiryTracking)
+                        <div class="card-toolbar">
+                            <button type="button" class="btn btn-sm btn-light-primary" data-batch-create-trigger>
+                                Yeni Parti Ekle
+                            </button>
                         </div>
-                        <div class="card-body p-9 pt-4">
-                             <div class="row g-5">
-                                <div class="col-md-4">
-                                    <div class="bg-light-success rounded p-6">
-                                        <div class="fs-2tx fw-bold text-success mb-2">{{ $stockStats['total_usage'] }}</div>
-                                        <div class="fs-6 fw-semibold text-gray-600">Toplam Kullanım</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="bg-light-info rounded p-6">
-                                        <div class="fs-2tx fw-bold text-info mb-2">{{ $stockStats['batch_count'] }}</div>
-                                        <div class="fs-6 fw-semibold text-gray-600">Aktif Parti Sayısı</div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="bg-light-primary rounded p-6">
-                                        <div class="fs-2tx fw-bold text-primary mb-2">{{ $product->total_stock }}</div>
-                                        <div class="fs-6 fw-semibold text-gray-600">Mevcut Stok</div>
-                                    </div>
-                                </div>
-                             </div>
-
-                             <div class="mt-10">
-                                <h3 class="mb-5">Ürün Açıklaması</h3>
-                                <div class="fs-5 text-gray-800">
-                                    {{ $product->description ?: 'Açıklama bulunmuyor.' }}
-                                </div>
-                             </div>
-                        </div>
+                    @endif
+                </div>
+                <div class="card-body pt-2">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5">
+                            <thead>
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th>Parti No / SKU</th>
+                                    <th>Tedarikçi</th>
+                                    <th>Stok</th>
+                                    <th>Maliyet</th>
+                                    <th>Miyat (SKT)</th>
+                                    <th>Konum</th>
+                                    @if($hasExpiryTracking)
+                                        <th>Kullanım</th>
+                                    @endif
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                                @forelse($product->batches as $batch)
+                                <tr>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="text-gray-800 fw-bold">#{{ $batch->id }}</span>
+                                            <span class="fs-8 text-muted">{{ $batch->batch_code ?: 'Parti Kodu Yok' }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ $batch->supplier?->name ?: '-' }}</td>
+                                    <td>
+                                        <span class="fw-bold {{ $batch->current_stock <= 0 ? 'text-danger' : 'text-gray-800' }}">
+                                            {{ $batch->current_stock }} {{ $product->unit }}
+                                        </span>
+                                    </td>
+                                    <td>{{ number_format($batch->purchase_price, 2) }} {{ $batch->currency }}</td>
+                                    <td>
+                                        @if($batch->expiry_date)
+                                            <span class="badge badge-light-{{ $batch->expiry_date->isPast() ? 'danger' : ($batch->expiry_date->diffInDays() < 30 ? 'warning' : 'success') }}">
+                                                {{ $batch->expiry_date->format('d/m/Y') }}
+                                            </span>
+                                        @else
+                                            -
+                                        @endif
+                                    </td>
+                                    <td>{{ $batch->storage_location ?: '-' }}</td>
+                                    @if($hasExpiryTracking)
+                                        <td class="min-w-175px">
+                                            @if($batch->is_active && $batch->current_stock > 0 && (!$batch->expiry_date || !$batch->expiry_date->isPast()))
+                                                <button
+                                                    type="button"
+                                                    class="btn btn-sm btn-light-danger"
+                                                    data-stock-use-trigger
+                                                    data-stock-use-action="{{ route('stocks.use', $batch) }}"
+                                                    data-stock-use-batch="#{{ $batch->id }} / {{ $batch->batch_code ?: $product->name }}"
+                                                    data-stock-use-max="{{ $batch->current_stock }}"
+                                                    data-stock-use-reason="Parti Bazlı Kullanım"
+                                                >
+                                                    Stok Kullan
+                                                </button>
+                                            @else
+                                                <span class="text-muted fs-8">Kullanılamaz</span>
+                                            @endif
+                                        </td>
+                                    @endif
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="{{ $hasExpiryTracking ? 7 : 6 }}" class="text-center py-10 text-muted">Bu ürüne ait stok partisi bulunamadı.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
+            </div>
 
-                <!-- History Tab -->
-                <div class="tab-pane fade" id="kt_product_view_history_tab" role="tabpanel">
-                    <div class="card card-flush mb-6 mb-xl-9">
-                        <div class="card-header mt-6">
-                            <div class="card-title flex-column">
-                                <h2 class="mb-1">İşlem Geçmişi</h2>
-                                <div class="fs-6 fw-semibold text-muted">Son 10 stok hareketi</div>
-                            </div>
-                        </div>
-                        <div class="card-body p-9 pt-4">
-                            <div class="table-responsive">
-                                <table class="table align-middle table-row-dashed fs-6 gy-5">
-                                    <thead>
-                                        <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                            <th class="min-w-100px">Tarih</th>
-                                            <th class="min-w-100px">İşlem</th>
-                                            <th class="min-w-100px">Miktar</th>
-                                            <th class="min-w-100px">Kullanıcı</th>
-                                            <th class="min-w-150px">Notlar</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="text-gray-600 fw-semibold">
-                                        @forelse($transactions as $txn)
-                                        <tr>
-                                            <td>{{ $txn->transaction_date->format('d/m/Y H:i') }}</td>
-                                            <td>
-                                                @php
-                                                    $typeLabels = [
-                                                        'purchase' => ['success', 'Alım'],
-                                                        'usage' => ['info', 'Kullanım'],
-                                                        'adjustment_increase' => ['primary', 'Düzeltme (+)'],
-                                                        'adjustment_decrease' => ['danger', 'Düzeltme (-)'],
-                                                        'transfer_in' => ['success', 'Transfer (Gelen)'],
-                                                        'transfer_out' => ['warning', 'Transfer (Giden)'],
-                                                    ];
-                                                    $label = $typeLabels[$txn->type] ?? ['secondary', $txn->type];
-                                                @endphp
-                                                <span class="badge badge-light-{{ $label[0] }}">{{ $label[1] }}</span>
-                                            </td>
-                                            <td>
-                                                <span class="fw-bold {{ $txn->quantity > 0 ? 'text-success' : 'text-danger' }}">
-                                                    {{ $txn->quantity > 0 ? '+' : '' }}{{ $txn->quantity }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $txn->user?->name ?: ($txn->performed_by ?: 'Sistem') }}</td>
-                                            <td>{{ $txn->notes ?: ($txn->description ?: '-') }}</td>
-                                        </tr>
-                                        @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center py-10 text-muted">İşlem geçmişi bulunamadı.</td>
-                                        </tr>
-                                        @endforelse
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="mt-5">
-                                {{ $transactions->links() }}
-                            </div>
-                        </div>
+            <div class="card card-flush app-stock-detail-card">
+                <div class="card-header">
+                    <div class="card-title">
+                        <h2 class="mb-0">İşlem Geçmişi</h2>
+                    </div>
+                </div>
+                <div class="card-body pt-2">
+                    <div class="table-responsive">
+                        <table class="table align-middle table-row-dashed fs-6 gy-5">
+                            <thead>
+                                <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
+                                    <th class="min-w-100px">Tarih</th>
+                                    <th class="min-w-100px">İşlem</th>
+                                    <th class="min-w-100px">Miktar</th>
+                                    <th class="min-w-100px">Kullanıcı</th>
+                                    <th class="min-w-150px">Notlar</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-gray-600 fw-semibold">
+                                @forelse($transactions as $txn)
+                                <tr>
+                                    <td>{{ $txn->transaction_date->format('d/m/Y H:i') }}</td>
+                                    <td>
+                                        @php
+                                            $typeLabels = [
+                                                'purchase' => ['success', 'Alım'],
+                                                'usage' => ['info', 'Kullanım'],
+                                                'adjustment_increase' => ['primary', 'Düzeltme (+)'],
+                                                'adjustment_decrease' => ['danger', 'Düzeltme (-)'],
+                                                'transfer_in' => ['success', 'Transfer (Gelen)'],
+                                                'transfer_out' => ['warning', 'Transfer (Giden)'],
+                                            ];
+                                            $label = $typeLabels[$txn->type] ?? ['secondary', $txn->type];
+                                        @endphp
+                                        <span class="badge badge-light-{{ $label[0] }}">{{ $label[1] }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="fw-bold {{ $txn->quantity > 0 ? 'text-success' : 'text-danger' }}">
+                                            {{ $txn->quantity > 0 ? '+' : '' }}{{ $txn->quantity }}
+                                        </span>
+                                    </td>
+                                    <td>{{ $txn->user?->name ?: ($txn->performed_by ?: 'Sistem') }}</td>
+                                    <td>{{ $txn->notes ?: ($txn->description ?: '-') }}</td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="5" class="text-center py-10 text-muted">İşlem geçmişi bulunamadı.</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-5">
+                        {{ $transactions->links() }}
                     </div>
                 </div>
             </div>
@@ -269,12 +301,135 @@
 @endsection
 
 @push('modals')
-    <!-- Modal Container -->
     <div class="modal fade" id="stockModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered mw-650px" id="stockModalContent">
-            <!-- AJAX content -->
         </div>
     </div>
+
+    <div class="modal fade" id="stockUseModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered mw-550px">
+            <div class="modal-content">
+                <form method="POST" id="stockUseForm" class="modal-form">
+                    @csrf
+                    <div class="modal-header">
+                        <div>
+                            <h2 class="fw-bold mb-1">Stok Kullan</h2>
+                            <div class="text-muted fs-7" id="stockUseModalBatch">Seçilen stok</div>
+                        </div>
+                        <button type="button" class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="ki-duotone ki-cross fs-1"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body py-7 px-10">
+                        <div class="alert alert-light-info d-flex align-items-center gap-3 mb-6">
+                            <i class="ki-duotone ki-information-4 fs-2 text-info">
+                                <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                            </i>
+                            <div class="text-gray-700 fs-7">
+                                Kullanilabilir stok: <span class="fw-bold" id="stockUseModalMax">0</span>
+                            </div>
+                        </div>
+                        <div class="row g-5">
+                            <div class="col-md-5">
+                                <label class="form-label required">Miktar</label>
+                                <input type="number" min="1" name="quantity" id="stockUseQuantity" class="form-control form-control-solid" required>
+                            </div>
+                            <div class="col-md-7">
+                                <label class="form-label">Sebep</label>
+                                <input type="text" name="reason" id="stockUseReason" class="form-control form-control-solid">
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Not</label>
+                                <textarea name="notes" rows="3" class="form-control form-control-solid" placeholder="Opsiyonel not"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kapat</button>
+                        <button type="submit" class="btn btn-danger">Stok Kullan</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    @if($hasExpiryTracking)
+        <div class="modal fade" id="stockBatchCreateModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered mw-900px">
+                <div class="modal-content">
+                    <form method="POST" action="{{ route('stocks.batches.store', $product) }}" class="modal-form">
+                        @csrf
+                        <div class="modal-header">
+                            <div>
+                                <h2 class="fw-bold mb-1">Yeni Parti Ekle</h2>
+                                <div class="text-muted fs-7">{{ $product->name }} icin yeni SKT takipli parti ekleyin.</div>
+                            </div>
+                            <button type="button" class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
+                                <i class="ki-duotone ki-cross fs-1"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body py-7 px-10">
+                            <div class="row g-5">
+                                <div class="col-md-4">
+                                    <label class="form-label">Parti Kodu</label>
+                                    <input type="text" name="batch_code" value="{{ old('batch_code') }}" class="form-control form-control-solid" placeholder="LOT-2026-001">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label required">Tedarikçi</label>
+                                    <select name="supplier_id" class="form-select form-select-solid" data-control="select2" required>
+                                        <option value="">Tedarikçi Seçin</option>
+                                        @foreach($suppliers as $supplier)
+                                            <option value="{{ $supplier->id }}" @selected(old('supplier_id') == $supplier->id)>{{ $supplier->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label required">Miktar</label>
+                                    <input type="number" min="1" name="quantity" value="{{ old('quantity') }}" class="form-control form-control-solid" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Alış Fiyatı</label>
+                                    <input type="number" step="0.01" min="0" name="purchase_price" value="{{ old('purchase_price') }}" class="form-control form-control-solid">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Döviz</label>
+                                    <select name="currency" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
+                                        @foreach($currencies as $code => $label)
+                                            <option value="{{ $code }}" @selected(old('currency', 'TRY') === $code)>{{ $label }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Alış Tarihi</label>
+                                    <input type="date" name="purchase_date" value="{{ old('purchase_date', now()->format('Y-m-d')) }}" class="form-control form-control-solid">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label required">SKT</label>
+                                    <input type="date" name="expiry_date" value="{{ old('expiry_date') }}" class="form-control form-control-solid" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Depo Konumu</label>
+                                    <input type="text" name="storage_location" value="{{ old('storage_location') }}" class="form-control form-control-solid" placeholder="Raf / Bölme">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Sarı Uyarı Günü</label>
+                                    <input type="number" min="0" name="expiry_yellow_days" value="{{ old('expiry_yellow_days', 30) }}" class="form-control form-control-solid">
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Kırmızı Uyarı Günü</label>
+                                    <input type="number" min="0" name="expiry_red_days" value="{{ old('expiry_red_days', 15) }}" class="form-control form-control-solid">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kapat</button>
+                            <button type="submit" class="btn btn-primary">Yeni Parti Ekle</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    @endif
 @endpush
 
 @push('scripts')
@@ -284,6 +439,10 @@
         var $modalElement = $('#stockModal');
         var $modalContent = $('#stockModalContent');
         var modalInstance = new bootstrap.Modal(document.getElementById('stockModal'));
+        var stockUseModalElement = document.getElementById('stockUseModal');
+        var stockUseModal = stockUseModalElement ? new bootstrap.Modal(stockUseModalElement) : null;
+        var stockBatchCreateModalElement = document.getElementById('stockBatchCreateModal');
+        var stockBatchCreateModal = stockBatchCreateModalElement ? new bootstrap.Modal(stockBatchCreateModalElement) : null;
         var stockIndexUrl = "{{ route('stocks.index') }}";
 
         function openModal(mode, id) {
@@ -337,6 +496,27 @@
 
         $(document).on('click', '[data-stock-edit]', function() { openModal('edit', $(this).attr('data-stock-edit')); });
         $(document).on('click', '[data-stock-adjust]', function() { openModal('adjust', $(this).attr('data-stock-adjust')); });
+        $(document).on('click', '[data-batch-create-trigger]', function() {
+            if (stockBatchCreateModal) {
+                stockBatchCreateModal.show();
+            }
+        });
+        $(document).on('click', '[data-stock-use-trigger]', function() {
+            if (!stockUseModal) {
+                return;
+            }
+
+            var $trigger = $(this);
+            $('#stockUseForm').attr('action', $trigger.attr('data-stock-use-action'));
+            $('#stockUseModalBatch').text($trigger.attr('data-stock-use-batch') || 'Seçilen stok');
+            $('#stockUseModalMax').text(($trigger.attr('data-stock-use-max') || '0') + ' {{ $product->unit }}');
+            $('#stockUseQuantity')
+                .attr('max', $trigger.attr('data-stock-use-max') || '')
+                .val('');
+            $('#stockUseReason').val($trigger.attr('data-stock-use-reason') || 'Web panel kullanımı');
+            $('#stockUseForm').find('textarea[name="notes"]').val('');
+            stockUseModal.show();
+        });
 
         $(document).on('submit', '#stockForm, #stockAdjustForm', function(e) {
             e.preventDefault();
@@ -364,6 +544,10 @@
                 }
             });
         });
+
+        @if($hasExpiryTracking && $errors->hasAny(['supplier_id', 'quantity', 'purchase_price', 'currency', 'purchase_date', 'expiry_date', 'storage_location', 'expiry_yellow_days', 'expiry_red_days', 'batch_code']))
+            stockBatchCreateModal?.show();
+        @endif
     });
 </script>
 @endpush

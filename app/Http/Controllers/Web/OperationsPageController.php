@@ -48,8 +48,6 @@ class OperationsPageController extends Controller
         $product = Product::with(['batches.supplier', 'batches.clinic', 'clinic', 'company'])
             ->where('company_id', auth()->user()->company_id)
             ->findOrFail($id);
-
-        $activeTab = $request->query('tab', 'overview');
         
         // Fetch transactions for the product (across all batches)
         $transactions = \App\Models\StockTransaction::whereIn('stock_id', $product->batches->pluck('id'))
@@ -58,10 +56,17 @@ class OperationsPageController extends Controller
             ->paginate(10, ['*'], 'page', $request->integer('page', 1))
             ->withQueryString();
 
+        $hasExpiryTracking = $product->has_expiration_date || $product->batches->contains(fn ($batch) => $batch->track_expiry);
+        $defaultUsageBatch = $product->batches
+            ->first(fn ($batch) => $batch->is_active && $batch->current_stock > 0);
+
         return view('operations.stocks.show', [
             'product' => $product,
             'transactions' => $transactions,
-            'activeTab' => $activeTab,
+            'hasExpiryTracking' => $hasExpiryTracking,
+            'defaultUsageBatch' => $defaultUsageBatch,
+            'suppliers' => Supplier::query()->active()->orderBy('name')->get(['id', 'name']),
+            'currencies' => ['TRY' => '₺ (TL)', 'USD' => '$ (USD)', 'EUR' => '€ (EUR)'],
             'stockStats' => [
                 'total_usage' => $product->batches->sum('internal_usage_count'),
                 'total_value' => $product->batches->sum(fn($b) => $b->current_stock * $b->purchase_price),
@@ -70,7 +75,77 @@ class OperationsPageController extends Controller
         ]);
     }
 
-    public function categories(Request $request): View
+    public function stockBatchStore(Request $request, Product $product): RedirectResponse
+    {
+        abort_if($product->company_id !== auth()->user()->company_id, 403);
+
+        $companyId = auth()->user()->company_id;
+
+        $validated = $request->validate([
+            'supplier_id' => ['required', Rule::exists('suppliers', 'id')->where(fn ($query) => $query->where('company_id', $companyId))],
+            'quantity' => 'required|integer|min:1',
+            'purchase_price' => 'nullable|numeric|min:0',
+            'currency' => 'nullable|string|max:10',
+            'purchase_date' => 'nullable|date',
+            'expiry_date' => 'required|date',
+            'storage_location' => 'nullable|string|max:100',
+            'expiry_yellow_days' => 'nullable|integer|min:0',
+            'expiry_red_days' => 'nullable|integer|min:0',
+            'batch_code' => 'nullable|string|max:100',
+        ]);
+
+        app(StockService::class)->createStock([
+            'product_id' => $product->id,
+            'clinic_id' => $product->clinic_id ?? $product->batches()->latest('id')->value('clinic_id'),
+            'supplier_id' => $validated['supplier_id'],
+            'current_stock' => $validated['quantity'],
+            'available_stock' => $validated['quantity'],
+            'purchase_price' => $validated['purchase_price'] ?? null,
+            'currency' => $validated['currency'] ?? 'TRY',
+            'purchase_date' => $validated['purchase_date'] ?? now()->toDateString(),
+            'expiry_date' => $validated['expiry_date'],
+            'storage_location' => $validated['storage_location'] ?? null,
+            'expiry_yellow_days' => $validated['expiry_yellow_days'] ?? 30,
+            'expiry_red_days' => $validated['expiry_red_days'] ?? 15,
+            'company_id' => $companyId,
+            'track_expiry' => true,
+            'is_active' => true,
+            'batch_code' => $validated['batch_code'] ?? null,
+        ]);
+
+        return redirect()->route('products.show', $product->id)->with('status', 'Yeni parti eklendi.');
+    }
+
+    public function stockUse(Request $request, Stock $stock): RedirectResponse
+    {
+        abort_if($stock->company_id !== auth()->user()->company_id, 403);
+
+        $validated = $request->validate([
+            'quantity' => 'required|integer|min:1',
+            'notes' => 'nullable|string|max:255',
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $productId = $stock->product_id;
+
+        try {
+            app(StockService::class)->useStock(
+                $stock->id,
+                (int) $validated['quantity'],
+                auth()->user()->name,
+                auth()->id(),
+                trim(($validated['reason'] ?? 'Web panel kullanımı') . (!empty($validated['notes']) ? ' - ' . $validated['notes'] : ''))
+            );
+
+            return redirect()->route('products.show', $productId)->with('status', 'Stok kullanımı kaydedildi.');
+        } catch (\Throwable $exception) {
+            return redirect()->route('products.show', $productId)->withErrors([
+                'stock_use' => $exception->getMessage(),
+            ]);
+        }
+    }
+
+    public function categories(Request $request): View|JsonResponse
     {
         $categories = Category::query()
             ->withCount('todos')
@@ -84,11 +159,19 @@ class OperationsPageController extends Controller
             $editingCategory = Category::findOrFail($request->integer('edit'));
         }
 
-        return view('operations.categories.index', [
+        $viewData = [
             'categories' => $categories,
             'modalMode' => $request->query('modal'),
             'editingCategory' => $editingCategory,
-        ]);
+        ];
+
+        return $this->moduleResponse(
+            $request,
+            'operations.categories.index',
+            $viewData,
+            'operations.categories.table.index',
+            'operations.categories.modal.form',
+        );
     }
 
     public function categoryCreate(): RedirectResponse
@@ -96,7 +179,7 @@ class OperationsPageController extends Controller
         return redirect()->route('categories.index', ['modal' => 'create']);
     }
 
-    public function categoryStore(Request $request): RedirectResponse
+    public function categoryStore(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -112,7 +195,7 @@ class OperationsPageController extends Controller
             'company_id' => auth()->user()->company_id,
         ]);
 
-        return redirect()->route('categories.index')->with('status', 'Kategori olusturuldu.');
+        return $this->actionResponse($request, 'categories.index', 'Kategori olusturuldu.');
     }
 
     public function categoryEdit(Category $category): RedirectResponse
@@ -120,7 +203,7 @@ class OperationsPageController extends Controller
         return redirect()->route('categories.index', ['modal' => 'edit', 'edit' => $category->id]);
     }
 
-    public function categoryUpdate(Request $request, Category $category): RedirectResponse
+    public function categoryUpdate(Request $request, Category $category): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -135,10 +218,10 @@ class OperationsPageController extends Controller
             'is_active' => $request->boolean('is_active', false),
         ]);
 
-        return redirect()->route('categories.index')->with('status', 'Kategori guncellendi.');
+        return $this->actionResponse($request, 'categories.index', 'Kategori guncellendi.');
     }
 
-    public function suppliers(Request $request): View
+    public function suppliers(Request $request): View|JsonResponse
     {
         $suppliers = Supplier::query()
             ->when($request->filled('search'), function (Builder $query) use ($request) {
@@ -159,11 +242,19 @@ class OperationsPageController extends Controller
             $editingSupplier = Supplier::findOrFail($request->integer('edit'));
         }
 
-        return view('operations.suppliers.index', [
+        $viewData = [
             'suppliers' => $suppliers,
             'modalMode' => $request->query('modal'),
             'editingSupplier' => $editingSupplier,
-        ]);
+        ];
+
+        return $this->moduleResponse(
+            $request,
+            'operations.suppliers.index',
+            $viewData,
+            'operations.suppliers.table.index',
+            'operations.suppliers.modal.form',
+        );
     }
 
     public function supplierCreate(): RedirectResponse
@@ -171,7 +262,7 @@ class OperationsPageController extends Controller
         return redirect()->route('suppliers.index', ['modal' => 'create']);
     }
 
-    public function supplierStore(Request $request): RedirectResponse
+    public function supplierStore(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -189,7 +280,7 @@ class OperationsPageController extends Controller
             'company_id' => auth()->user()->company_id,
         ]);
 
-        return redirect()->route('suppliers.index')->with('status', 'Tedarikci olusturuldu.');
+        return $this->actionResponse($request, 'suppliers.index', 'Tedarikci olusturuldu.');
     }
 
     public function supplierEdit(Supplier $supplier): RedirectResponse
@@ -197,7 +288,7 @@ class OperationsPageController extends Controller
         return redirect()->route('suppliers.index', ['modal' => 'edit', 'edit' => $supplier->id]);
     }
 
-    public function supplierUpdate(Request $request, Supplier $supplier): RedirectResponse
+    public function supplierUpdate(Request $request, Supplier $supplier): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -214,10 +305,10 @@ class OperationsPageController extends Controller
             'is_active' => $request->boolean('is_active', false),
         ]);
 
-        return redirect()->route('suppliers.index')->with('status', 'Tedarikci guncellendi.');
+        return $this->actionResponse($request, 'suppliers.index', 'Tedarikci guncellendi.');
     }
 
-    public function clinics(Request $request): View
+    public function clinics(Request $request): View|JsonResponse
     {
         $clinics = Clinic::query()
             ->when($request->filled('search'), function (Builder $query) use ($request) {
@@ -238,11 +329,19 @@ class OperationsPageController extends Controller
             $editingClinic = Clinic::findOrFail($request->integer('edit'));
         }
 
-        return view('operations.clinics.index', [
+        $viewData = [
             'clinics' => $clinics,
             'modalMode' => $request->query('modal'),
             'editingClinic' => $editingClinic,
-        ]);
+        ];
+
+        return $this->moduleResponse(
+            $request,
+            'operations.clinics.index',
+            $viewData,
+            'operations.clinics.table.index',
+            'operations.clinics.modal.form',
+        );
     }
 
     public function clinicCreate(): RedirectResponse
@@ -250,7 +349,7 @@ class OperationsPageController extends Controller
         return redirect()->route('clinics.index', ['modal' => 'create']);
     }
 
-    public function clinicStore(Request $request): RedirectResponse
+    public function clinicStore(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -274,7 +373,7 @@ class OperationsPageController extends Controller
             'company_id' => auth()->user()->company_id,
         ]);
 
-        return redirect()->route('clinics.index')->with('status', 'Klinik olusturuldu.');
+        return $this->actionResponse($request, 'clinics.index', 'Klinik olusturuldu.');
     }
 
     public function clinicEdit(Clinic $clinic): RedirectResponse
@@ -282,7 +381,7 @@ class OperationsPageController extends Controller
         return redirect()->route('clinics.index', ['modal' => 'edit', 'edit' => $clinic->id]);
     }
 
-    public function clinicUpdate(Request $request, Clinic $clinic): RedirectResponse
+    public function clinicUpdate(Request $request, Clinic $clinic): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -305,10 +404,10 @@ class OperationsPageController extends Controller
             'is_active' => $request->boolean('is_active', false),
         ]);
 
-        return redirect()->route('clinics.index')->with('status', 'Klinik guncellendi.');
+        return $this->actionResponse($request, 'clinics.index', 'Klinik guncellendi.');
     }
 
-    public function stockRequests(Request $request): View
+    public function stockRequests(Request $request): View|JsonResponse
     {
         $requests = StockRequest::query()
             ->with(['requesterClinic', 'requestedFromClinic', 'stock.product'])
@@ -325,12 +424,20 @@ class OperationsPageController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('operations.stock-requests.index', [
+        $viewData = [
             'requests' => $requests,
             'stocks' => Stock::query()->with(['product', 'clinic'])->active()->orderBy('id', 'desc')->get(),
             'clinics' => Clinic::query()->active()->orderBy('name')->get(['id', 'name']),
             'modalMode' => $request->query('modal'),
-        ]);
+        ];
+
+        return $this->moduleResponse(
+            $request,
+            'operations.stock-requests.index',
+            $viewData,
+            'operations.stock-requests.table.index',
+            'operations.stock-requests.modal.form',
+        );
     }
 
     public function stockRequestCreate(): RedirectResponse
@@ -338,7 +445,7 @@ class OperationsPageController extends Controller
         return redirect()->route('stock-requests.index', ['modal' => 'create']);
     }
 
-    public function stockRequestStore(Request $request): RedirectResponse
+    public function stockRequestStore(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'requester_clinic_id' => ['required', Rule::exists('clinics', 'id')],
@@ -354,10 +461,10 @@ class OperationsPageController extends Controller
             'company_id' => auth()->user()->company_id,
         ]);
 
-        return redirect()->route('stock-requests.index')->with('status', 'Stok talebi olusturuldu.');
+        return $this->actionResponse($request, 'stock-requests.index', 'Stok talebi olusturuldu.');
     }
 
-    public function stockRequestApprove(Request $request, StockRequest $stockRequest): RedirectResponse
+    public function stockRequestApprove(Request $request, StockRequest $stockRequest): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'approved_quantity' => 'required|integer|min:1',
@@ -371,10 +478,10 @@ class OperationsPageController extends Controller
             $validated['admin_notes'] ?? null
         );
 
-        return redirect()->route('stock-requests.index')->with('status', 'Talep onaylandi.');
+        return $this->actionResponse($request, 'stock-requests.index', 'Talep onaylandi.');
     }
 
-    public function stockRequestReject(Request $request, StockRequest $stockRequest): RedirectResponse
+    public function stockRequestReject(Request $request, StockRequest $stockRequest): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'rejection_reason' => 'required|string|max:500',
@@ -386,24 +493,24 @@ class OperationsPageController extends Controller
             auth()->user()->name
         );
 
-        return redirect()->route('stock-requests.index')->with('status', 'Talep reddedildi.');
+        return $this->actionResponse($request, 'stock-requests.index', 'Talep reddedildi.');
     }
 
-    public function stockRequestShip(StockRequest $stockRequest): RedirectResponse
+    public function stockRequestShip(Request $request, StockRequest $stockRequest): RedirectResponse|JsonResponse
     {
         app(StockRequestService::class)->shipRequest($stockRequest->id, auth()->user()->name);
 
-        return redirect()->route('stock-requests.index')->with('status', 'Talep sevk surecine alindi.');
+        return $this->actionResponse($request, 'stock-requests.index', 'Talep sevk surecine alindi.');
     }
 
-    public function stockRequestComplete(StockRequest $stockRequest): RedirectResponse
+    public function stockRequestComplete(Request $request, StockRequest $stockRequest): RedirectResponse|JsonResponse
     {
         app(StockRequestService::class)->completeRequest($stockRequest->id, auth()->user()->name);
 
-        return redirect()->route('stock-requests.index')->with('status', 'Talep tamamlandi.');
+        return $this->actionResponse($request, 'stock-requests.index', 'Talep tamamlandi.');
     }
 
-    public function alerts(Request $request): View
+    public function alerts(Request $request): View|JsonResponse
     {
         $alerts = StockAlert::query()
             ->with(['clinic', 'product'])
@@ -420,24 +527,31 @@ class OperationsPageController extends Controller
             ->paginate(20)
             ->withQueryString();
 
-        return view('operations.alerts.index', compact('alerts'));
+        $viewData = compact('alerts');
+
+        return $this->moduleResponse(
+            $request,
+            'operations.alerts.index',
+            $viewData,
+            'operations.alerts.table.index',
+        );
     }
 
-    public function alertResolve(StockAlert $stockAlert): RedirectResponse
+    public function alertResolve(Request $request, StockAlert $stockAlert): RedirectResponse|JsonResponse
     {
         app(StockAlertService::class)->resolveAlert($stockAlert->id, auth()->user()->name);
 
-        return redirect()->route('alerts.index')->with('status', 'Uyari cozuldu.');
+        return $this->actionResponse($request, 'alerts.index', 'Uyari cozuldu.');
     }
 
-    public function alertDismiss(StockAlert $stockAlert): RedirectResponse
+    public function alertDismiss(Request $request, StockAlert $stockAlert): RedirectResponse|JsonResponse
     {
         app(StockAlertService::class)->dismissAlert($stockAlert->id);
 
-        return redirect()->route('alerts.index')->with('status', 'Uyari kapatildi.');
+        return $this->actionResponse($request, 'alerts.index', 'Uyari kapatildi.');
     }
 
-    public function todos(Request $request): View
+    public function todos(Request $request): View|JsonResponse
     {
         $todos = Todo::query()
             ->with('category')
@@ -452,12 +566,20 @@ class OperationsPageController extends Controller
             $editingTodo = Todo::findOrFail($request->integer('edit'));
         }
 
-        return view('operations.todos.index', [
+        $viewData = [
             'todos' => $todos,
             'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
             'modalMode' => $request->query('modal'),
             'editingTodo' => $editingTodo,
-        ]);
+        ];
+
+        return $this->moduleResponse(
+            $request,
+            'operations.todos.index',
+            $viewData,
+            'operations.todos.table.index',
+            'operations.todos.modal.form',
+        );
     }
 
     public function todoCreate(): RedirectResponse
@@ -465,7 +587,7 @@ class OperationsPageController extends Controller
         return redirect()->route('todos.index', ['modal' => 'create']);
     }
 
-    public function todoStore(Request $request): RedirectResponse
+    public function todoStore(Request $request): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'title' => 'required|string|min:3|max:255',
@@ -479,7 +601,7 @@ class OperationsPageController extends Controller
             'company_id' => auth()->user()->company_id,
         ]);
 
-        return redirect()->route('todos.index')->with('status', 'Todo olusturuldu.');
+        return $this->actionResponse($request, 'todos.index', 'Todo olusturuldu.');
     }
 
     public function todoEdit(Todo $todo): RedirectResponse
@@ -487,7 +609,7 @@ class OperationsPageController extends Controller
         return redirect()->route('todos.index', ['modal' => 'edit', 'edit' => $todo->id]);
     }
 
-    public function todoUpdate(Request $request, Todo $todo): RedirectResponse
+    public function todoUpdate(Request $request, Todo $todo): RedirectResponse|JsonResponse
     {
         $validated = $request->validate([
             'title' => 'required|string|min:3|max:255',
@@ -504,10 +626,10 @@ class OperationsPageController extends Controller
             'completed_at' => $completed ? now() : null,
         ]);
 
-        return redirect()->route('todos.index')->with('status', 'Todo guncellendi.');
+        return $this->actionResponse($request, 'todos.index', 'Todo guncellendi.');
     }
 
-    public function todoToggle(Todo $todo): RedirectResponse
+    public function todoToggle(Request $request, Todo $todo): RedirectResponse|JsonResponse
     {
         $completed = !$todo->completed;
         $todo->update([
@@ -515,21 +637,21 @@ class OperationsPageController extends Controller
             'completed_at' => $completed ? now() : null,
         ]);
 
-        return redirect()->route('todos.index')->with('status', $completed ? 'Todo tamamlandi.' : 'Todo tekrar acildi.');
+        return $this->actionResponse($request, 'todos.index', $completed ? 'Todo tamamlandi.' : 'Todo tekrar acildi.');
     }
 
-    public function todoDestroy(Todo $todo): RedirectResponse
+    public function todoDestroy(Request $request, Todo $todo): RedirectResponse|JsonResponse
     {
         if ($todo->completed) {
-            return redirect()->route('todos.index')->withErrors(['todo' => 'Tamamlanmis todo silinemez.']);
+            return $this->actionErrorResponse($request, 'todos.index', 'todo', 'Tamamlanmis todo silinemez.');
         }
 
         $todo->delete();
 
-        return redirect()->route('todos.index')->with('status', 'Todo silindi.');
+        return $this->actionResponse($request, 'todos.index', 'Todo silindi.');
     }
 
-    public function employees(Request $request): View
+    public function employees(Request $request): View|JsonResponse
     {
         $users = User::query()
             ->with(['clinic', 'roles'])
@@ -550,13 +672,21 @@ class OperationsPageController extends Controller
             $editingEmployee = User::with('roles')->findOrFail($request->integer('edit'));
         }
 
-        return view('operations.employees.index', [
+        $viewData = [
             'users' => $users,
             'roles' => Role::query()->orderBy('name')->get(['id', 'name']),
             'clinics' => Clinic::query()->active()->orderBy('name')->get(['id', 'name']),
             'modalMode' => $request->query('modal'),
             'editingEmployee' => $editingEmployee,
-        ]);
+        ];
+
+        return $this->moduleResponse(
+            $request,
+            'operations.employees.index',
+            $viewData,
+            'operations.employees.table.index',
+            'operations.employees.modal.form',
+        );
     }
 
     public function employeeCreate(): RedirectResponse
@@ -564,7 +694,7 @@ class OperationsPageController extends Controller
         return redirect()->route('employees.index', ['modal' => 'create']);
     }
 
-    public function employeeStore(Request $request): RedirectResponse
+    public function employeeStore(Request $request): RedirectResponse|JsonResponse
     {
         $companyId = auth()->user()->company_id;
 
@@ -590,7 +720,7 @@ class OperationsPageController extends Controller
 
         $employee->syncRoles($validated['role_names'] ?? []);
 
-        return redirect()->route('employees.index')->with('status', 'Personel olusturuldu.');
+        return $this->actionResponse($request, 'employees.index', 'Personel olusturuldu.');
     }
 
     public function employeeEdit(User $user): RedirectResponse
@@ -598,7 +728,7 @@ class OperationsPageController extends Controller
         return redirect()->route('employees.index', ['modal' => 'edit', 'edit' => $user->id]);
     }
 
-    public function employeeUpdate(Request $request, User $user): RedirectResponse
+    public function employeeUpdate(Request $request, User $user): RedirectResponse|JsonResponse
     {
         $companyId = auth()->user()->company_id;
 
@@ -626,22 +756,22 @@ class OperationsPageController extends Controller
         $user->update($payload);
         $user->syncRoles($validated['role_names'] ?? []);
 
-        return redirect()->route('employees.index')->with('status', 'Personel guncellendi.');
+        return $this->actionResponse($request, 'employees.index', 'Personel guncellendi.');
     }
 
-    public function employeeDestroy(User $user): RedirectResponse
+    public function employeeDestroy(Request $request, User $user): RedirectResponse|JsonResponse
     {
         if ($user->id === auth()->id()) {
-            return redirect()->route('employees.index')->withErrors(['employee' => 'Kendi hesabinizi silemezsiniz.']);
+            return $this->actionErrorResponse($request, 'employees.index', 'employee', 'Kendi hesabinizi silemezsiniz.');
         }
 
         if ($user->hasRole(User::ROLE_OWNER)) {
-            return redirect()->route('employees.index')->withErrors(['employee' => 'Sirket sahibi silinemez.']);
+            return $this->actionErrorResponse($request, 'employees.index', 'employee', 'Sirket sahibi silinemez.');
         }
 
         $user->delete();
 
-        return redirect()->route('employees.index')->with('status', 'Personel silindi.');
+        return $this->actionResponse($request, 'employees.index', 'Personel silindi.');
     }
 
     public function stockCreate(): RedirectResponse
@@ -998,5 +1128,55 @@ class OperationsPageController extends Controller
             'chartSeries' => $chartSeries,
             'detailMeta' => $detailMeta,
         ];
+    }
+
+    private function moduleResponse(
+        Request $request,
+        string $pageView,
+        array $viewData,
+        string $tableView,
+        ?string $modalView = null,
+        array $extra = [],
+    ): View|JsonResponse {
+        if ($request->ajax()) {
+            return response()->json([
+                'tableHtml' => view($tableView, $viewData)->render(),
+                'modalHtml' => $modalView ? view($modalView, $viewData)->render() : '',
+                ...$extra,
+            ]);
+        }
+
+        return view($pageView, $viewData);
+    }
+
+    private function actionResponse(Request $request, string $route, string $message): RedirectResponse|JsonResponse
+    {
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => $message,
+            ]);
+        }
+
+        return redirect()->route($route)->with('status', $message);
+    }
+
+    private function actionErrorResponse(
+        Request $request,
+        string $route,
+        string $key,
+        string $message,
+        int $status = 422,
+    ): RedirectResponse|JsonResponse {
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => $message,
+                'errors' => [
+                    $key => [$message],
+                ],
+            ], $status);
+        }
+
+        return redirect()->route($route)->withErrors([$key => $message]);
     }
 }

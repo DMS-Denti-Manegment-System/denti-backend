@@ -30,7 +30,7 @@
                             </span>
                         </td>
                         <td>{{ optional($company->created_at)->format('d.m.Y') }}</td>
-                        <td><a href="{{ route('admin.companies.edit', $company) }}" class="btn btn-sm btn-light-primary">Duzenle</a></td>
+                        <td><a href="{{ route('admin.companies.edit', $company) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a></td>
                     </tr>
                 @endforeach
             </tbody>

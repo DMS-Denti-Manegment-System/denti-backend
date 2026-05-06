@@ -23,12 +23,12 @@
                             <td>
                                 <div class="d-flex gap-2">
                                     @if(!$alert->is_resolved)
-                                        <form method="POST" action="{{ route('alerts.resolve', $alert) }}">
+                                        <form method="POST" action="{{ route('alerts.resolve', $alert) }}" data-module-action>
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-light-success">Coz</button>
                                         </form>
                                     @endif
-                                    <form method="POST" action="{{ route('alerts.dismiss', $alert) }}">
+                                    <form method="POST" action="{{ route('alerts.dismiss', $alert) }}" data-module-action>
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-light-danger">Kapat</button>
                                     </form>

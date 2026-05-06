@@ -68,9 +68,15 @@ class ProductRepository
         // 5. Seviye (Stok ve SKT Uyarıları)
         if (!empty($filters['level'])) {
             $level = $filters['level'];
+            $levelAliases = [
+                'low_stock' => 'low',
+                'critical_stock' => 'critical',
+                'low_expiry' => 'near_expiry',
+            ];
+            $level = $levelAliases[$level] ?? $level;
             
             // Stok Miktarı Bazlı Filtreler (Total Stock)
-            if (in_array($level, ['low', 'critical'])) {
+            if (in_array($level, ['low', 'critical'], true)) {
                 if ($level === 'critical') {
                     $query->whereHas('batches', function($q) {
                         $q->where('is_active', 1);
@@ -82,22 +88,28 @@ class ProductRepository
             }
             
             // SKT (Miyat) Bazlı Filtreler
-            if (in_array($level, ['near_expiry', 'critical_expiry', 'expired'])) {
+            if (in_array($level, ['near_expiry', 'critical_expiry', 'expired'], true)) {
                 $query->whereHas('batches', function($q) use ($level, $isSqlite, $now) {
                     $q->where('is_active', 1)->where('track_expiry', 1);
                     
                     if ($level === 'expired') {
-                        $q->where('expiry_date', '<=', $now->toDateTimeString());
+                        $q->whereDate('expiry_date', '<', $now->toDateString());
                     } elseif ($level === 'critical_expiry') {
                         $redDaysSql = $isSqlite 
                             ? "date(?, '+' || COALESCE(expiry_red_days, 15) || ' days')"
                             : "DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)";
-                        $q->whereRaw("expiry_date <= {$redDaysSql}", [$now->toDateTimeString()]);
+                        $q->whereDate('expiry_date', '>=', $now->toDateString())
+                          ->whereRaw("expiry_date <= {$redDaysSql}", [$now->toDateTimeString()]);
                     } else { // near_expiry
                         $yellowDaysSql = $isSqlite
                             ? "date(?, '+' || COALESCE(expiry_yellow_days, 30) || ' days')"
                             : "DATE_ADD(?, INTERVAL COALESCE(expiry_yellow_days, 30) DAY)";
-                        $q->whereRaw("expiry_date <= {$yellowDaysSql}", [$now->toDateTimeString()]);
+                        $redDaysSql = $isSqlite 
+                            ? "date(?, '+' || COALESCE(expiry_red_days, 15) || ' days')"
+                            : "DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)";
+                        $q->whereDate('expiry_date', '>=', $now->toDateString())
+                          ->whereRaw("expiry_date <= {$yellowDaysSql}", [$now->toDateTimeString()])
+                          ->whereRaw("expiry_date > {$redDaysSql}", [$now->toDateTimeString()]);
                     }
                 });
             }

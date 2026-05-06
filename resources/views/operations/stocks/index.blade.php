@@ -1,4 +1,4 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 
 @section('title', 'Stok Yönetimi - Denti')
 @section('page-title', 'Stok Yönetimi')
@@ -28,7 +28,7 @@
 @push('modals')
     <!-- Modal Container -->
     <div class="modal fade" id="stockModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered mw-650px" id="stockModalContent">
+        <div class="modal-dialog modal-dialog-centered mw-900px" id="stockModalContent">
             <!-- AJAX content -->
         </div>
     </div>

@@ -1,18 +1,31 @@
-@extends('layouts.metronic')
+@extends('layouts.app')
 @section('title', 'Roller - Denti')
 @section('page-title', 'Rol ve Yetki Yonetimi')
 @section('page-subtitle', 'Sirket ve sistem rolleri')
 @section('content')
-    <div class="app-module-shell">
+    <div id="rolesModule" class="app-module-shell" data-index-url="{{ route('roles.index') }}">
         @include('operations.roles.components.filters')
-        @include('operations.roles.table.index')
+        <div id="rolesTableContainer" data-module-table>
+            @include('operations.roles.table.index')
+        </div>
     </div>
 @endsection
 
 @push('modals')
-    @include('operations.roles.modal.form')
+    <div id="roleModalHost">
+        @include('operations.roles.modal.form')
+    </div>
 @endpush
 
 @push('scripts')
-    @include('operations.roles.components.scripts')
+    <script>
+        $(function () {
+            window.RoleModule = window.DentiUI.createModule({
+                name: 'roles',
+                root: '#rolesModule',
+                indexUrl: @json(route('roles.index')),
+                modalHost: '#roleModalHost',
+            });
+        });
+    </script>
 @endpush

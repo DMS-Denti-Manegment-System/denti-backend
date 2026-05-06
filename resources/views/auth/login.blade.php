@@ -1,4 +1,4 @@
-@extends('layouts.metronic-auth')
+@extends('layouts.app-auth')
 
 @section('title', 'Giris - Denti')
 
@@ -62,14 +62,14 @@
             </div>
 
             <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2 app-auth-hero"
-                style="background-image: url({{ asset('metronic/assets/media/misc/auth-bg.png') }})">
+                style="background-image: url({{ asset('ui-kit/media/misc/auth-bg.png') }})">
                 <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100">
                     <div class="mb-0 mb-lg-12">
-                        <img alt="Logo" src="{{ asset('metronic/assets/media/logos/custom-1.png') }}"
+                        <img alt="Logo" src="{{ asset('ui-kit/media/logos/custom-1.png') }}"
                             class="h-60px h-lg-75px" />
                     </div>
                     <img class="d-none d-lg-block mx-auto w-275px w-md-50 w-xl-500px mb-10 mb-lg-20"
-                        src="{{ asset('metronic/assets/media/misc/auth-screens.png') }}" alt="" />
+                        src="{{ asset('ui-kit/media/misc/auth-screens.png') }}" alt="" />
                     <h1 class="d-none d-lg-block text-white fs-2qx fw-bolder text-center mb-7">Daha hizli, daha net, daha
                         yonetilebilir</h1>
                     <div class="d-none d-lg-block text-white fs-base text-center">

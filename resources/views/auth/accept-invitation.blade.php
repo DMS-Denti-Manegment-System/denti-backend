@@ -1,4 +1,4 @@
-@extends('layouts.metronic-auth')
+@extends('layouts.app-auth')
 
 @section('title', 'Davet Kabul - Denti')
 
@@ -67,7 +67,7 @@
         </div>
 
         <div class="d-flex flex-lg-row-fluid w-lg-50 bgi-size-cover bgi-position-center order-1 order-lg-2 app-auth-hero"
-             style="background-image: url({{ asset('metronic/assets/media/misc/auth-bg.png') }})">
+             style="background-image: url({{ asset('ui-kit/media/misc/auth-bg.png') }})">
             <div class="d-flex flex-column flex-center py-7 py-lg-15 px-5 px-md-15 w-100">
                 <span class="badge badge-light-primary fs-2 fw-bold px-6 py-4 mb-8">{{ $invitation->role }}</span>
                 <h1 class="d-none d-lg-block text-white fs-2qx fw-bolder text-center mb-7">Ekibe katil</h1>

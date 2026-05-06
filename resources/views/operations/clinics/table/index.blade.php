@@ -20,7 +20,7 @@
                             <td>{{ $clinic->city ?: '-' }}</td>
                             <td>{{ $clinic->phone ?: '-' }}</td>
                             <td><span class="badge {{ $clinic->is_active ? 'badge-light-success' : 'badge-light-danger' }}">{{ $clinic->is_active ? 'Aktif' : 'Pasif' }}</span></td>
-                            <td><a href="{{ route('clinics.edit', $clinic) }}" class="btn btn-sm btn-light-primary">Duzenle</a></td>
+                            <td><a href="{{ route('clinics.edit', $clinic) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a></td>
                         </tr>
                     @empty
                         <tr>

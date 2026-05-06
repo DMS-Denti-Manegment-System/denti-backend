@@ -88,8 +88,45 @@
                     {!! $selectedTransactions->links('pagination::bootstrap-4') !!}
                 </div>
             @elseif($activeDetailTab === 'analytics')
-                <div class="text-center text-muted py-10">
-                    Son işlemlere göre stok değişim noktası: {{ $chartSeries->last()['value'] ?? 0 }}
+                <div class="row g-5">
+                    <div class="col-lg-8">
+                        <div class="app-stock-detail-card p-5">
+                            <div class="fw-bold text-gray-900 mb-4">Stok Değişim Grafiği</div>
+                            @if($chartSeries->isNotEmpty())
+                                <div class="app-stock-analytics-list">
+                                    @php $maxChartValue = max(1, (int) $chartSeries->max('value')); @endphp
+                                    @foreach($chartSeries as $point)
+                                        <div class="app-stock-analytics-row">
+                                            <div class="app-stock-analytics-row__label">{{ $point['label'] }}</div>
+                                            <div class="app-stock-analytics-row__bar">
+                                                <span style="width: {{ max(8, round(($point['value'] / $maxChartValue) * 100)) }}%"></span>
+                                            </div>
+                                            <div class="app-stock-analytics-row__value">{{ $point['value'] }}</div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="text-muted py-10 text-center">Grafik için yeterli hareket verisi bulunmuyor.</div>
+                            @endif
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="app-stock-detail-card p-5 h-100">
+                            <div class="fw-bold text-gray-900 mb-4">Özet</div>
+                            <div class="mb-4">
+                                <div class="text-muted fs-7">Son Stok Noktası</div>
+                                <div class="fw-bold fs-3">{{ $chartSeries->last()['value'] ?? $selectedProduct->total_stock }}</div>
+                            </div>
+                            <div class="mb-4">
+                                <div class="text-muted fs-7">Toplam Stok Değeri</div>
+                                <div class="fw-bold fs-5">{{ number_format($detailMeta['total_stock_value'] ?? 0, 2, '.', ',') }} TRY</div>
+                            </div>
+                            <div>
+                                <div class="text-muted fs-7">Son Alış Fiyatı</div>
+                                <div class="fw-bold fs-5">{{ number_format($detailMeta['last_purchase_price'] ?? 0, 2, '.', ',') }} TRY</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             @else
                 <div class="row g-6">
@@ -97,11 +134,13 @@
                         <div class="mb-5"><div class="text-muted fs-7">Ürün Adı</div><div class="fw-bold fs-5">{{ $selectedProduct->name }}</div></div>
                         <div class="mb-5"><div class="text-muted fs-7">Kategori</div><div class="fw-bold fs-6">{{ $selectedProduct->category ?: '-' }}</div></div>
                         <div class="mb-5"><div class="text-muted fs-7">SKU / Barkod</div><div class="fw-bold fs-6">{{ $selectedProduct->sku ?: '-' }}</div></div>
+                        <div class="mb-5"><div class="text-muted fs-7">Klinik</div><div class="fw-bold fs-6">{{ $selectedProduct->clinic?->name ?: ($selectedBatch?->clinic?->name ?: '-') }}</div></div>
                     </div>
                     <div class="col-md-6">
                         <div class="mb-5"><div class="text-muted fs-7">Marka</div><div class="fw-bold fs-6">{{ $selectedProduct->brand ?: '-' }}</div></div>
                         <div class="mb-5"><div class="text-muted fs-7">Takip Tipi</div><div class="fw-bold fs-6">{{ $detailMeta['tracking_type'] }}</div></div>
                         <div class="mb-5"><div class="text-muted fs-7">Ağırlıklı Ortalama Alış</div><div class="fw-bold fs-6">{{ number_format($detailMeta['weighted_average_price'], 2, '.', ',') }} TRY</div></div>
+                        <div class="mb-5"><div class="text-muted fs-7">Depo / Konum</div><div class="fw-bold fs-6">{{ $selectedBatch?->storage_location ?: '-' }}</div></div>
                     </div>
                     <div class="col-12">
                         <div class="text-muted fs-7">Açıklama</div>
