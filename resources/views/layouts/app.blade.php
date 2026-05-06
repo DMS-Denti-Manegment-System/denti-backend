@@ -240,7 +240,8 @@
                             applyResponse(response);
                             $tableContainer.css('opacity', '1');
                         },
-                        error() {
+                        error(xhr) {
+                            if (window.DentiUI.debug) console.error('[DentiUI] AJAX Error:', xhr);
                             window.DentiUI.notify('error', 'Veriler yuklenirken bir hata olustu.');
                             $tableContainer.css('opacity', '1');
                         }
@@ -304,7 +305,8 @@
                                 showModalMarkup(response.modalHtml);
                             }
                         },
-                        error() {
+                        error(xhr) {
+                            if (window.DentiUI.debug) console.error('[DentiUI] Modal AJAX Error:', xhr);
                             window.DentiUI.notify('error', 'Modal yuklenirken bir hata olustu.');
                         }
                     });
@@ -324,6 +326,10 @@
                     searchTimer = setTimeout(function () {
                         loadData(true);
                     }, 400);
+                });
+
+                $root.on('change', '[data-control="per-page-selector"]', function () {
+                    loadData(true);
                 });
 
                 $root.on('click', settings.createSelector + ',' + settings.editSelector, function (event) {
@@ -354,6 +360,7 @@
                             loadData(false);
                         },
                         error(xhr) {
+                            if (window.DentiUI.debug) console.error('[DentiUI] Action AJAX Error:', xhr);
                             if (xhr.status === 422 && xhr.responseJSON?.errors) {
                                 window.DentiUI.showValidationErrors(xhr.responseJSON.errors);
                             } else if (xhr.responseJSON?.message) {
@@ -396,6 +403,7 @@
                             loadData(false);
                         },
                         error(xhr) {
+                            if (window.DentiUI.debug) console.error('[DentiUI] Modal Submit AJAX Error:', xhr);
                             if (xhr.status === 422 && xhr.responseJSON?.errors) {
                                 window.DentiUI.showValidationErrors(xhr.responseJSON.errors);
                             } else if (xhr.responseJSON?.message) {
@@ -413,6 +421,8 @@
                 if ($modalHost.find('.modal').length) {
                     showModalMarkup($modalHost.html());
                 }
+
+                loadData(true);
 
                 return api;
             },

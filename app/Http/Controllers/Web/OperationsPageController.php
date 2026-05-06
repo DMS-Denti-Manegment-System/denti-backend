@@ -25,6 +25,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class OperationsPageController extends Controller
 {
@@ -66,6 +67,8 @@ class OperationsPageController extends Controller
             'hasExpiryTracking' => $hasExpiryTracking,
             'defaultUsageBatch' => $defaultUsageBatch,
             'suppliers' => Supplier::query()->active()->orderBy('name')->get(['id', 'name']),
+            'clinics' => Clinic::query()->active()->where('company_id', auth()->user()->company_id)->orderBy('name')->get(['id', 'name']),
+            'units' => ['Adet', 'Kutu', 'Paket', 'Sise', 'Ml', 'Lt', 'Kg', 'Gr', 'Set'],
             'currencies' => ['TRY' => '₺ (TL)', 'USD' => '$ (USD)', 'EUR' => '€ (EUR)'],
             'stockStats' => [
                 'total_usage' => $product->batches->sum('internal_usage_count'),
@@ -83,6 +86,7 @@ class OperationsPageController extends Controller
 
         $validated = $request->validate([
             'supplier_id' => ['required', Rule::exists('suppliers', 'id')->where(fn ($query) => $query->where('company_id', $companyId))],
+            'clinic_id' => ['required', Rule::exists('clinics', 'id')->where(fn ($query) => $query->where('company_id', $companyId))],
             'quantity' => 'required|integer|min:1',
             'purchase_price' => 'nullable|numeric|min:0',
             'currency' => 'nullable|string|max:10',
@@ -91,12 +95,24 @@ class OperationsPageController extends Controller
             'storage_location' => 'nullable|string|max:100',
             'expiry_yellow_days' => 'nullable|integer|min:0',
             'expiry_red_days' => 'nullable|integer|min:0',
-            'batch_code' => 'nullable|string|max:100',
+            'unit' => 'required|string|max:20',
+            'has_sub_unit' => 'nullable|boolean',
+            'sub_unit_name' => 'nullable|required_if:has_sub_unit,1|string|max:50',
+            'sub_unit_multiplier' => 'nullable|required_if:has_sub_unit,1|integer|min:1',
+        ]);
+
+        // Update product settings
+        $product->update([
+            'unit' => $validated['unit'],
+            'clinic_id' => $validated['clinic_id'],
+            'has_sub_unit' => $request->boolean('has_sub_unit'),
+            'sub_unit_name' => $request->boolean('has_sub_unit') ? $validated['sub_unit_name'] : null,
+            'sub_unit_multiplier' => $request->boolean('has_sub_unit') ? $validated['sub_unit_multiplier'] : null,
         ]);
 
         app(StockService::class)->createStock([
             'product_id' => $product->id,
-            'clinic_id' => $product->clinic_id ?? $product->batches()->latest('id')->value('clinic_id'),
+            'clinic_id' => $validated['clinic_id'],
             'supplier_id' => $validated['supplier_id'],
             'current_stock' => $validated['quantity'],
             'available_stock' => $validated['quantity'],
@@ -110,7 +126,7 @@ class OperationsPageController extends Controller
             'company_id' => $companyId,
             'track_expiry' => true,
             'is_active' => true,
-            'batch_code' => $validated['batch_code'] ?? null,
+            'batch_code' => null,
         ]);
 
         return redirect()->route('products.show', $product->id)->with('status', 'Yeni parti eklendi.');
@@ -151,7 +167,7 @@ class OperationsPageController extends Controller
             ->withCount('todos')
             ->when($request->filled('search'), fn (Builder $query) => $query->where('name', 'like', '%' . $request->string('search') . '%'))
             ->orderBy('name')
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $editingCategory = null;
@@ -234,7 +250,7 @@ class OperationsPageController extends Controller
             })
             ->when($request->filled('status'), fn (Builder $query) => $query->where('is_active', $request->string('status') === 'active'))
             ->latest()
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $editingSupplier = null;
@@ -321,7 +337,7 @@ class OperationsPageController extends Controller
             })
             ->when($request->filled('status'), fn (Builder $query) => $query->where('is_active', $request->string('status') === 'active'))
             ->latest()
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $editingClinic = null;
@@ -421,7 +437,7 @@ class OperationsPageController extends Controller
             })
             ->when($request->filled('status'), fn (Builder $query) => $query->where('status', $request->string('status')))
             ->latest('requested_at')
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $viewData = [
@@ -524,7 +540,7 @@ class OperationsPageController extends Controller
             ->when($request->filled('type'), fn (Builder $query) => $query->where('type', $request->string('type')))
             ->when($request->filled('resolved'), fn (Builder $query) => $query->where('is_resolved', $request->string('resolved') === '1'))
             ->latest()
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $viewData = compact('alerts');
@@ -558,7 +574,7 @@ class OperationsPageController extends Controller
             ->when($request->filled('search'), fn (Builder $query) => $query->where('title', 'like', '%' . $request->string('search') . '%'))
             ->when($request->filled('status'), fn (Builder $query) => $query->where('completed', $request->string('status') === 'completed'))
             ->latest()
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $editingTodo = null;
@@ -664,17 +680,17 @@ class OperationsPageController extends Controller
                 });
             })
             ->latest()
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $editingEmployee = null;
         if ($request->filled('edit')) {
-            $editingEmployee = User::with('roles')->findOrFail($request->integer('edit'));
+            $editingEmployee = User::with(['roles', 'permissions'])->findOrFail($request->integer('edit'));
         }
 
         $viewData = [
             'users' => $users,
-            'roles' => Role::query()->orderBy('name')->get(['id', 'name']),
+            'permissions' => Permission::query()->orderBy('name')->get(),
             'clinics' => Clinic::query()->active()->orderBy('name')->get(['id', 'name']),
             'modalMode' => $request->query('modal'),
             'editingEmployee' => $editingEmployee,
@@ -704,8 +720,8 @@ class OperationsPageController extends Controller
             'email' => 'nullable|email|max:255|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
             'clinic_id' => ['nullable', Rule::exists('clinics', 'id')->where(fn ($query) => $query->where('company_id', $companyId))],
-            'role_names' => 'nullable|array',
-            'role_names.*' => 'string|exists:roles,name',
+            'permission_names' => 'nullable|array',
+            'permission_names.*' => 'string|exists:permissions,name',
         ]);
 
         $employee = User::create([
@@ -718,7 +734,9 @@ class OperationsPageController extends Controller
             'is_active' => true,
         ]);
 
-        $employee->syncRoles($validated['role_names'] ?? []);
+        if ($request->has('permission_names')) {
+            $employee->syncPermissions($validated['permission_names'] ?? []);
+        }
 
         return $this->actionResponse($request, 'employees.index', 'Personel olusturuldu.');
     }
@@ -738,8 +756,8 @@ class OperationsPageController extends Controller
             'password' => 'nullable|string|min:8|confirmed',
             'clinic_id' => ['nullable', Rule::exists('clinics', 'id')->where(fn ($query) => $query->where('company_id', $companyId))],
             'is_active' => 'nullable|boolean',
-            'role_names' => 'nullable|array',
-            'role_names.*' => 'string|exists:roles,name',
+            'permission_names' => 'nullable|array',
+            'permission_names.*' => 'string|exists:permissions,name',
         ]);
 
         $payload = [
@@ -754,7 +772,7 @@ class OperationsPageController extends Controller
         }
 
         $user->update($payload);
-        $user->syncRoles($validated['role_names'] ?? []);
+        $user->syncPermissions($validated['permission_names'] ?? []);
 
         return $this->actionResponse($request, 'employees.index', 'Personel guncellendi.');
     }
@@ -1013,7 +1031,7 @@ class OperationsPageController extends Controller
             ->when($dateFrom, fn($q) => $q->whereDate('transaction_date', '>=', $dateFrom))
             ->when($dateTo, fn($q) => $q->whereDate('transaction_date', '<=', $dateTo))
             ->latest('transaction_date')
-            ->paginate(20)
+            ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
         $clinics = Clinic::query()->active()->get(['id', 'name']);
@@ -1059,8 +1077,8 @@ class OperationsPageController extends Controller
 
     private function getStocksViewData(Request $request): array
     {
-        $filters = $request->only(['search', 'clinic_id', 'category', 'status', 'level']);
-        $products = app(ProductService::class)->getAllProducts($filters, 20);
+        $filters = $request->only(['search', 'clinic_id', 'category', 'status', 'level', 'per_page']);
+        $products = app(ProductService::class)->getAllProducts($filters, $request->integer('per_page', 20));
 
         $companyId = auth()->user()->company_id;
         $selectedClinicId = $request->filled('clinic_id') ? $request->integer('clinic_id') : null;

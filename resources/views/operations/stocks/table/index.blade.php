@@ -8,11 +8,11 @@
             <table class="table align-middle fs-6 gy-4 app-stock-table">
                 <thead>
                     <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                        <th>Ürün Bilgisi</th>
-                        <th>Klinik & Konum</th>
-                        <th>Stok Durumu</th>
-                        <th>Partiler</th>
-                        <th class="text-end">İşlem</th>
+                        <th class="min-w-200px">Ürün Bilgisi</th>
+                        <th class="min-w-150px">Klinik & Konum</th>
+                        <th class="min-w-150px">Stok Durumu</th>
+                        <th class="min-w-80px text-center">Giriş Sayısı</th>
+                        <th class="min-w-100px text-end">İşlemler</th>
                     </tr>
                 </thead>
                 <tbody class="text-gray-700 fw-semibold">
@@ -26,8 +26,8 @@
                         @endphp
                         <tr>
                             <td>
-                                <div class="d-flex align-items-center gap-3 min-w-225px">
-                                    <div class="app-stock-table__avatar">
+                                <div class="d-flex align-items-center gap-3">
+                                    <div class="app-stock-table__avatar shadow-sm">
                                         <i class="ki-duotone ki-package fs-2 text-primary">
                                             <span class="path1"></span><span class="path2"></span><span class="path3"></span>
                                         </i>
@@ -45,33 +45,27 @@
                                 </div>
                             </td>
                             <td>
-                                <div class="app-stock-level min-w-225px">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="text-gray-900 fw-bold">{{ $product->total_stock }} adet</span>
-                                        <span class="badge badge-light-{{ $statusClass }} fs-8">{{ $statusLabel }}</span>
+                                <div class="app-stock-level">
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <span class="text-gray-900 fw-bold fs-7">{{ $product->total_stock }} adet</span>
+                                        <span class="text-{{ $statusClass }} fw-bold fs-8">{{ $statusLabel }}</span>
                                     </div>
-                                    <div class="progress h-6px w-100 bg-light">
-                                        <div class="progress-bar bg-{{ $statusClass }}" role="progressbar" style="width: {{ $progressWidth }}%"></div>
+                                    <div class="progress h-5px w-100 bg-light rounded-pill">
+                                        <div class="progress-bar bg-{{ $statusClass }} rounded-pill" role="progressbar" style="width: {{ $progressWidth }}%"></div>
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <span class="app-stock-table__counter">{{ $product->batches_count }}</span>
+                            <td class="text-center">
+                                <span class="app-stock-table__counter shadow-sm">{{ $product->batches_count }}</span>
                             </td>
-                            <td class="text-end">
-                                <div class="d-flex justify-content-end align-items-center gap-2">
-                                    <button type="button" class="btn btn-sm btn-light-primary px-4" data-stock-detail="{{ $product->id }}">Yönet</button>
-                                    <div class="dropdown">
-                                        <button class="btn btn-sm btn-icon btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <i class="ki-duotone ki-dots-vertical fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <li><a class="dropdown-item" href="{{ route('products.show', $product->id) }}">Detay</a></li>
-                                            <li><button class="dropdown-item" type="button" data-stock-edit="{{ $product->id }}">Düzenle</button></li>
-                                            <li><button class="dropdown-item" type="button" data-stock-adjust="{{ $product->id }}">Stok Hareketi</button></li>
-                                            <li><button class="dropdown-item text-danger" type="button" data-stock-delete="{{ $product->id }}">Sil</button></li>
-                                        </ul>
-                                    </div>
+                             <td class="text-end">
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-sm btn-icon btn-light-primary" data-stock-edit="{{ $product->id }}" title="Düzenle">
+                                        <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-icon btn-light-danger" data-stock-delete="{{ $product->id }}" title="Sil">
+                                        <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>

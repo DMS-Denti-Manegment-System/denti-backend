@@ -6,7 +6,7 @@
                     <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
                         <th>Kullanici</th>
                         <th>Klinik</th>
-                        <th>Roller</th>
+                        <th>Yetkiler</th>
                         <th>Durum</th>
                         <th>Islem</th>
                     </tr>
@@ -16,7 +16,7 @@
                         <tr>
                             <td><div>{{ $employee->name }}</div><div class="text-muted fs-7">{{ $employee->username ?: $employee->email }}</div></td>
                             <td>{{ $employee->clinic?->name ?: '-' }}</td>
-                            <td>{{ $employee->roles->pluck('name')->implode(', ') ?: '-' }}</td>
+                            <td><span class="badge badge-light-primary">{{ $employee->permissions->count() }} Yetki</span></td>
                             <td><span class="badge {{ $employee->is_active ? 'badge-light-success' : 'badge-light-danger' }}">{{ $employee->is_active ? 'Aktif' : 'Pasif' }}</span></td>
                             <td>
                                 <div class="d-flex gap-2">

@@ -28,14 +28,14 @@
                             <span class="path1"></span><span class="path2"></span><span class="path3"></span>
                         </i>
                     </span>
-                    <span class="menu-title">Stok Yönetimi</span>
+                    <span class="menu-title">Ürün Yönetimi</span>
                     <span class="menu-arrow"></span>
                 </span>
                 <div class="menu-sub menu-sub-accordion">
                     <div class="menu-item">
                         <a class="menu-link {{ request()->routeIs('stocks.*') ? 'active' : '' }}" href="{{ route('stocks.index') }}">
                             <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
-                            <span class="menu-title">Stok Listesi</span>
+                            <span class="menu-title">Ürün Listesi</span>
                         </a>
                     </div>
                     <div class="menu-item">
@@ -123,16 +123,7 @@
                 </a>
             </div>
 
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('roles.*') ? 'active' : '' }}" href="{{ route('roles.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-shield-search fs-2">
-                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Yetkiler</span>
-                </a>
-            </div>
+
 
         </div>
         <!--end::Menu-->

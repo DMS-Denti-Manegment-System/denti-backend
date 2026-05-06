@@ -112,7 +112,7 @@
 
                             @if($hasExpiryTracking)
                                 <button type="button" class="btn btn-primary" data-batch-create-trigger>
-                                    Yeni Parti Ekle
+                                    Yeni Stok Ekle
                                 </button>
                             @endif
                         </div>
@@ -139,7 +139,7 @@
                         <div class="col-md-4">
                             <div class="bg-light-info rounded p-6 h-100">
                                 <div class="fs-2tx fw-bold text-info mb-2">{{ $stockStats['batch_count'] }}</div>
-                                <div class="fs-6 fw-semibold text-gray-600">Aktif Parti Sayısı</div>
+                                <div class="fs-6 fw-semibold text-gray-600">Aktif Giriş Sayısı</div>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -155,12 +155,12 @@
             <div class="card card-flush app-stock-detail-card mb-7">
                 <div class="card-header align-items-center">
                     <div class="card-title">
-                        <h2 class="mb-0">Stok Partileri</h2>
+                        <h2 class="mb-0">Stok Girişleri</h2>
                     </div>
                     @if($hasExpiryTracking)
                         <div class="card-toolbar">
                             <button type="button" class="btn btn-sm btn-light-primary" data-batch-create-trigger>
-                                Yeni Parti Ekle
+                                Yeni Stok Ekle
                             </button>
                         </div>
                     @endif
@@ -170,7 +170,7 @@
                         <table class="table align-middle table-row-dashed fs-6 gy-5">
                             <thead>
                                 <tr class="text-start text-muted fw-bold fs-7 text-uppercase gs-0">
-                                    <th>Parti No / SKU</th>
+                                    <th>Giriş No / SKU</th>
                                     <th>Tedarikçi</th>
                                     <th>Stok</th>
                                     <th>Maliyet</th>
@@ -187,7 +187,7 @@
                                     <td>
                                         <div class="d-flex flex-column">
                                             <span class="text-gray-800 fw-bold">#{{ $batch->id }}</span>
-                                            <span class="fs-8 text-muted">{{ $batch->batch_code ?: 'Parti Kodu Yok' }}</span>
+                                            <span class="fs-8 text-muted">{{ $batch->batch_code ?: 'Kayıt Kodu Yok' }}</span>
                                         </div>
                                     </td>
                                     <td>{{ $batch->supplier?->name ?: '-' }}</td>
@@ -355,14 +355,14 @@
 
     @if($hasExpiryTracking)
         <div class="modal fade" id="stockBatchCreateModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered mw-900px">
+            <div class="modal-dialog modal-dialog-centered mw-750px">
                 <div class="modal-content">
                     <form method="POST" action="{{ route('stocks.batches.store', $product) }}" class="modal-form">
                         @csrf
                         <div class="modal-header">
                             <div>
-                                <h2 class="fw-bold mb-1">Yeni Parti Ekle</h2>
-                                <div class="text-muted fs-7">{{ $product->name }} icin yeni SKT takipli parti ekleyin.</div>
+                                <h2 class="fw-bold mb-1">Yeni Ürün Girişi</h2>
+                                <div class="text-muted fs-7">{{ $product->name }} için yeni stok girişi yapın.</div>
                             </div>
                             <button type="button" class="btn btn-icon btn-sm btn-active-light-primary ms-2" data-bs-dismiss="modal" aria-label="Close">
                                 <i class="ki-duotone ki-cross fs-1"></i>
@@ -370,60 +370,108 @@
                         </div>
                         <div class="modal-body py-7 px-10">
                             <div class="row g-5">
-                                <div class="col-md-4">
-                                    <label class="form-label">Parti Kodu</label>
-                                    <input type="text" name="batch_code" value="{{ old('batch_code') }}" class="form-control form-control-solid" placeholder="LOT-2026-001">
-                                </div>
-                                <div class="col-md-4">
+                                <!-- Tedarikçi & Klinik -->
+                                <div class="col-md-6">
                                     <label class="form-label required">Tedarikçi</label>
-                                    <select name="supplier_id" class="form-select form-select-solid" data-control="select2" required>
+                                    <select name="supplier_id" class="form-select form-select-solid" data-control="select2" data-dropdown-parent="#stockBatchCreateModal" required>
                                         <option value="">Tedarikçi Seçin</option>
                                         @foreach($suppliers as $supplier)
                                             <option value="{{ $supplier->id }}" @selected(old('supplier_id') == $supplier->id)>{{ $supplier->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
+                                <div class="col-md-6">
+                                    <label class="form-label required">Klinik</label>
+                                    <select name="clinic_id" class="form-select form-select-solid" data-control="select2" data-dropdown-parent="#stockBatchCreateModal" required>
+                                        @foreach($clinics as $clinic)
+                                            <option value="{{ $clinic->id }}" @selected(old('clinic_id', $product->clinic_id) == $clinic->id)>{{ $clinic->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+
+                                <!-- Miktar & Fiyat -->
                                 <div class="col-md-4">
                                     <label class="form-label required">Miktar</label>
                                     <input type="number" min="1" name="quantity" value="{{ old('quantity') }}" class="form-control form-control-solid" required>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Alış Fiyatı</label>
+                                <div class="col-md-4">
+                                    <label class="form-label">Birim Fiyat</label>
                                     <input type="number" step="0.01" min="0" name="purchase_price" value="{{ old('purchase_price') }}" class="form-control form-control-solid">
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Döviz</label>
-                                    <select name="currency" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
+                                <div class="col-md-4">
+                                    <label class="form-label">Para Birimi</label>
+                                    <select name="currency" class="form-select form-select-solid" data-control="select2" data-hide-search="true" data-dropdown-parent="#stockBatchCreateModal">
                                         @foreach($currencies as $code => $label)
                                             <option value="{{ $code }}" @selected(old('currency', 'TRY') === $code)>{{ $label }}</option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-3">
+
+                                <!-- Tarihler -->
+                                <div class="col-md-6">
                                     <label class="form-label">Alış Tarihi</label>
                                     <input type="date" name="purchase_date" value="{{ old('purchase_date', now()->format('Y-m-d')) }}" class="form-control form-control-solid">
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label required">SKT</label>
+                                <div class="col-md-6">
+                                    <label class="form-label required">S.K.T</label>
                                     <input type="date" name="expiry_date" value="{{ old('expiry_date') }}" class="form-control form-control-solid" required>
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Depo Konumu</label>
-                                    <input type="text" name="storage_location" value="{{ old('storage_location') }}" class="form-control form-control-solid" placeholder="Raf / Bölme">
-                                </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Sarı Uyarı Günü</label>
+
+                                <!-- Alarmlar -->
+                                <div class="col-md-6">
+                                    <label class="form-label">SKT Sarı Alarm (Gün)</label>
                                     <input type="number" min="0" name="expiry_yellow_days" value="{{ old('expiry_yellow_days', 30) }}" class="form-control form-control-solid">
                                 </div>
-                                <div class="col-md-4">
-                                    <label class="form-label">Kırmızı Uyarı Günü</label>
-                                    <input type="number" min="0" name="expiry_red_days" value="{{ old('expiry_red_days', 15) }}" class="form-control form-control-solid">
+                                <div class="col-md-6">
+                                    <label class="form-label">SKT Kritik Alarm (Gün)</label>
+                                    <input type="number" min="0" name="expiry_red_days" value="{{ old('expiry_red_days', 10) }}" class="form-control form-control-solid">
+                                </div>
+
+                                <!-- Konum -->
+                                <div class="col-12">
+                                    <label class="form-label">Depolama Konumu</label>
+                                    <input type="text" name="storage_location" value="{{ old('storage_location') }}" class="form-control form-control-solid" placeholder="Raf / Bölme">
+                                </div>
+
+                                <!-- Birim Ayarları -->
+                                <div class="col-12 mt-5">
+                                    <div class="separator separator-dashed my-5"></div>
+                                    <h4 class="fw-bold mb-5">Birim & Alt Birim Ayarları</h4>
+                                    <div class="row g-5">
+                                        <div class="col-md-6">
+                                            <label class="required form-label">Ana Birim</label>
+                                            <select name="unit" class="form-select form-select-solid" data-control="select2" data-hide-search="true" data-dropdown-parent="#stockBatchCreateModal">
+                                                @foreach($units as $u)
+                                                    <option value="{{ $u }}" @selected(old('unit', $product->unit) === $u)>{{ $u }}</option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-check form-switch form-check-custom form-check-solid mt-9">
+                                                <input type="hidden" name="has_sub_unit" value="0" />
+                                                <input class="form-check-input" type="checkbox" name="has_sub_unit" value="1" id="sub_unit_toggle_batch" @checked(old('has_sub_unit', $product->has_sub_unit)) />
+                                                <span class="form-check-label fw-bold text-gray-700">Alt Birim Kullan</span>
+                                            </label>
+                                        </div>
+                                        <div id="sub_unit_container_batch" class="{{ old('has_sub_unit', $product->has_sub_unit) ? '' : 'd-none' }} col-12">
+                                            <div class="row g-5">
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Alt Birim Adı</label>
+                                                    <input type="text" name="sub_unit_name" class="form-control form-control-solid" value="{{ old('sub_unit_name', $product->sub_unit_name) }}" placeholder="örn: Adet" />
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <label class="form-label">Çarpan (1 Ana Birim = ? Alt Birim)</label>
+                                                    <input type="number" name="sub_unit_multiplier" class="form-control form-control-solid" value="{{ old('sub_unit_multiplier', $product->sub_unit_multiplier) }}" placeholder="örn: 10" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">Kapat</button>
-                            <button type="submit" class="btn btn-primary">Yeni Parti Ekle</button>
+                            <button type="button" class="btn btn-light" data-bs-dismiss="modal">İptal</button>
+                            <button type="submit" class="btn btn-primary">Kaydet</button>
                         </div>
                     </form>
                 </div>
@@ -494,12 +542,18 @@
             }
         }
 
+
         $(document).on('click', '[data-stock-edit]', function() { openModal('edit', $(this).attr('data-stock-edit')); });
         $(document).on('click', '[data-stock-adjust]', function() { openModal('adjust', $(this).attr('data-stock-adjust')); });
         $(document).on('click', '[data-batch-create-trigger]', function() {
             if (stockBatchCreateModal) {
                 stockBatchCreateModal.show();
             }
+        });
+
+        $(document).on('change', '#sub_unit_toggle_batch', function() {
+            var isChecked = $(this).is(':checked');
+            $('#sub_unit_container_batch').toggleClass('d-none', !isChecked);
         });
         $(document).on('click', '[data-stock-use-trigger]', function() {
             if (!stockUseModal) {

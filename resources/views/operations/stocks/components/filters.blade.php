@@ -2,7 +2,8 @@
     <form id="stockFilterForm" class="app-stock-filter-bar">
         <div class="app-stock-filter-bar__fields">
             <div class="app-stock-search">
-                <input type="text" name="search" class="form-control form-control-solid" placeholder="Stok adi ile ara..." value="{{ request('search') }}" />
+                <input type="text" name="search" class="form-control form-control-solid"
+                    placeholder="Stok adi ile ara..." value="{{ request('search') }}" />
                 <button class="btn btn-icon btn-light" type="submit" aria-label="Ara">
                     <i class="ki-duotone ki-magnifier fs-3">
                         <span class="path1"></span><span class="path2"></span>
@@ -10,14 +11,16 @@
                 </button>
             </div>
 
-            <select name="clinic_id" class="form-select form-select-solid" data-control="select2" data-placeholder="Klinik Seçin">
+            <select name="clinic_id" class="form-select form-select-solid" data-control="select2"
+                data-placeholder="Klinik Seçin">
                 <option value="">Klinik Seçin</option>
                 @foreach ($clinics as $clinic)
                     <option value="{{ $clinic->id }}" @selected(request('clinic_id') == $clinic->id)>{{ $clinic->name }}</option>
                 @endforeach
             </select>
 
-            <select name="category" class="form-select form-select-solid" data-control="select2" data-placeholder="Kategori">
+            <select name="category" class="form-select form-select-solid" data-control="select2"
+                data-placeholder="Kategori">
                 <option value="">Kategori</option>
                 @foreach ($categories as $category)
                     <option value="{{ $category->name }}" @selected(request('category') == $category->name)>{{ $category->name }}</option>
@@ -38,18 +41,14 @@
                 <option value="active" @selected(request('status', 'active') === 'active')>Aktif</option>
                 <option value="inactive" @selected(request('status') === 'inactive')>Pasif</option>
             </select>
-        </div>
-
-        <div class="app-stock-filter-bar__actions">
             <button type="button" id="resetFilters" class="btn btn-light">Temizle</button>
-            <a href="{{ route('categories.index') }}" class="btn btn-light">
-                <i class="ki-duotone ki-tag fs-5 me-1"><span class="path1"></span><span class="path2"></span></i>
-                Kategoriler
-            </a>
+
             <button type="button" class="btn btn-primary" id="btnCreateStock">
                 <i class="ki-duotone ki-plus fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
                 Yeni Stok
             </button>
         </div>
+
+
     </form>
 </div>

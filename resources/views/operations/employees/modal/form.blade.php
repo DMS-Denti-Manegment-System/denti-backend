@@ -61,16 +61,58 @@
                                     <span class="form-check-label">Aktif</span>
                                 </label>
                             </div>
-                            <div class="col-12">
-                                <label class="form-label">Roller</label>
-                                <div class="row g-3">
-                                    @php($selectedRoles = old('role_names', $editingEmployee?->roles?->pluck('name')->all() ?? []))
-                                    @foreach($roles as $role)
-                                        <div class="col-md-4">
-                                            <label class="form-check form-check-custom form-check-solid">
-                                                <input class="form-check-input" type="checkbox" name="role_names[]" value="{{ $role->name }}" @checked(in_array($role->name, $selectedRoles, true)) />
-                                                <span class="form-check-label">{{ $role->name }}</span>
-                                            </label>
+                            <div class="col-12 mt-10">
+                                <label class="form-label fw-bold fs-4 mb-5">Personel Yetkileri</label>
+                                <div class="row g-7">
+                                    @php
+                                        $selectedPermissions = old('permission_names', $editingEmployee?->permissions?->pluck('name')->all() ?? []);
+                                        $groups = [
+                                            'Stok Yönetimi' => ['view-stocks', 'create-stocks', 'update-stocks', 'delete-stocks', 'adjust-stocks', 'use-stocks'],
+                                            'Klinik Yönetimi' => ['view-clinics', 'create-clinics', 'update-clinics', 'delete-clinics'],
+                                            'Raporlar & Analiz' => ['view-reports', 'export-reports', 'view-audit-logs'],
+                                            'Sistem & Personel' => ['manage-users', 'manage-company'],
+                                            'Görevler (Todo)' => ['view-todos', 'manage-todos'],
+                                        ];
+                                        $labels = [
+                                            'view-stocks' => 'Stokları Görüntüle',
+                                            'create-stocks' => 'Yeni Ürün/Stok Ekle',
+                                            'update-stocks' => 'Stok Düzenle',
+                                            'delete-stocks' => 'Stok Sil',
+                                            'adjust-stocks' => 'Stok Düzeltme (+/-)',
+                                            'use-stocks' => 'Stok Kullanımı',
+                                            'view-clinics' => 'Klinikleri Görüntüle',
+                                            'create-clinics' => 'Yeni Klinik Ekle',
+                                            'update-clinics' => 'Klinik Düzenle',
+                                            'delete-clinics' => 'Klinik Sil',
+                                            'view-reports' => 'Raporları Görüntüle',
+                                            'export-reports' => 'Rapor Dışa Aktar',
+                                            'view-audit-logs' => 'İşlem Kayıtlarını Gör',
+                                            'manage-users' => 'Personel Yönetimi',
+                                            'manage-company' => 'Şirket Ayarları',
+                                            'view-todos' => 'Görevleri Görüntüle',
+                                            'manage-todos' => 'Görev Yönetimi',
+                                        ];
+                                    @endphp
+
+                                    @foreach($groups as $groupName => $perms)
+                                        <div class="col-md-6 col-lg-4">
+                                            <div class="card card-flush border-dashed h-100">
+                                                <div class="card-header pt-5">
+                                                    <h3 class="card-title align-items-start flex-column">
+                                                        <span class="card-label fw-bold text-gray-800 fs-6">{{ $groupName }}</span>
+                                                    </h3>
+                                                </div>
+                                                <div class="card-body pt-0">
+                                                    <div class="d-flex flex-column gap-3">
+                                                        @foreach($perms as $permName)
+                                                            <label class="form-check form-check-custom form-check-solid">
+                                                                <input class="form-check-input h-20px w-20px" type="checkbox" name="permission_names[]" value="{{ $permName }}" @checked(in_array($permName, $selectedPermissions, true)) />
+                                                                <span class="form-check-label fw-semibold text-gray-700">{{ $labels[$permName] ?? $permName }}</span>
+                                                            </label>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     @endforeach
                                 </div>
