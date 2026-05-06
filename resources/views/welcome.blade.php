@@ -4,7 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        <title>Laravel</title>
+        <title>Denti</title>
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -12,7 +12,7 @@
 
         <!-- Styles / Scripts -->
         @if (file_exists(public_path('build/manifest.json')) || file_exists(public_path('hot')))
-            {{-- Statik sayfa: sadece CSS; tüm Inertia+Antd bundle'ını yüklemek gereksiz maliyet --}}
+            {{-- Statik sayfa: sadece CSS yuklenir, panel bundle'ina bagli degil --}}
             @vite(['resources/css/app.css'])
         @else
             <style>

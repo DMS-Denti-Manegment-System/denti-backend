@@ -21,7 +21,10 @@ class ProductRepository
             ->groupBy('product_id');
 
         $query = Product::query()
-            ->with(['clinic:id,name'])
+            ->with([
+                'clinic:id,name',
+                'batches' => fn($q) => $q->with(['supplier:id,name', 'clinic:id,name'])->latest('id')
+            ])
             ->leftJoinSub($stockSummary, 'stock_summary', function ($join) {
                 $join->on('stock_summary.product_id', '=', 'products.id');
             })
@@ -108,10 +111,10 @@ class ProductRepository
         return Product::with(['batches.supplier', 'batches.clinic', 'clinic'])
             ->withCount('batches')
             ->withSum(['stockTransactions as total_in' => function($q) {
-                $q->whereIn('type', ['entry', 'adjustment_plus', 'adjustment_increase', 'purchase', 'transfer_in', 'returned', 'return_in']);
+                $q->whereIn('type', Product::incomingTransactionTypes());
             }], 'quantity')
             ->withSum(['stockTransactions as total_out' => function($q) {
-                $q->whereIn('type', ['usage', 'loss', 'adjustment_minus', 'adjustment_decrease', 'transfer_out', 'expired', 'damaged', 'return_out']);
+                $q->whereIn('type', Product::outgoingTransactionTypes());
             }], 'quantity')
             ->find($id);
     }

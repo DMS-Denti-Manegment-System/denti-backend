@@ -1,36 +1,26 @@
 import { test, expect } from '@playwright/test';
 
+const clinicCode = process.env.E2E_CLINIC_CODE || 'deneme01';
+const username = process.env.E2E_USERNAME || 'deneme';
+const password = process.env.E2E_PASSWORD || 'oRtc613LFgca';
+
 test.describe('Authentication', () => {
   test('successful login redirects to dashboard', async ({ page }) => {
-    // Go to the login page
     await page.goto('/login');
-
-    // Assuming the fields are based on what we saw in LoginForm.tsx
-    // The inputs have antd ids or placeholder, but using placeholder is easier since they are present.
-    await page.getByPlaceholder('Klinik Kodu').fill('deneme01');
-    await page.getByPlaceholder('Kullanıcı Adı').fill('deneme');
-    await page.getByPlaceholder('Şifre').fill('oRtc613LFgca');
-
-    // Click the login button
-    await page.getByRole('button', { name: 'Giriş Yap' }).click();
-
-    // Expect to be redirected to the homepage/dashboard
+    await page.locator('input[name="clinic_code"]').fill(clinicCode);
+    await page.locator('input[name="username"]').fill(username);
+    await page.locator('input[name="password"]').fill(password);
+    await page.getByRole('button', { name: /Giris Yap/i }).click();
     await expect(page).toHaveURL('/');
-    
-    // Optionally wait for a dashboard element to be visible
-    // await expect(page.getByText('Denti')).toBeVisible();
+    await expect(page.getByText(/Operasyon/i)).toBeVisible();
   });
 
   test('shows error message on invalid credentials', async ({ page }) => {
     await page.goto('/login');
-
-    await page.getByPlaceholder('Klinik Kodu').fill('invalid_code');
-    await page.getByPlaceholder('Kullanıcı Adı').fill('wrong_user');
-    await page.getByPlaceholder('Şifre').fill('wrong_pass');
-
-    await page.getByRole('button', { name: 'Giriş Yap' }).click();
-
-    // Expect validation error message to appear
-    await expect(page.getByText('Geçersiz kullanıcı adı veya şifre')).toBeVisible();
+    await page.locator('input[name="clinic_code"]').fill('invalid_code');
+    await page.locator('input[name="username"]').fill('wrong_user');
+    await page.locator('input[name="password"]').fill('wrong_pass');
+    await page.getByRole('button', { name: /Giris Yap/i }).click();
+    await expect(page.getByText(/Gecersiz|Geçersiz/i)).toBeVisible();
   });
 });

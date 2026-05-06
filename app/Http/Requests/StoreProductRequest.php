@@ -9,7 +9,7 @@ class StoreProductRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true;
+        return (bool) $this->user()?->hasPermissionTo('create-stocks');
     }
 
     public function rules(): array

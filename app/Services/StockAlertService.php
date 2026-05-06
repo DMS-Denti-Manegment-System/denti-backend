@@ -200,8 +200,9 @@ class StockAlertService
     {
         // Alarma ait ilişkileri yükle
         $alert->load(['clinic', 'stock.product']);
+        $company = \App\Models\Company::find($alert->stock->company_id);
 
-        // Şirket sahibi ve yöneticileri bul
+        // 1. Sistem kullanıcılarına (yöneticilere) bildirim gönder
         $users = \App\Models\User::where('company_id', $alert->stock->company_id)
             ->whereHas('roles', function($q) {
                 $q->whereIn('name', ['Company Owner', 'Admin', 'Stock Manager', 'Clinic Manager']);
@@ -209,6 +210,17 @@ class StockAlertService
 
         if ($users->isNotEmpty()) {
             \Illuminate\Support\Facades\Notification::send($users, new \App\Notifications\StockLowLevelNotification($alert));
+        }
+
+        // 2. Şirket bazlı ek e-posta adreslerine gönder
+        if ($company && $company->alert_emails) {
+            $emails = array_map('trim', explode(',', $company->alert_emails));
+            $validEmails = array_filter($emails, fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL));
+            
+            if (!empty($validEmails)) {
+                \Illuminate\Support\Facades\Notification::route('mail', $validEmails)
+                    ->notify(new \App\Notifications\StockLowLevelNotification($alert));
+            }
         }
     }
 

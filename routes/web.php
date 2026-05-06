@@ -1,68 +1,82 @@
 <?php
 
-use Inertia\Inertia;
-
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Web\AuthPageController;
+use App\Http\Controllers\Web\AdminCompanyPageController;
+use App\Http\Controllers\Web\DashboardPageController;
+use App\Http\Controllers\Web\OperationsPageController;
+use App\Http\Controllers\Web\RolePageController;
 
 Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
 Route::post('login', [AuthenticatedSessionController::class, 'store']);
 Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-Route::get('/admin/login', function () {
-    return Inertia::render('Auth/AdminLogin');
-})->name('admin.login');
-
-Route::get('/accept-invitation/{token}', function ($token) {
-    return Inertia::render('Auth/AcceptInvitation', ['token' => $token]);
-});
+Route::get('/admin/login', [AuthPageController::class, 'adminLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AuthPageController::class, 'adminLogin'])->name('admin.login.store');
+Route::get('/accept-invitation/{token}', [AuthPageController::class, 'invitationForm'])->name('invitation.accept');
+Route::post('/accept-invitation', [AuthPageController::class, 'acceptInvitation'])->name('invitation.accept.store');
 
 Route::middleware(['auth'])->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Dashboard/Index');
-    })->name('dashboard');
+    Route::get('/', DashboardPageController::class)->name('dashboard');
 
-    Route::get('/admin/companies', function () {
-        return Inertia::render('Admin/Index');
-    })->name('admin.companies');
+    Route::get('/admin/companies', AdminCompanyPageController::class)->name('admin.companies');
+    Route::get('/admin/companies/create', [AdminCompanyPageController::class, 'create'])->name('admin.companies.create');
+    Route::post('/admin/companies', [AdminCompanyPageController::class, 'store'])->name('admin.companies.store');
+    Route::get('/admin/companies/{company}/edit', [AdminCompanyPageController::class, 'edit'])->name('admin.companies.edit');
+    Route::put('/admin/companies/{company}', [AdminCompanyPageController::class, 'update'])->name('admin.companies.update');
 
-    Route::get('/stocks', [App\Http\Controllers\Api\ProductInertiaController::class, 'index'])->name('stocks.index');
-    Route::get('/stock/products/{id}', [App\Http\Controllers\Api\ProductInertiaController::class, 'show'])->name('products.show');
-
-    Route::get('/stock-categories', function () {
-        return Inertia::render('Category/Index');
-    });
-
-    Route::get('/suppliers', function () {
-        return Inertia::render('Supplier/Index');
-    });
-
-    Route::get('/clinics', function () {
-        return Inertia::render('Clinic/Index');
-    });
-
-    Route::get('/stock-requests', function () {
-        return Inertia::render('StockRequest/Index');
-    });
-
-    Route::get('/alerts', function () {
-        return Inertia::render('Alert/Index');
-    });
-
-    Route::get('/todos', function () {
-        return Inertia::render('Todo/Index');
-    });
-
-    Route::get('/reports', function () {
-        return Inertia::render('Report/Index');
-    });
-
-    Route::get('/employees', function () {
-        return Inertia::render('Employee/Index');
-    });
-
-
-
-    Route::get('/profile', function () {
-        return Inertia::render('Profile/Index');
-    });
+    Route::get('/stocks', [OperationsPageController::class, 'stocks'])->name('stocks.index');
+    Route::get('/stocks/create', [OperationsPageController::class, 'stockCreate'])->name('stocks.create');
+    Route::post('/stocks', [OperationsPageController::class, 'stockStore'])->name('stocks.store');
+    Route::get('/stocks/{product}/edit', [OperationsPageController::class, 'stockEdit'])->name('stocks.edit');
+    Route::put('/stocks/{product}', [OperationsPageController::class, 'stockUpdate'])->name('stocks.update');
+    Route::get('/stock/products/{id}', [OperationsPageController::class, 'stockShow'])->name('products.show');
+    Route::post('/stock/products/{product}/adjust', [OperationsPageController::class, 'stockAdjust'])->name('products.adjust-stock');
+    Route::get('/stock-categories', [OperationsPageController::class, 'categories'])->name('categories.index');
+    Route::get('/stock-categories/create', [OperationsPageController::class, 'categoryCreate'])->name('categories.create');
+    Route::post('/stock-categories', [OperationsPageController::class, 'categoryStore'])->name('categories.store');
+    Route::get('/stock-categories/{category}/edit', [OperationsPageController::class, 'categoryEdit'])->name('categories.edit');
+    Route::put('/stock-categories/{category}', [OperationsPageController::class, 'categoryUpdate'])->name('categories.update');
+    Route::get('/suppliers', [OperationsPageController::class, 'suppliers'])->name('suppliers.index');
+    Route::get('/suppliers/create', [OperationsPageController::class, 'supplierCreate'])->name('suppliers.create');
+    Route::post('/suppliers', [OperationsPageController::class, 'supplierStore'])->name('suppliers.store');
+    Route::get('/suppliers/{supplier}/edit', [OperationsPageController::class, 'supplierEdit'])->name('suppliers.edit');
+    Route::put('/suppliers/{supplier}', [OperationsPageController::class, 'supplierUpdate'])->name('suppliers.update');
+    Route::get('/clinics', [OperationsPageController::class, 'clinics'])->name('clinics.index');
+    Route::get('/clinics/create', [OperationsPageController::class, 'clinicCreate'])->name('clinics.create');
+    Route::post('/clinics', [OperationsPageController::class, 'clinicStore'])->name('clinics.store');
+    Route::get('/clinics/{clinic}/edit', [OperationsPageController::class, 'clinicEdit'])->name('clinics.edit');
+    Route::put('/clinics/{clinic}', [OperationsPageController::class, 'clinicUpdate'])->name('clinics.update');
+    Route::get('/stock-requests', [OperationsPageController::class, 'stockRequests'])->name('stock-requests.index');
+    Route::get('/stock-requests/create', [OperationsPageController::class, 'stockRequestCreate'])->name('stock-requests.create');
+    Route::post('/stock-requests', [OperationsPageController::class, 'stockRequestStore'])->name('stock-requests.store');
+    Route::post('/stock-requests/{stockRequest}/approve', [OperationsPageController::class, 'stockRequestApprove'])->name('stock-requests.approve');
+    Route::post('/stock-requests/{stockRequest}/reject', [OperationsPageController::class, 'stockRequestReject'])->name('stock-requests.reject');
+    Route::post('/stock-requests/{stockRequest}/ship', [OperationsPageController::class, 'stockRequestShip'])->name('stock-requests.ship');
+    Route::post('/stock-requests/{stockRequest}/complete', [OperationsPageController::class, 'stockRequestComplete'])->name('stock-requests.complete');
+    Route::get('/alerts', [OperationsPageController::class, 'alerts'])->name('alerts.index');
+    Route::post('/alerts/{stockAlert}/resolve', [OperationsPageController::class, 'alertResolve'])->name('alerts.resolve');
+    Route::post('/alerts/{stockAlert}/dismiss', [OperationsPageController::class, 'alertDismiss'])->name('alerts.dismiss');
+    Route::get('/todos', [OperationsPageController::class, 'todos'])->name('todos.index');
+    Route::get('/todos/create', [OperationsPageController::class, 'todoCreate'])->name('todos.create');
+    Route::post('/todos', [OperationsPageController::class, 'todoStore'])->name('todos.store');
+    Route::get('/todos/{todo}/edit', [OperationsPageController::class, 'todoEdit'])->name('todos.edit');
+    Route::put('/todos/{todo}', [OperationsPageController::class, 'todoUpdate'])->name('todos.update');
+    Route::post('/todos/{todo}/toggle', [OperationsPageController::class, 'todoToggle'])->name('todos.toggle');
+    Route::delete('/todos/{todo}', [OperationsPageController::class, 'todoDestroy'])->name('todos.destroy');
+    Route::get('/reports', [OperationsPageController::class, 'reports'])->name('reports.index');
+    Route::get('/employees', [OperationsPageController::class, 'employees'])->name('employees.index');
+    Route::get('/employees/create', [OperationsPageController::class, 'employeeCreate'])->name('employees.create');
+    Route::post('/employees', [OperationsPageController::class, 'employeeStore'])->name('employees.store');
+    Route::get('/employees/{user}/edit', [OperationsPageController::class, 'employeeEdit'])->name('employees.edit');
+    Route::put('/employees/{user}', [OperationsPageController::class, 'employeeUpdate'])->name('employees.update');
+    Route::delete('/employees/{user}', [OperationsPageController::class, 'employeeDestroy'])->name('employees.destroy');
+    Route::get('/roles', RolePageController::class)->name('roles.index');
+    Route::get('/roles/create', [RolePageController::class, 'create'])->name('roles.create');
+    Route::post('/roles', [RolePageController::class, 'store'])->name('roles.store');
+    Route::get('/roles/{role}/edit', [RolePageController::class, 'edit'])->name('roles.edit');
+    Route::put('/roles/{role}', [RolePageController::class, 'update'])->name('roles.update');
+    Route::get('/profile', [OperationsPageController::class, 'profile'])->name('profile.index');
+    Route::put('/profile/info', [OperationsPageController::class, 'profileUpdateInfo'])->name('profile.update.info');
+    Route::put('/profile/password', [OperationsPageController::class, 'profileUpdatePassword'])->name('profile.update.password');
 });

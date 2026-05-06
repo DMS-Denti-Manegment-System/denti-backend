@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 class Product extends Model
 {
@@ -135,25 +136,93 @@ class Product extends Model
 
     public function getLastPurchasePriceAttribute()
     {
-        if (!$this->relationLoaded('batches')) {
-            return 0;
-        }
-
-        $lastBatch = $this->batches
+        $lastBatch = $this->getLoadedOrFreshBatches()
             ->where('current_stock', '>', 0)
-            ->sortByDesc('purchase_date')
+            ->sortByDesc(function (Stock $batch) {
+                return sprintf(
+                    '%s-%010d',
+                    optional($batch->purchase_date)->format('Y-m-d H:i:s') ?? '0000-00-00 00:00:00',
+                    $batch->id
+                );
+            })
             ->first();
-        
+
         return $lastBatch ? $lastBatch->purchase_price : 0;
     }
 
     public function getTotalInAttribute()
     {
-        return $this->attributes['total_in'] ?? 0;
+        if (array_key_exists('total_in', $this->attributes)) {
+            return (int) $this->attributes['total_in'];
+        }
+
+        $stockIds = $this->getLoadedOrFreshBatches()->pluck('id');
+
+        if ($stockIds->isEmpty()) {
+            return 0;
+        }
+
+        return (int) StockTransaction::query()
+            ->whereIn('stock_id', $stockIds)
+            ->whereIn('type', self::incomingTransactionTypes())
+            ->sum('quantity');
     }
 
     public function getTotalOutAttribute()
     {
-        return $this->attributes['total_out'] ?? 0;
+        if (array_key_exists('total_out', $this->attributes)) {
+            return (int) $this->attributes['total_out'];
+        }
+
+        $stockIds = $this->getLoadedOrFreshBatches()->pluck('id');
+
+        if ($stockIds->isEmpty()) {
+            return 0;
+        }
+
+        return (int) StockTransaction::query()
+            ->whereIn('stock_id', $stockIds)
+            ->whereIn('type', self::outgoingTransactionTypes())
+            ->sum('quantity');
+    }
+
+    protected function getLoadedOrFreshBatches(): Collection
+    {
+        if ($this->relationLoaded('batches')) {
+            return $this->batches;
+        }
+
+        return $this->batches()->get();
+    }
+
+    public static function incomingTransactionTypes(): array
+    {
+        return [
+            'in',
+            'entry',
+            'purchase',
+            'transfer_in',
+            'returned',
+            'return_in',
+            'adjustment_in',
+            'adjustment_plus',
+            'adjustment_increase',
+        ];
+    }
+
+    public static function outgoingTransactionTypes(): array
+    {
+        return [
+            'out',
+            'usage',
+            'loss',
+            'transfer_out',
+            'expired',
+            'damaged',
+            'return_out',
+            'adjustment_out',
+            'adjustment_minus',
+            'adjustment_decrease',
+        ];
     }
 }

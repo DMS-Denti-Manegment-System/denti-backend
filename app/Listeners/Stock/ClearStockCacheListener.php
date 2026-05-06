@@ -19,11 +19,9 @@ class ClearStockCacheListener
 {
     public function handle(StockLevelChanged $event): void
     {
-        // Cache Thrashing'i önlemek için anlık silme işlemini devre dışı bıraktık.
-        // Cache süresi dolduğunda (15 dk) otomatik güncellenecektir.
-        // Cache::forget("stock_stats_{$event->companyId}_all");
-        // if ($event->clinicId) {
-        //     Cache::forget("stock_stats_{$event->companyId}_{$event->clinicId}");
-        // }
+        Cache::forget("stock_stats_{$event->companyId}_all");
+        if ($event->clinicId) {
+            Cache::forget("stock_stats_{$event->companyId}_{$event->clinicId}");
+        }
     }
 }

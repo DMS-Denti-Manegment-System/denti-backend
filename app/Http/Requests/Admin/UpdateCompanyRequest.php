@@ -17,10 +17,20 @@ class UpdateCompanyRequest extends FormRequest
 
         return [
             'name' => 'sometimes|required|string|max:255',
+            'code' => 'sometimes|required|string|max:20|unique:companies,code,' . $companyId,
             'domain' => 'nullable|string|max:255|unique:companies,domain,' . $companyId,
-            'subscription_plan' => 'sometimes|required|string|in:free,basic,pro,enterprise',
+            'subscription_plan' => 'sometimes|required|string|in:basic,standard,premium',
             'max_users' => 'sometimes|required|integer|min:1',
             'status' => 'sometimes|required|string|in:active,inactive,suspended',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('code')) {
+            $this->merge([
+                'code' => strtoupper($this->code),
+            ]);
+        }
     }
 }
