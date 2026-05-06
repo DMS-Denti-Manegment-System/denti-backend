@@ -60,6 +60,10 @@ class Product extends Model
     // Accessors
     public function getTotalStockAttribute()
     {
+        if (array_key_exists('total_stock', $this->attributes)) {
+            return (int) $this->attributes['total_stock'];
+        }
+
         if (!$this->relationLoaded('batches')) {
             $this->load('batches');
         }

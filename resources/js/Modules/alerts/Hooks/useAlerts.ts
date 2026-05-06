@@ -29,7 +29,7 @@ export const useAlerts = (filters?: AlertFilters) => {
         )
       }));
     },
-    enabled,
+    enabled: true,
     staleTime: 60 * 1000, // 1 dakika
     refetchOnWindowFocus: true,
     refetchOnMount: true,
@@ -166,7 +166,7 @@ export const useActiveAlerts = (clinicId?: number) => {
         )
       }));
     },
-    enabled,
+    enabled: true,
     staleTime: 1 * 60 * 1000, // 1 dakika
     refetchOnWindowFocus: true,
     refetchOnMount: true,
@@ -198,7 +198,7 @@ export const useAlertStats = (clinicId?: number) => {
     queryKey: ['alertStats', clinicId],
     queryFn: () => alertApi.getStats(clinicId),
     select: (data) => data.data,
-    enabled,
+    enabled: true,
     staleTime: 5 * 60 * 1000, // 5 dakika
     refetchOnWindowFocus: true,
     refetchOnMount: true,
@@ -216,7 +216,7 @@ export const useAlertSettings = () => {
     queryKey: ['alertSettings'],
     queryFn: alertApi.getSettings,
     select: (data) => data.data,
-    enabled,
+    enabled: true,
     staleTime: 10 * 60 * 1000, // 10 dakika
     refetchOnWindowFocus: true,
     refetchOnMount: true,

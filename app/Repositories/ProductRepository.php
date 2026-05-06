@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Models\Product;
+use App\Models\Stock;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -10,9 +12,22 @@ class ProductRepository
 {
     public function getAllWithFilters(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
+        $totalBaseUnitsSql = Stock::totalBaseUnitsRaw();
+
+        $stockSummary = Stock::query()
+            ->selectRaw('product_id')
+            ->selectRaw("SUM(CASE WHEN is_active = 1 THEN {$totalBaseUnitsSql} ELSE 0 END) as total_stock")
+            ->selectRaw('SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as batches_count')
+            ->groupBy('product_id');
+
         $query = Product::query()
-            ->with(['batches.clinic:id,name', 'clinic:id,name'])
-            ->withCount('batches');
+            ->with(['clinic:id,name'])
+            ->leftJoinSub($stockSummary, 'stock_summary', function ($join) {
+                $join->on('stock_summary.product_id', '=', 'products.id');
+            })
+            ->select('products.*')
+            ->selectRaw('COALESCE(stock_summary.total_stock, 0) as total_stock')
+            ->selectRaw('COALESCE(stock_summary.batches_count, 0) as batches_count');
 
         $isSqlite = \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite';
         $now = now();
@@ -53,15 +68,13 @@ class ProductRepository
             
             // Stok Miktarı Bazlı Filtreler (Total Stock)
             if (in_array($level, ['low', 'critical'])) {
-                // Optimization: Use subquery in WHERE to avoid repeated SUM calculations if possible, 
-                // but for readability and relative speed, we'll refine the existing one to be more targeted.
                 if ($level === 'critical') {
                     $query->whereHas('batches', function($q) {
                         $q->where('is_active', 1);
-                    })->whereRaw("(SELECT SUM(current_stock) FROM stocks WHERE product_id = products.id AND is_active = 1) <= COALESCE(red_alert_level, critical_stock_level)");
+                    })->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.red_alert_level, products.critical_stock_level)');
                 } else {
-                    $query->whereRaw("(SELECT SUM(current_stock) FROM stocks WHERE product_id = products.id AND is_active = 1) <= COALESCE(yellow_alert_level, min_stock_level)")
-                          ->whereRaw("(SELECT SUM(current_stock) FROM stocks WHERE product_id = products.id AND is_active = 1) > COALESCE(red_alert_level, critical_stock_level)");
+                    $query->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
+                          ->whereRaw('COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level)');
                 }
             }
             
@@ -93,6 +106,7 @@ class ProductRepository
     public function find(int $id): ?Product
     {
         return Product::with(['batches.supplier', 'batches.clinic', 'clinic'])
+            ->withCount('batches')
             ->withSum(['stockTransactions as total_in' => function($q) {
                 $q->whereIn('type', ['entry', 'adjustment_plus', 'adjustment_increase', 'purchase', 'transfer_in', 'returned', 'return_in']);
             }], 'quantity')

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { AppLayout } from '@/Layouts/AppLayout';
 import { 
     Card, 
@@ -41,7 +41,7 @@ interface Props {
 const ProductShow = ({ product: initialProduct }: Props) => {
     const { product, isLoading, addBatch, isAddingBatch } = useProductDetail(initialProduct.id);
     const { data: transactions, isLoading: isHistoryLoading } = useProductTransactions(initialProduct.id);
-    const { adjustStock, useStock: executeStockUsage, isAdjusting, isUsing } = useStocks();
+    const { adjustStock, useStock: executeStockUsage, isAdjusting, isUsing } = useStocks(null);
     
     const [isAddBatchModalVisible, setIsAddBatchModalVisible] = useState(false);
     const [isAdjustModalVisible, setIsAdjustModalVisible] = useState(false);
@@ -75,7 +75,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
             
             <div style={{ marginBottom: 16 }}>
                 <Breadcrumb items={[
-                    { title: <a href="/stocks">Stok Yönetimi</a> },
+                    { title: <Link href="/stocks">Stok Yönetimi</Link> },
                     { title: data.name }
                 ]} />
             </div>
@@ -88,7 +88,7 @@ const ProductShow = ({ product: initialProduct }: Props) => {
                             <Space align="center" size="middle">
                                 <Button 
                                     icon={<ArrowLeftOutlined />} 
-                                    onClick={() => window.location.href = '/stocks'} 
+                                    onClick={() => router.visit('/stocks')} 
                                 />
                                 <div>
                                     <Title level={2} style={{ margin: 0 }}>{data.name}</Title>

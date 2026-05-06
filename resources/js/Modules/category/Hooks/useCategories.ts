@@ -3,7 +3,7 @@ import { message } from 'antd'
 import { categoryApi } from '../Services/categoryApi'
 import { CreateCategoryRequest, UpdateCategoryRequest } from '../Types/category.types'
 
-export const useCategories = () => {
+export const useCategories = (enabled = true) => {
   const queryClient = useQueryClient()
 
   const {
@@ -13,7 +13,8 @@ export const useCategories = () => {
   } = useQuery({
     queryKey: ['categories'],
     queryFn: categoryApi.getAll,
-    select: (data) => data.data
+    select: (data) => data.data,
+    enabled,
   })
 
   const createMutation = useMutation({

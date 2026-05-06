@@ -1,6 +1,6 @@
 // src/modules/stock/Components/StockFilters.tsx
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, Row, Col, Input, Select, Button, Space } from "antd";
 import { PlusOutlined, TagsOutlined, BarcodeOutlined } from "@ant-design/icons";
 import { router } from "@inertiajs/react";
@@ -27,8 +27,10 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
     onAdd,
     onScannerOpen,
 }) => {
-    const { categories, isLoading: isCategoriesLoading } = useCategories();
-    const { clinics, isLoading: isClinicsLoading } = useClinics();
+    const [shouldLoadCategories, setShouldLoadCategories] = useState(false);
+    const [shouldLoadClinics, setShouldLoadClinics] = useState(false);
+    const { categories, isLoading: isCategoriesLoading } = useCategories(shouldLoadCategories);
+    const { clinics, isLoading: isClinicsLoading } = useClinics(undefined, shouldLoadClinics);
 
     const levelOptions = [
         { label: "Normal", value: "normal" },
@@ -59,6 +61,10 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
                         allowClear
                         loading={isClinicsLoading}
                         popupMatchSelectWidth={false}
+                        onOpenChange={(open) => {
+                            if (open) setShouldLoadClinics(true);
+                        }}
+                        onFocus={() => setShouldLoadClinics(true)}
                         onChange={(value) => onFilterChange("clinic_id", value)}
                     >
                         {(clinics ?? []).map((clinic) => (
@@ -76,6 +82,10 @@ export const StockFilters: React.FC<StockFiltersProps> = ({
                         allowClear
                         loading={isCategoriesLoading}
                         popupMatchSelectWidth={false}
+                        onOpenChange={(open) => {
+                            if (open) setShouldLoadCategories(true);
+                        }}
+                        onFocus={() => setShouldLoadCategories(true)}
                         onChange={(value) => onFilterChange("category", value)}
                     >
                         {(categories ?? []).map((option: any) => (

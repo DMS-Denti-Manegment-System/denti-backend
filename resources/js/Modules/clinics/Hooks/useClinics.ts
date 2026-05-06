@@ -8,7 +8,7 @@ import {
   ClinicFilter
 } from '../Types/clinic.types'
 
-export const useClinics = (filters?: ClinicFilter) => {
+export const useClinics = (filters?: ClinicFilter, enabled = true) => {
   const queryClient = useQueryClient()
 
   const {
@@ -20,6 +20,7 @@ export const useClinics = (filters?: ClinicFilter) => {
     queryKey: ['clinics', filters],
     queryFn: () => clinicApi.getAll(filters),
     select: (data) => data.data,
+    enabled,
     staleTime: 2 * 60 * 1000, // 2 dakika
     refetchOnWindowFocus: false
   })

@@ -22,7 +22,7 @@ export const BarcodeScannerModal: React.FC<BarcodeScannerModalProps> = ({ visibl
   
   const { user } = useAuth()
   const { products } = useProducts()
-  const { useStock } = useStocks()
+  const { useStock } = useStocks(null)
 
   useEffect(() => {
     if (visible) {

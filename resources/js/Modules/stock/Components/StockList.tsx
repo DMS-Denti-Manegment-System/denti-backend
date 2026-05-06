@@ -1,7 +1,8 @@
 // src/modules/stock/Components/StockList.tsx
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react'
+import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react'
 import { Card, Form, Typography } from 'antd'
+import { router } from '@inertiajs/react'
 import { useProducts, useStocks, useStockStats } from '../Hooks/useStocks'
 import { Product as Stock, StockFilter } from '../Types/stock.types'
 
@@ -9,11 +10,11 @@ import { Product as Stock, StockFilter } from '../Types/stock.types'
 import { StockTable } from './StockTable'
 import { StockFilters } from './StockFilters'
 import { StockStats } from './StockStats'
-import { StockModals } from './StockModals'
-import { StockHistoryModal } from './StockHistoryModal'
-import { BarcodeScannerModal } from './BarcodeScannerModal'
 
 const { Title } = Typography
+const StockModals = lazy(() => import('./StockModals').then((module) => ({ default: module.StockModals })))
+const StockHistoryModal = lazy(() => import('./StockHistoryModal').then((module) => ({ default: module.StockHistoryModal })))
+const BarcodeScannerModal = lazy(() => import('./BarcodeScannerModal').then((module) => ({ default: module.BarcodeScannerModal })))
 
 export const StockList: React.FC = () => {
   const [filters, setFilters] = useState<StockFilter & { page?: number; per_page?: number }>({
@@ -27,6 +28,7 @@ export const StockList: React.FC = () => {
   const [isUseModalVisible, setIsUseModalVisible] = useState(false)
   const [isHistoryModalVisible, setIsHistoryModalVisible] = useState(false)
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null)
+  const [enableSecondaryData, setEnableSecondaryData] = useState(false)
   
   // Form instances
   const [adjustForm] = Form.useForm()
@@ -60,9 +62,23 @@ export const StockList: React.FC = () => {
     reactivateStock,
     isAdjusting,
     isUsing
-  } = useStocks()
+  } = useStocks(null)
 
-  const { data: globalStats } = useStockStats()
+  const { data: globalStats } = useStockStats(enableSecondaryData)
+
+  useEffect(() => {
+    const schedule = window.requestIdleCallback
+      ? window.requestIdleCallback(() => setEnableSecondaryData(true), { timeout: 1500 })
+      : window.setTimeout(() => setEnableSecondaryData(true), 600)
+
+    return () => {
+      if (typeof schedule === 'number') {
+        window.clearTimeout(schedule)
+      } else if (window.cancelIdleCallback) {
+        window.cancelIdleCallback(schedule)
+      }
+    }
+  }, [])
 
   // Computed data
   const activeStocks = useMemo(() => {
@@ -94,8 +110,7 @@ export const StockList: React.FC = () => {
         setSelectedStock(stock.batches[0])
         setIsAdjustModalVisible(true)
     } else {
-        // Redirect to detail to add a batch first
-        window.location.href = `/stock/products/${stock.id}`
+        router.visit(`/stock/products/${stock.id}`)
     }
   }, [])
 
@@ -104,7 +119,7 @@ export const StockList: React.FC = () => {
         setSelectedStock(stock.batches[0])
         setIsUseModalVisible(true)
     } else {
-        window.location.href = `/stock/products/${stock.id}`
+        router.visit(`/stock/products/${stock.id}`)
     }
   }, [])
 
@@ -155,50 +170,58 @@ export const StockList: React.FC = () => {
         />
       </Card>
 
-      <StockModals 
-        isFormModalVisible={isFormModalVisible}
-        editingStock={editingStock}
-        onFormModalClose={() => setIsFormModalVisible(false)}
-        onFormSuccess={onFormSuccess}
-        
-        isAdjustModalVisible={isAdjustModalVisible}
-        selectedStock={selectedStock as any}
-        adjustForm={adjustForm}
-        onAdjustModalClose={() => setIsAdjustModalVisible(false)}
-        onAdjustSubmit={async (values) => {
-            if (selectedStock) {
-                await adjustStock({ id: selectedStock.id, data: values })
-                setIsAdjustModalVisible(false)
-                adjustForm.resetFields()
-                refetch()
-            }
-        }}
-        isAdjusting={isAdjusting}
-        
-        isUseModalVisible={isUseModalVisible}
-        useForm={useForm}
-        onUseModalClose={() => setIsUseModalVisible(false)}
-        onUseSubmit={async (values) => {
-            if (selectedStock) {
-                await executeStockUsage({ id: selectedStock.id, data: values })
-                setIsUseModalVisible(false)
-                useForm.resetFields()
-                refetch()
-            }
-        }}
-        isUsing={isUsing}
-      />
+      <Suspense fallback={null}>
+        {(isFormModalVisible || isAdjustModalVisible || isUseModalVisible) && (
+          <StockModals 
+            isFormModalVisible={isFormModalVisible}
+            editingStock={editingStock}
+            onFormModalClose={() => setIsFormModalVisible(false)}
+            onFormSuccess={onFormSuccess}
+            
+            isAdjustModalVisible={isAdjustModalVisible}
+            selectedStock={selectedStock as any}
+            adjustForm={adjustForm}
+            onAdjustModalClose={() => setIsAdjustModalVisible(false)}
+            onAdjustSubmit={async (values) => {
+                if (selectedStock) {
+                    await adjustStock({ id: selectedStock.id, data: values })
+                    setIsAdjustModalVisible(false)
+                    adjustForm.resetFields()
+                    refetch()
+                }
+            }}
+            isAdjusting={isAdjusting}
+            
+            isUseModalVisible={isUseModalVisible}
+            useForm={useForm}
+            onUseModalClose={() => setIsUseModalVisible(false)}
+            onUseSubmit={async (values) => {
+                if (selectedStock) {
+                    await executeStockUsage({ id: selectedStock.id, data: values })
+                    setIsUseModalVisible(false)
+                    useForm.resetFields()
+                    refetch()
+                }
+            }}
+            isUsing={isUsing}
+          />
+        )}
 
-      <StockHistoryModal 
-        visible={isHistoryModalVisible}
-        stock={selectedStock as any}
-        onClose={() => setIsHistoryModalVisible(false)}
-      />
+        {isHistoryModalVisible && (
+          <StockHistoryModal 
+            visible={isHistoryModalVisible}
+            stock={selectedStock as any}
+            onClose={() => setIsHistoryModalVisible(false)}
+          />
+        )}
 
-      <BarcodeScannerModal 
-        visible={isScannerVisible}
-        onClose={() => setIsScannerVisible(false)}
-      />
+        {isScannerVisible && (
+          <BarcodeScannerModal 
+            visible={isScannerVisible}
+            onClose={() => setIsScannerVisible(false)}
+          />
+        )}
+      </Suspense>
     </div>
   )
 }

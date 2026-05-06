@@ -21,11 +21,8 @@ class ProductListResource extends JsonResource
             'status' => $this->stock_status,
             'is_active' => $this->is_active,
             'clinic_name' => $this->clinic?->name,
-            // Clinics list for the tag display in table
-            'clinics' => $this->relationLoaded('batches') 
-                ? $this->batches->pluck('clinic.name')->unique()->filter()->values()
-                : [],
-            'batches_count' => $this->batches_count ?? ($this->relationLoaded('batches') ? $this->batches->count() : 0),
+            'clinics' => $this->clinic?->name ? [$this->clinic->name] : [],
+            'batches_count' => $this->batches_count ?? 0,
             'created_at' => $this->created_at?->toDateTimeString(),
         ];
     }

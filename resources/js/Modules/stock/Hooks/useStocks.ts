@@ -117,8 +117,9 @@ export const useProductDetail = (id: number) => {
   }
 }
 
-export const useStocks = (filters?: StockFilter) => {
+export const useStocks = (filters?: StockFilter | null) => {
   const queryClient = useQueryClient()
+  const shouldFetch = filters !== null
 
   const {
     data: stocks,
@@ -130,6 +131,7 @@ export const useStocks = (filters?: StockFilter) => {
     queryFn: () => stockApi.getAll(filters),
     select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
+    enabled: shouldFetch,
   })
 
   const createMutation = useMutation({
@@ -360,11 +362,12 @@ export const useStockTransactions = (stockId: number, filters: any = {}) => {
 }
 
 // İstatistikler için hook
-export const useStockStats = () => {
+export const useStockStats = (enabled = true) => {
   return useQuery({
     queryKey: [STOCK_QUERY_KEYS.STOCK_STATS],
     queryFn: stockApi.getStats,
     select: (response: any) => response.data?.data || response.data,
     staleTime: STALE_TIME,
+    enabled,
   })
 }

@@ -24,6 +24,7 @@ export default defineConfig({
             output: {
                 manualChunks(id) {
                     if (!id.includes('node_modules')) return;
+                    if (id.includes('recharts')) return 'charts';
                     if (id.includes('antd')) return 'antd';
                     if (id.includes('@tanstack/react-query')) return 'react-query';
                     if (id.includes('@inertiajs')) return 'inertia';

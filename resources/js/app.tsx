@@ -12,7 +12,17 @@ import { AntdStaticHelper } from '@/Utils/antdHelper';
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1000,
+            gcTime: 10 * 60 * 1000,
+            refetchOnWindowFocus: false,
+            refetchOnReconnect: false,
+            retry: 1,
+        },
+    },
+});
 
 // 🛡️ 401 Unauthorized handler - otomatik login'e yönlendir
 window.addEventListener('auth:unauthorized', () => {
