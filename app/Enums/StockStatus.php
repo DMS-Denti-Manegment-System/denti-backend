@@ -12,7 +12,7 @@ enum StockStatus: string
 
     public function label(): string
     {
-        return match($this) {
+        return match ($this) {
             self::ACTIVE => 'Aktif',
             self::INACTIVE => 'Pasif',
             self::DELETED => 'Silindi',

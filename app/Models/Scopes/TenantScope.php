@@ -14,7 +14,7 @@ class TenantScope implements Scope
      */
     public function apply(Builder $builder, Model $model): void
     {
-        // User modeli için global scope'u devre dışı bırakıyoruz 
+        // User modeli için global scope'u devre dışı bırakıyoruz
         // çünkü Sanctum user'ı çekerken bu scope sonsuz döngüye giriyor.
         if ($model instanceof \App\Models\User) {
             return;
@@ -22,7 +22,7 @@ class TenantScope implements Scope
 
         if (Auth::check()) {
             $user = Auth::user();
-            
+
             // ✅ KRİTİK: DB query yerine User modeli üzerindeki cached metodu kullanıyoruz.
             // Bu sayede her TenantScope tetiklendiğinde DB'ye gitmiyoruz.
             if ($user->isSuperAdmin()) {
@@ -30,8 +30,8 @@ class TenantScope implements Scope
             }
 
             $builder->where(function ($query) use ($user, $model) {
-                $query->where($model->getTable() . '.company_id', $user->company_id)
-                      ->orWhereNull($model->getTable() . '.company_id');
+                $query->where($model->getTable().'.company_id', $user->company_id)
+                    ->orWhereNull($model->getTable().'.company_id');
             });
         }
     }

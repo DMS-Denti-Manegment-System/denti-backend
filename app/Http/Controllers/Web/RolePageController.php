@@ -71,7 +71,7 @@ class RolePageController extends Controller
         ]);
 
         $requestedPermissions = $request->permissions;
-        if (!auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->hasRole('Super Admin')) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }
@@ -90,7 +90,7 @@ class RolePageController extends Controller
     public function edit(Role $role): RedirectResponse
     {
         abort_if($role->company_id !== null && $role->company_id !== auth()->user()->company_id, 403);
-        abort_if($role->company_id === null && !auth()->user()->isSuperAdmin(), 403);
+        abort_if($role->company_id === null && ! auth()->user()->isSuperAdmin(), 403);
 
         return redirect()->route('roles.index', ['modal' => 'edit', 'edit' => $role->id]);
     }
@@ -98,12 +98,12 @@ class RolePageController extends Controller
     public function update(UpdateRoleRequest $request, Role $role): RedirectResponse|JsonResponse
     {
         abort_if($role->company_id !== null && $role->company_id !== auth()->user()->company_id, 403);
-        abort_if($role->company_id === null && !auth()->user()->isSuperAdmin(), 403);
+        abort_if($role->company_id === null && ! auth()->user()->isSuperAdmin(), 403);
 
         $role->update(['name' => $request->name]);
 
         $requestedPermissions = $request->permissions;
-        if (!auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->hasRole('Super Admin')) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }

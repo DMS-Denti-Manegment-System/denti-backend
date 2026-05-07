@@ -3,7 +3,6 @@
 namespace App\Observers;
 
 use App\Models\StockTransaction;
-use Illuminate\Support\Facades\DB;
 
 class StockTransactionObserver
 {
@@ -31,7 +30,7 @@ class StockTransactionObserver
     private function updateStockLevel(StockTransaction $transaction, string $action): void
     {
         $stock = $transaction->stock;
-        if (!$stock) {
+        if (! $stock) {
             return;
         }
 
@@ -50,7 +49,7 @@ class StockTransactionObserver
 
         // If we are reversing (deleting), flip the direction
         if ($action === 'reverse') {
-            $isPositive = !$isPositive;
+            $isPositive = ! $isPositive;
         }
 
         $quantity = (int) $transaction->quantity;
@@ -66,10 +65,10 @@ class StockTransactionObserver
             } else {
                 $stock->decrement('current_stock', $quantity);
             }
-            
+
             // Sync available_stock (current - reserved)
             $stock->updateQuietly([
-                'available_stock' => $stock->current_stock - $stock->reserved_stock
+                'available_stock' => $stock->current_stock - $stock->reserved_stock,
             ]);
         }
 
@@ -84,7 +83,7 @@ class StockTransactionObserver
     private function handleSubUnitCalculation($stock, int $quantity, bool $isPositive): void
     {
         $multiplier = (int) $stock->sub_unit_multiplier;
-        
+
         // Load fresh data to ensure we have the latest sub-stock levels
         $stock->refresh();
 

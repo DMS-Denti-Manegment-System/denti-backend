@@ -22,12 +22,13 @@ class StockAlertObserver
 
         try {
             $recipients = $this->getAlertRecipients($alert);
-            
+
             if (empty($recipients)) {
                 Log::warning('Stock alert created but no recipients found', [
                     'alert_id' => $alert->id,
                     'alert_type' => $alert->type,
                 ]);
+
                 return;
             }
 
@@ -36,15 +37,15 @@ class StockAlertObserver
                 case 'critical_stock':
                     $this->sendLowStockAlert($alert, $recipients);
                     break;
-                    
+
                 case 'near_expiry':
                     $this->sendExpiryAlert($alert, $recipients, 'warning');
                     break;
-                    
+
                 case 'critical_expiry':
                     $this->sendExpiryAlert($alert, $recipients, 'critical');
                     break;
-                    
+
                 case 'expired':
                     $this->sendExpiryAlert($alert, $recipients, 'expired');
                     break;
@@ -72,11 +73,12 @@ class StockAlertObserver
     private function sendLowStockAlert(StockAlert $alert, array $recipients): void
     {
         $product = $alert->product ?? $alert->stock?->product;
-        
-        if (!$product) {
+
+        if (! $product) {
             Log::warning('Cannot send low stock alert - product not found', [
                 'alert_id' => $alert->id,
             ]);
+
             return;
         }
 
@@ -90,11 +92,12 @@ class StockAlertObserver
     private function sendExpiryAlert(StockAlert $alert, array $recipients, string $alertType): void
     {
         $stock = $alert->stock;
-        
-        if (!$stock) {
+
+        if (! $stock) {
             Log::warning('Cannot send expiry alert - stock not found', [
                 'alert_id' => $alert->id,
             ]);
+
             return;
         }
 
@@ -108,8 +111,8 @@ class StockAlertObserver
     private function getAlertRecipients(StockAlert $alert): array
     {
         $company = $alert->company;
-        
-        if (!$company) {
+
+        if (! $company) {
             return [];
         }
 

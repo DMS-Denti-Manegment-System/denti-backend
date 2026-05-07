@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\DB;
 
 class StockTransferController extends Controller
 {
-
     /**
      * Transfer listesi (şirket bazlı)
      */
@@ -32,7 +31,7 @@ class StockTransferController extends Controller
             'requestedBy:id,name',
             'approvedBy:id,name',
         ])
-        ->where('company_id', $user->company_id);
+            ->where('company_id', $user->company_id);
 
         // Klinik filtresi
         if ($clinicId) {
@@ -74,7 +73,7 @@ class StockTransferController extends Controller
         $stock = Stock::with('product')->findOrFail($validated['stock_id']);
 
         // Yetki kontrolü: Kaynak klinikte stok görme yetkisi
-        if ($stock->clinic_id !== $user->clinic_id && !$user->hasPermissionTo('transfer-stocks')) {
+        if ($stock->clinic_id !== $user->clinic_id && ! $user->hasPermissionTo('transfer-stocks')) {
             \Log::warning('Transfer yetki hatası', [
                 'user_id' => $user->id,
                 'user_clinic_id' => $user->clinic_id,
@@ -85,6 +84,7 @@ class StockTransferController extends Controller
             if (is_null($user->clinic_id)) {
                 return $this->error('Kullanıcıya atanmış bir klinik bulunmuyor. Lütfen yöneticinize başvurun.', 403);
             }
+
             return $this->error('Bu stok için transfer yetkiniz yok.', 403);
         }
 
@@ -135,7 +135,8 @@ class StockTransferController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->error('Transfer oluşturulurken hata: ' . $e->getMessage(), 500);
+
+            return $this->error('Transfer oluşturulurken hata: '.$e->getMessage(), 500);
         }
     }
 
@@ -155,8 +156,8 @@ class StockTransferController extends Controller
             'approvedBy:id,name,email',
             'completedBy:id,name,email',
         ])
-        ->where('company_id', $user->company_id)
-        ->findOrFail($id);
+            ->where('company_id', $user->company_id)
+            ->findOrFail($id);
 
         return $this->success($transfer, 'Transfer details retrieved.');
     }
@@ -172,15 +173,16 @@ class StockTransferController extends Controller
             ->findOrFail($id);
 
         // Yetki kontrolü: Hedef klinik yetkilisi mi?
-        if ($transfer->to_clinic_id !== $user->clinic_id && !$user->hasPermissionTo('approve-transfers')) {
+        if ($transfer->to_clinic_id !== $user->clinic_id && ! $user->hasPermissionTo('approve-transfers')) {
             if (is_null($user->clinic_id)) {
                 return $this->error('Kullanıcıya atanmış bir klinik bulunmuyor. Lütfen yöneticinize başvurun.', 403);
             }
+
             return $this->error('Bu transferi onaylama yetkiniz yok.', 403);
         }
 
-        if (!$transfer->canApprove()) {
-            return $this->error('Bu transfer onaylanamaz. Durum: ' . $transfer->status_label, 422);
+        if (! $transfer->canApprove()) {
+            return $this->error('Bu transfer onaylanamaz. Durum: '.$transfer->status_label, 422);
         }
 
         $stock = Stock::findOrFail($transfer->stock_id);
@@ -255,7 +257,8 @@ class StockTransferController extends Controller
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return $this->error('Transfer onaylanırken hata: ' . $e->getMessage(), 500);
+
+            return $this->error('Transfer onaylanırken hata: '.$e->getMessage(), 500);
         }
     }
 
@@ -274,14 +277,15 @@ class StockTransferController extends Controller
             ->findOrFail($id);
 
         // Yetki kontrolü
-        if ($transfer->to_clinic_id !== $user->clinic_id && !$user->hasPermissionTo('approve-transfers')) {
+        if ($transfer->to_clinic_id !== $user->clinic_id && ! $user->hasPermissionTo('approve-transfers')) {
             if (is_null($user->clinic_id)) {
                 return $this->error('Kullanıcıya atanmış bir klinik bulunmuyor. Lütfen yöneticinize başvurun.', 403);
             }
+
             return $this->error('Bu transferi reddetme yetkiniz yok.', 403);
         }
 
-        if (!$transfer->canReject()) {
+        if (! $transfer->canReject()) {
             return $this->error('Bu transfer reddedilemez.', 422);
         }
 
@@ -314,11 +318,11 @@ class StockTransferController extends Controller
             ->findOrFail($id);
 
         // Yetki kontrolü: Sadece isteyen veya admin
-        if ($transfer->requested_by !== $user->id && !$user->hasPermissionTo('cancel-transfers')) {
+        if ($transfer->requested_by !== $user->id && ! $user->hasPermissionTo('cancel-transfers')) {
             return $this->error('Bu transferi iptal etme yetkiniz yok.', 403);
         }
 
-        if (!$transfer->canCancel()) {
+        if (! $transfer->canCancel()) {
             return $this->error('Bu transfer iptal edilemez.', 422);
         }
 

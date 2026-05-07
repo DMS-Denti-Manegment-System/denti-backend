@@ -3,15 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Services\TodoService;
 use App\Http\Requests\StoreTodoRequest;
 use App\Http\Requests\UpdateTodoRequest;
+use App\Services\TodoService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class TodoController extends Controller
 {
-
     protected $todoService;
 
     public function __construct(TodoService $todoService)
@@ -22,6 +20,7 @@ class TodoController extends Controller
     public function index(): JsonResponse
     {
         $todos = $this->todoService->getAllTodos();
+
         return $this->success($todos, 'Todos retrieved successfully');
     }
 
@@ -29,6 +28,7 @@ class TodoController extends Controller
     {
         try {
             $todo = $this->todoService->createTodo($request->validated());
+
             return $this->success($todo->load('category'), 'Todo created successfully', 201);
         } catch (\Exception $e) {
             return $this->error($e->getMessage());
@@ -39,7 +39,7 @@ class TodoController extends Controller
     {
         $todo = $this->todoService->getTodoById($id);
 
-        if (!$todo) {
+        if (! $todo) {
             return $this->error('Todo not found', 404);
         }
 
@@ -51,7 +51,7 @@ class TodoController extends Controller
         try {
             $todo = $this->todoService->updateTodo($id, $request->validated());
 
-            if (!$todo) {
+            if (! $todo) {
                 return $this->error('Todo not found', 404);
             }
 
@@ -66,7 +66,7 @@ class TodoController extends Controller
         try {
             $deleted = $this->todoService->deleteTodo($id);
 
-            if (!$deleted) {
+            if (! $deleted) {
                 return $this->error('Todo not found', 404);
             }
 
@@ -81,7 +81,7 @@ class TodoController extends Controller
         try {
             $todo = $this->todoService->toggleTodoStatus($id);
 
-            if (!$todo) {
+            if (! $todo) {
                 return $this->error('Todo not found', 404);
             }
 
@@ -94,6 +94,7 @@ class TodoController extends Controller
     public function stats(): JsonResponse
     {
         $stats = $this->todoService->getTodoStats();
+
         return $this->success($stats, 'Todo statistics retrieved successfully');
     }
 
@@ -101,6 +102,7 @@ class TodoController extends Controller
     {
         try {
             $todos = $this->todoService->getTodosByCategory($categoryId);
+
             return $this->success($todos, 'Todos by category retrieved successfully');
         } catch (\Exception $e) {
             return $this->error($e->getMessage());

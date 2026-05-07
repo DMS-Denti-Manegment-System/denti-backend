@@ -41,10 +41,15 @@ class StockTransfer extends Model
 
     // Durum sabitleri
     const STATUS_PENDING = 'pending';
+
     const STATUS_APPROVED = 'approved';
+
     const STATUS_IN_TRANSIT = 'in_transit';
+
     const STATUS_COMPLETED = 'completed';
+
     const STATUS_REJECTED = 'rejected';
+
     const STATUS_CANCELLED = 'cancelled';
 
     // İlişkiler
@@ -108,7 +113,7 @@ class StockTransfer extends Model
     {
         return $query->where(function ($q) use ($clinicId) {
             $q->where('from_clinic_id', $clinicId)
-              ->orWhere('to_clinic_id', $clinicId);
+                ->orWhere('to_clinic_id', $clinicId);
         });
     }
 
@@ -171,7 +176,7 @@ class StockTransfer extends Model
     // Status label
     public function getStatusLabelAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_PENDING => 'Beklemede',
             self::STATUS_APPROVED => 'Onaylandı',
             self::STATUS_IN_TRANSIT => 'Transfer Sürecinde',
@@ -185,7 +190,7 @@ class StockTransfer extends Model
     // Status color (UI için)
     public function getStatusColorAttribute(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             self::STATUS_PENDING => 'orange',
             self::STATUS_APPROVED => 'blue',
             self::STATUS_IN_TRANSIT => 'cyan',

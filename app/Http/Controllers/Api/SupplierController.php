@@ -1,95 +1,51 @@
 <?php
-// app/Modules/Stock/Controllers/SupplierController.php - DÜZELTİLMİŞ
 
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreSupplierRequest;
 use App\Services\SupplierService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class SupplierController extends Controller
 {
-    protected $supplierService;
-
-    public function __construct(SupplierService $supplierService)
-    {
-        $this->supplierService = $supplierService;
-    }
+    public function __construct(protected SupplierService $supplierService) {}
 
     public function index(Request $request)
     {
         $filters = $request->only(['search', 'status']);
-        return response()->json([
-            'success' => true,
-            'data' => $this->supplierService->getAllWithFilters($filters)
-        ]);
+
+        return $this->success($this->supplierService->getAllWithFilters($filters));
     }
 
-    public function store(Request $request)
+    public function store(StoreSupplierRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'contact_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'tax_number' => 'nullable|string|max:50',
-            'is_active' => 'boolean',
-            'additional_info' => 'nullable|array'
-        ]);
+        $supplier = $this->supplierService->createSupplier($request->validated());
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
-
-        try {
-            $supplier = $this->supplierService->createSupplier($validator->validated());
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Tedarikçi başarıyla oluşturuldu',
-                'data' => $supplier
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        return $this->success($supplier, 'Tedarikci basariyla olusturuldu', 201);
     }
 
     public function show($id)
     {
         $supplier = $this->supplierService->getSupplierById($id);
 
-        if (!$supplier) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Tedarikçi bulunamadı'
-            ], 404);
+        if (! $supplier) {
+            return $this->error('Tedarikci bulunamadi', 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $supplier
-        ]);
+        return $this->success($supplier);
     }
 
     public function update(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'name' => [
                 'sometimes',
                 'required',
                 'string',
                 'max:255',
-                \Illuminate\Validation\Rule::unique('suppliers')->where(function ($query) {
-                    return $query->where('company_id', auth()->user()->company_id);
-                })->ignore($id)
+                Rule::unique('suppliers')->where(fn ($query) => $query->where('company_id', auth()->user()->company_id))->ignore($id),
             ],
             'contact_person' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
@@ -97,86 +53,41 @@ class SupplierController extends Controller
             'address' => 'nullable|string',
             'tax_number' => 'nullable|string|max:50',
             'is_active' => 'boolean',
-            'additional_info' => 'nullable|array'
+            'additional_info' => 'nullable|array',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+        $supplier = $this->supplierService->updateSupplier($id, $validated);
+
+        if (! $supplier) {
+            return $this->error('Tedarikci bulunamadi', 404);
         }
 
-        try {
-            $supplier = $this->supplierService->updateSupplier($id, $validator->validated());
-
-            if (!$supplier) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tedarikçi bulunamadı'
-                ], 404);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Tedarikçi başarıyla güncellendi',
-                'data' => $supplier
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        return $this->success($supplier, 'Tedarikci basariyla guncellendi');
     }
 
     public function destroy($id)
     {
-        try {
-            $supplier = $this->supplierService->getSupplierById($id);
-            if (!$supplier) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tedarikçi bulunamadı'
-                ], 404);
-            }
+        $supplier = $this->supplierService->getSupplierById($id);
 
-            // Ownership check
-            if (!auth()->user()->hasRole('Super Admin') && $supplier->company_id !== auth()->user()->company_id) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Bu işlem için yetkiniz yok.'
-                ], 403);
-            }
-
-            $deleted = $this->supplierService->deleteSupplier($id);
-
-            if (!$deleted) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Tedarikçi silme işlemi başarısız'
-                ], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Tedarikçi başarıyla silindi'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Silme hatası: ' . $e->getMessage()
-            ], 400);
+        if (! $supplier) {
+            return $this->error('Tedarikci bulunamadi', 404);
         }
+
+        if (! auth()->user()->hasRole('Super Admin') && $supplier->company_id !== auth()->user()->company_id) {
+            return $this->error('Bu islem icin yetkiniz yok.', 403);
+        }
+
+        $deleted = $this->supplierService->deleteSupplier($id);
+
+        if (! $deleted) {
+            return $this->error('Tedarikci silme islemi basarisiz', 400);
+        }
+
+        return $this->success(null, 'Tedarikci basariyla silindi');
     }
 
     public function getActive()
     {
-        $suppliers = $this->supplierService->getActiveSuppliers();
-
-        return response()->json([
-            'success' => true,
-            'data' => $suppliers
-        ]);
+        return $this->success($this->supplierService->getActiveSuppliers());
     }
 }

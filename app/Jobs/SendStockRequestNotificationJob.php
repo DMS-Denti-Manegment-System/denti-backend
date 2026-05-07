@@ -33,7 +33,7 @@ class SendStockRequestNotificationJob implements ShouldQueue
         // Log için
         \Log::info('Stock request notification sent', [
             'request_id' => $this->stockRequest->id,
-            'request_number' => $this->stockRequest->request_number
+            'request_number' => $this->stockRequest->request_number,
         ]);
     }
 }

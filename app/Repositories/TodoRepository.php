@@ -1,4 +1,5 @@
 <?php
+
 // app/Repositories/TodoRepository.php
 
 namespace App\Repositories;
@@ -36,14 +37,17 @@ class TodoRepository implements TodoRepositoryInterface
         $todo = $this->find($id);
         if ($todo) {
             $todo->update($data);
+
             return $todo;
         }
+
         return null;
     }
 
     public function delete(int $id): bool
     {
         $todo = $this->find($id);
+
         return $todo ? $todo->delete() : false;
     }
 

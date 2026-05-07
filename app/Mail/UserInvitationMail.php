@@ -14,6 +14,7 @@ class UserInvitationMail extends Mailable
     use Queueable, SerializesModels;
 
     public $invitation;
+
     public $inviteUrl;
 
     /**

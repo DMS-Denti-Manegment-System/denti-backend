@@ -29,7 +29,7 @@ class ProductResource extends JsonResource
             'clinic_name' => $this->clinic?->name,
             'clinics' => $this->batches->pluck('clinic.name')->unique()->filter()->values(),
             'has_expiration_date' => $this->has_expiration_date,
-            
+
             // Finansal Bilgiler
             'average_cost' => $this->averageCost,
             'last_purchase_price' => $this->lastPurchasePrice,
@@ -37,11 +37,11 @@ class ProductResource extends JsonResource
             'potential_revenue' => $this->potentialRevenue,
             'potential_profit' => $this->potentialProfit,
             'profit_margin' => $this->profitMargin,
-            
+
             // Transaction Summary
             'total_in' => $this->totalIn,
             'total_out' => $this->totalOut,
-            
+
             'batches' => StockResource::collection($this->whenLoaded('batches')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

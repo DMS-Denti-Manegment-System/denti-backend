@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         // 1. Create products table if not exists
-        if (!Schema::hasTable('products')) {
+        if (! Schema::hasTable('products')) {
             Schema::create('products', function (Blueprint $table) {
                 $table->id();
                 $table->string('name');
@@ -21,23 +21,23 @@ return new class extends Migration
                 $table->string('unit')->default('adet');
                 $table->string('category')->nullable();
                 $table->string('brand')->nullable();
-                
+
                 $table->integer('min_stock_level')->default(10);
                 $table->integer('critical_stock_level')->default(5);
                 $table->integer('yellow_alert_level')->default(10);
                 $table->integer('red_alert_level')->default(5);
-                
+
                 $table->boolean('is_active')->default(true);
                 $table->foreignId('company_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
                 $table->softDeletes();
-                
+
                 $table->index(['name', 'company_id']);
             });
         }
 
         // 2. Add product_id to stocks table if not exists
-        if (!Schema::hasColumn('stocks', 'product_id')) {
+        if (! Schema::hasColumn('stocks', 'product_id')) {
             Schema::table('stocks', function (Blueprint $table) {
                 $table->foreignId('product_id')->nullable()->after('id')->constrained('products')->onDelete('cascade');
             });
@@ -50,7 +50,7 @@ return new class extends Migration
                 ->where('company_id', $stock->company_id)
                 ->value('id');
 
-            if (!$productId) {
+            if (! $productId) {
                 $productId = DB::table('products')->insertGetId([
                     'name' => $stock->name,
                     'sku' => $stock->code,
@@ -74,9 +74,24 @@ return new class extends Migration
 
         // 4. Clean up stocks table
         // Drop indexes one by one (to ignore if already dropped)
-        try { Schema::table('stocks', function (Blueprint $table) { $table->dropIndex(['name', 'status']); }); } catch (\Exception $e) {}
-        try { Schema::table('stocks', function (Blueprint $table) { $table->dropIndex(['current_stock', 'min_stock_level']); }); } catch (\Exception $e) {}
-        try { Schema::table('stocks', function (Blueprint $table) { $table->dropUnique(['code']); }); } catch (\Exception $e) {}
+        try {
+            Schema::table('stocks', function (Blueprint $table) {
+                $table->dropIndex(['name', 'status']);
+            });
+        } catch (\Exception $e) {
+        }
+        try {
+            Schema::table('stocks', function (Blueprint $table) {
+                $table->dropIndex(['current_stock', 'min_stock_level']);
+            });
+        } catch (\Exception $e) {
+        }
+        try {
+            Schema::table('stocks', function (Blueprint $table) {
+                $table->dropUnique(['code']);
+            });
+        } catch (\Exception $e) {
+        }
 
         // Finally drop columns
         Schema::table('stocks', function (Blueprint $table) {
@@ -86,8 +101,8 @@ return new class extends Migration
                     $columnsToDrop[] = $col;
                 }
             }
-            
-            if (!empty($columnsToDrop)) {
+
+            if (! empty($columnsToDrop)) {
                 $table->dropColumn($columnsToDrop);
             }
         });

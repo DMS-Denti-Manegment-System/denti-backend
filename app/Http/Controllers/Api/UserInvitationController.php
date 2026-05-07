@@ -17,7 +17,6 @@ use Illuminate\Support\Str;
 
 class UserInvitationController extends Controller
 {
-
     /**
      * Invite a new user to the company.
      */
@@ -39,7 +38,7 @@ class UserInvitationController extends Controller
             'expires_at' => now()->addHours(24),
         ]);
 
-        $inviteUrl = config('app.frontend_url') . '/accept-invitation/' . $invitation->token;
+        $inviteUrl = config('app.frontend_url').'/accept-invitation/'.$invitation->token;
 
         Mail::to($request->email)->send(new UserInvitationMail($invitation, $inviteUrl));
 
@@ -55,7 +54,7 @@ class UserInvitationController extends Controller
             ->whereNull('accepted_at')
             ->first();
 
-        if (!$invitation || $invitation->isExpired()) {
+        if (! $invitation || $invitation->isExpired()) {
             return $this->error('Invitation is invalid or has expired.', 422);
         }
 

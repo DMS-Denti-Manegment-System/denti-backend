@@ -18,8 +18,8 @@ class EnsureTwoFactorIsVerified
         $user = $request->user();
 
         // Kullanıcı login olmuş ve 2FA aktifse ama session'da doğrulanmamışsa
-        if ($user && $user->hasTwoFactorEnabled() && !$request->session()->has('2fa_verified')) {
-            
+        if ($user && $user->hasTwoFactorEnabled() && ! $request->session()->has('2fa_verified')) {
+
             // İstisna: 2FA doğrulama endpoint'lerine erişebilmeli
             if ($request->is('api/auth/2fa/verify') || $request->is('api/auth/logout')) {
                 return $next($request);

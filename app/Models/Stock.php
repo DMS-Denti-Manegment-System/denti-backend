@@ -1,9 +1,9 @@
 <?php
+
 // app/Modules/Stock/Models/Stock.php
 
 namespace App\Models;
 
-use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Stock extends Model
 {
-    use HasFactory, Tenantable, SoftDeletes;
-    
+    use HasFactory, SoftDeletes, Tenantable;
+
     protected $appends = [];
 
     protected $fillable = [
@@ -24,7 +24,7 @@ class Stock extends Model
         'expiry_yellow_days', 'expiry_red_days',
         'clinic_id', 'storage_location',
         'has_sub_unit', 'sub_unit_name', 'sub_unit_multiplier', 'current_sub_stock',
-        'company_id'
+        'company_id',
     ];
 
     // İlişkiler
@@ -60,6 +60,7 @@ class Stock extends Model
         'has_sub_unit' => false,
         'current_sub_stock' => 0,
     ];
+
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
@@ -96,10 +97,10 @@ class Stock extends Model
      */
     public static function totalBaseUnitsRaw(): string
     {
-        return "(CASE 
+        return '(CASE 
                     WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock 
                     ELSE current_stock 
-                 END)";
+                 END)';
     }
 
     // Scope'lar
@@ -116,56 +117,66 @@ class Stock extends Model
     public function scopeLowStock($query)
     {
         return $query->join('products', 'stocks.product_id', '=', 'products.id')
-                     ->whereRaw(self::totalBaseUnitsRaw() . ' <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
-                     ->where('stocks.is_active', true)
-                     ->select('stocks.*');
+            ->whereRaw(self::totalBaseUnitsRaw().' <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
+            ->where('stocks.is_active', true)
+            ->select('stocks.*');
     }
 
     public function scopeCriticalStock($query)
     {
         return $query->join('products', 'stocks.product_id', '=', 'products.id')
-                     ->whereRaw(self::totalBaseUnitsRaw() . ' <= COALESCE(products.red_alert_level, products.critical_stock_level)')
-                     ->where('stocks.is_active', true)
-                     ->select('stocks.*');
+            ->whereRaw(self::totalBaseUnitsRaw().' <= COALESCE(products.red_alert_level, products.critical_stock_level)')
+            ->where('stocks.is_active', true)
+            ->select('stocks.*');
     }
 
     public function scopeNearExpiry($query, $days = null)
     {
         return $query->where('track_expiry', true)
-                    ->where('expiry_date', '<=', today()->addDays($days ?? 30))
-                    ->where('expiry_date', '>', today())
-                    ->where('is_active', true);
+            ->where('expiry_date', '<=', today()->addDays($days ?? 30))
+            ->where('expiry_date', '>', today())
+            ->where('is_active', true);
     }
 
     public function scopeExpired($query)
     {
         return $query->where('track_expiry', true)
-                    ->where('expiry_date', '<', today())
-                    ->where('is_active', true);
+            ->where('expiry_date', '<', today())
+            ->where('is_active', true);
     }
 
     // Accessor'lar
     public function getTotalBaseUnitsAttribute()
     {
-        if (!$this->has_sub_unit) {
+        if (! $this->has_sub_unit) {
             return $this->current_stock;
         }
+
         return ($this->current_stock * ($this->sub_unit_multiplier ?? 1)) + $this->current_sub_stock;
     }
 
     public function getStockStatusAttribute()
     {
-        if (!$this->is_active) return \App\Enums\StockStatus::INACTIVE->value;
-        
+        if (! $this->is_active) {
+            return \App\Enums\StockStatus::INACTIVE->value;
+        }
+
         $product = $this->product;
-        if (!$product) return 'normal';
+        if (! $product) {
+            return 'normal';
+        }
 
         $total = $this->total_base_units;
         $redLevel = $product->red_alert_level ?? $product->critical_stock_level;
         $yellowLevel = $product->yellow_alert_level ?? $product->min_stock_level;
 
-        if ($total <= $redLevel) return 'critical';
-        if ($total <= $yellowLevel) return \App\Enums\StockStatus::LOW_STOCK->value;
+        if ($total <= $redLevel) {
+            return 'critical';
+        }
+        if ($total <= $yellowLevel) {
+            return \App\Enums\StockStatus::LOW_STOCK->value;
+        }
+
         return 'normal';
     }
 
@@ -183,19 +194,30 @@ class Stock extends Model
 
     public function getExpiryStatusAttribute()
     {
-        if (!$this->track_expiry || !$this->expiry_date) return 'normal';
-        if ($this->expiry_date < today()) return 'expired';
-        
+        if (! $this->track_expiry || ! $this->expiry_date) {
+            return 'normal';
+        }
+        if ($this->expiry_date < today()) {
+            return 'expired';
+        }
+
         $days = $this->days_to_expiry;
-        if ($days <= ($this->expiry_red_days ?? 15)) return 'critical';
-        if ($days <= ($this->expiry_yellow_days ?? 30)) return 'warning';
-        
+        if ($days <= ($this->expiry_red_days ?? 15)) {
+            return 'critical';
+        }
+        if ($days <= ($this->expiry_yellow_days ?? 30)) {
+            return 'warning';
+        }
+
         return 'normal';
     }
 
     public function getDaysToExpiryAttribute()
     {
-        if (!$this->track_expiry || !$this->expiry_date) return null;
+        if (! $this->track_expiry || ! $this->expiry_date) {
+            return null;
+        }
+
         return now()->diffInDays($this->expiry_date, false);
     }
 
@@ -213,7 +235,7 @@ class Stock extends Model
             // Soft delete sırasında status'ü güncelle ve uyarılrı sil
             $stock->status = \App\Enums\StockStatus::DELETED;
             $stock->saveQuietly();
-            
+
             // Bağlı uyarıları sil
             $stock->alerts()->delete();
         });

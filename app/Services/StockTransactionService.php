@@ -7,10 +7,10 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\StockTransactionRepositoryInterface;
 use App\Models\StockTransaction;
-use Illuminate\Database\Eloquent\Collection;
+use App\Repositories\Interfaces\StockTransactionRepositoryInterface;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class StockTransactionService
 {
@@ -46,12 +46,12 @@ class StockTransactionService
         return $this->stockTransactionRepository->getByClinic($clinicId);
     }
 
-    public function getTransactionsByDateRange(Carbon $startDate, Carbon $endDate, int $clinicId = null): Collection
+    public function getTransactionsByDateRange(Carbon $startDate, Carbon $endDate, ?int $clinicId = null): Collection
     {
         return $this->stockTransactionRepository->getByDateRange($startDate, $endDate, $clinicId);
     }
 
-    public function getTransactionsByType(string $type, int $clinicId = null): Collection
+    public function getTransactionsByType(string $type, ?int $clinicId = null): Collection
     {
         return $this->stockTransactionRepository->getByType($type, $clinicId);
     }

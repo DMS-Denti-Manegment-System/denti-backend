@@ -15,6 +15,7 @@ class CheckStockLevelsJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $stockId;
+
     protected $companyId;
 
     public function __construct(int $stockId, int $companyId)

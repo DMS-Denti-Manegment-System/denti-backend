@@ -9,8 +9,8 @@ namespace App\Repositories;
 
 use App\Models\StockTransaction;
 use App\Repositories\Interfaces\StockTransactionRepositoryInterface;
-use Illuminate\Database\Eloquent\Collection;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class StockTransactionRepository implements StockTransactionRepositoryInterface
 {
@@ -24,8 +24,8 @@ class StockTransactionRepository implements StockTransactionRepositoryInterface
     public function all(): Collection
     {
         return $this->model->with(['stock', 'clinic'])
-                          ->orderByDesc('transaction_date')
-                          ->get();
+            ->orderByDesc('transaction_date')
+            ->get();
     }
 
     public function find(int $id): ?StockTransaction
@@ -41,20 +41,20 @@ class StockTransactionRepository implements StockTransactionRepositoryInterface
     public function getByStock(int $stockId): Collection
     {
         return $this->model->where('stock_id', $stockId)
-                          ->with(['clinic'])
-                          ->orderByDesc('transaction_date')
-                          ->get();
+            ->with(['clinic'])
+            ->orderByDesc('transaction_date')
+            ->get();
     }
 
     public function getByClinic(int $clinicId): Collection
     {
         return $this->model->where('clinic_id', $clinicId)
-                          ->with(['stock'])
-                          ->orderByDesc('transaction_date')
-                          ->get();
+            ->with(['stock'])
+            ->orderByDesc('transaction_date')
+            ->get();
     }
 
-    public function getByDateRange(Carbon $startDate, Carbon $endDate, int $clinicId = null): Collection
+    public function getByDateRange(Carbon $startDate, Carbon $endDate, ?int $clinicId = null): Collection
     {
         $query = $this->model->byDateRange($startDate, $endDate)->with(['stock', 'clinic']);
 
@@ -65,7 +65,7 @@ class StockTransactionRepository implements StockTransactionRepositoryInterface
         return $query->orderByDesc('transaction_date')->get();
     }
 
-    public function getByType(string $type, int $clinicId = null): Collection
+    public function getByType(string $type, ?int $clinicId = null): Collection
     {
         $query = $this->model->byType($type)->with(['stock', 'clinic']);
 

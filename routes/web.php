@@ -1,8 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Web\AuthPageController;
+use App\Http\Controllers\Health\HealthController;
 use App\Http\Controllers\Web\AdminCompanyPageController;
+use App\Http\Controllers\Web\AuthPageController;
 use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\OperationsPageController;
 use App\Http\Controllers\Web\RolePageController;
@@ -15,6 +16,7 @@ Route::get('/admin/login', [AuthPageController::class, 'adminLoginForm'])->name(
 Route::post('/admin/login', [AuthPageController::class, 'adminLogin'])->name('admin.login.store');
 Route::get('/accept-invitation/{token}', [AuthPageController::class, 'invitationForm'])->name('invitation.accept');
 Route::post('/accept-invitation', [AuthPageController::class, 'acceptInvitation'])->name('invitation.accept.store');
+Route::get('/up', HealthController::class)->name('health.up');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/', DashboardPageController::class)->name('dashboard');

@@ -1,12 +1,12 @@
 <?php
+
 // app/Modules/Stock/Services/StockAlertService.php
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\StockAlertRepositoryInterface;
 use App\Models\Stock;
 use App\Models\StockAlert;
-use App\Notifications\StockLowLevelNotification;
+use App\Repositories\Interfaces\StockAlertRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
 
@@ -22,9 +22,10 @@ class StockAlertService
     public function checkAndCreateAlerts(Stock $stock): void
     {
         $alerts = $this->calculateAlertsForStock($stock);
-        
+
         if (empty($alerts)) {
             $this->forceDeleteAlertsByProduct($stock->product_id);
+
             return;
         }
 
@@ -47,14 +48,14 @@ class StockAlertService
     protected function calculateAlertsForStock(Stock $stock): array
     {
         // Ensure product is loaded
-        if (!$stock->relationLoaded('product')) {
+        if (! $stock->relationLoaded('product')) {
             $stock->load('product');
         }
 
         $product = $stock->product;
 
         // Pasif stoklar veya ürünü olmayan stoklar için uyarı üretme
-        if (!$stock->is_active || !$product) {
+        if (! $stock->is_active || ! $product) {
             return [];
         }
 
@@ -74,7 +75,7 @@ class StockAlertService
                 'title' => 'Kritik Stok Seviyesi',
                 'message' => "{$product->name} için kritik stok seviyesine ulaşıldı. Toplam: {$currentValue} {$unitName}",
                 'current_stock_level' => $currentValue,
-                'threshold_level' => $redLevel
+                'threshold_level' => $redLevel,
             ];
         }
         // 2. Düşük Stok Kontrolü
@@ -85,7 +86,7 @@ class StockAlertService
                 'title' => 'Düşük Stok Seviyesi',
                 'message' => "{$product->name} stok miktarı azaldı. Toplam: {$currentValue} {$unitName}",
                 'current_stock_level' => $currentValue,
-                'threshold_level' => $yellowLevel
+                'threshold_level' => $yellowLevel,
             ];
         }
 
@@ -95,7 +96,7 @@ class StockAlertService
         $allBatches = $product->batches->filter(function ($batch) {
             return $batch->is_active && $batch->track_expiry && $batch->expiry_date !== null;
         });
-        
+
         if ($allBatches->isNotEmpty()) {
             $today = now();
             $mostUrgentBatch = null;
@@ -104,13 +105,13 @@ class StockAlertService
 
             foreach ($allBatches as $batch) {
                 $daysToExpiry = $today->diffInDays($batch->expiry_date, false);
-                
+
                 if ($daysToExpiry < 0) {
                     $hasExpired = true;
                     $mostUrgentBatch = $batch;
                     break; // En kritik durum, hemen çık
                 }
-                
+
                 if ($daysToExpiry < $mostUrgentDays) {
                     $mostUrgentDays = $daysToExpiry;
                     $mostUrgentBatch = $batch;
@@ -122,7 +123,7 @@ class StockAlertService
                     'type' => 'expired',
                     'title' => 'Süresi Geçen Ürün',
                     'message' => "{$product->name} ürününün son kullanma tarihi geçmiştir! (Parti: #{$mostUrgentBatch->id})",
-                    'expiry_date' => $mostUrgentBatch->expiry_date
+                    'expiry_date' => $mostUrgentBatch->expiry_date,
                 ];
             } elseif ($mostUrgentBatch) {
                 $redDays = $mostUrgentBatch->expiry_red_days ?? 10;
@@ -133,14 +134,14 @@ class StockAlertService
                         'type' => 'critical_expiry',
                         'title' => 'Kritik Son Kullanma Tarihi',
                         'message' => "{$product->name} ürününün son kullanma tarihine çok az kaldı! Kalan: {$mostUrgentDays} gün (Parti: #{$mostUrgentBatch->id})",
-                        'expiry_date' => $mostUrgentBatch->expiry_date
+                        'expiry_date' => $mostUrgentBatch->expiry_date,
                     ];
                 } elseif ($mostUrgentDays <= $yellowDays) {
                     $alerts[] = [
                         'type' => 'near_expiry',
                         'title' => 'Son Kullanma Tarihi Yaklaşıyor',
                         'message' => "{$product->name} ürününün son kullanma tarihi yaklaşıyor. Kalan: {$mostUrgentDays} gün (Parti: #{$mostUrgentBatch->id})",
-                        'expiry_date' => $mostUrgentBatch->expiry_date
+                        'expiry_date' => $mostUrgentBatch->expiry_date,
                     ];
                 }
             }
@@ -157,7 +158,7 @@ class StockAlertService
             'stock_id' => $stock->id,
             'clinic_id' => $stock->clinic_id,
             'is_active' => true,
-            'is_resolved' => false
+            'is_resolved' => false,
         ]);
 
         return $this->stockAlertRepository->create($alertData);
@@ -182,15 +183,19 @@ class StockAlertService
     public function sendDigestNotification(int $companyId, array $items): void
     {
         $company = \App\Models\Company::find($companyId);
-        if (!$company) return;
+        if (! $company) {
+            return;
+        }
 
         // Şirket sahibini veya yöneticileri bul
         $users = \App\Models\User::where('company_id', $companyId)
-            ->whereHas('roles', function($q) {
+            ->whereHas('roles', function ($q) {
                 $q->whereIn('name', ['Company Owner', 'Admin', 'Clinic Manager']);
             })->get();
 
-        if ($users->isEmpty()) return;
+        if ($users->isEmpty()) {
+            return;
+        }
 
         // Özet bildirimi gönder
         Notification::send($users, new \App\Notifications\StockAlertDigestNotification($items));
@@ -204,7 +209,7 @@ class StockAlertService
 
         // 1. Sistem kullanıcılarına (yöneticilere) bildirim gönder
         $users = \App\Models\User::where('company_id', $alert->stock->company_id)
-            ->whereHas('roles', function($q) {
+            ->whereHas('roles', function ($q) {
                 $q->whereIn('name', ['Company Owner', 'Admin', 'Stock Manager', 'Clinic Manager']);
             })->get();
 
@@ -215,9 +220,9 @@ class StockAlertService
         // 2. Şirket bazlı ek e-posta adreslerine gönder
         if ($company && $company->alert_emails) {
             $emails = array_map('trim', explode(',', $company->alert_emails));
-            $validEmails = array_filter($emails, fn($email) => filter_var($email, FILTER_VALIDATE_EMAIL));
-            
-            if (!empty($validEmails)) {
+            $validEmails = array_filter($emails, fn ($email) => filter_var($email, FILTER_VALIDATE_EMAIL));
+
+            if (! empty($validEmails)) {
                 \Illuminate\Support\Facades\Notification::route('mail', $validEmails)
                     ->notify(new \App\Notifications\StockLowLevelNotification($alert));
             }
@@ -234,11 +239,16 @@ class StockAlertService
         return $this->stockAlertRepository->getAlerts($filters);
     }
 
+    public function getAlertById(int $id): ?StockAlert
+    {
+        return $this->stockAlertRepository->find($id);
+    }
+
     /**
      * Tüm stokları tarayıp eksik uyarıları oluşturur.
      * Chunk kullanarak bellek verimliliği sağlar.
      */
-    public function syncAlerts(int $clinicId = null): int
+    public function syncAlerts(?int $clinicId = null): int
     {
         $query = Stock::with(['product.batches']);
         if ($clinicId) {
@@ -260,22 +270,22 @@ class StockAlertService
         return (bool) $this->stockAlertRepository->update($alertId, [
             'is_resolved' => true,
             'resolved_at' => now(),
-            'resolved_by' => $resolvedBy
+            'resolved_by' => $resolvedBy,
         ]);
     }
 
-    public function getAlertStatistics(int $clinicId = null): array
+    public function getAlertStatistics(?int $clinicId = null): array
     {
         return [
             'total_active' => $this->stockAlertRepository->countActiveAlerts($clinicId),
             'low_stock' => $this->stockAlertRepository->countAlertsByType('low_stock', $clinicId),
             'critical_stock' => $this->stockAlertRepository->countAlertsByType('critical_stock', $clinicId),
             'expired' => $this->stockAlertRepository->countAlertsByType('expired', $clinicId),
-            'near_expiry' => $this->stockAlertRepository->countAlertsByType('near_expiry', $clinicId)
+            'near_expiry' => $this->stockAlertRepository->countAlertsByType('near_expiry', $clinicId),
         ];
     }
 
-    public function getPendingCount(int $clinicId = null): int
+    public function getPendingCount(?int $clinicId = null): int
     {
         return $this->stockAlertRepository->countActiveAlerts($clinicId);
     }

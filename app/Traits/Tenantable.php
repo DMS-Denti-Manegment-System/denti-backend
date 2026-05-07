@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Scopes\TenantScope;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 trait Tenantable
@@ -15,8 +16,10 @@ trait Tenantable
         static::addGlobalScope(new TenantScope);
 
         static::creating(function ($model) {
-            if (Auth::check() && !isset($model->company_id)) {
-                $model->company_id = Auth::user()->company_id;
+            if (Auth::check() && ! isset($model->company_id)) {
+                /** @var User|null $user */
+                $user = Auth::user();
+                $model->company_id = $user?->company_id;
             }
             // ⚠️ NOT: Artisan komutlarında, Job'larda ve Seeder'larda Auth::check() false döner.
             // Bu bağlamlarda company_id null kalabilir veya DB hatası verebilir.

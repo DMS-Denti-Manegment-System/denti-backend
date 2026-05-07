@@ -19,11 +19,17 @@ class PageRenderingTest extends TestCase
     use RefreshDatabase;
 
     private Company $company;
+
     private Clinic $clinic;
+
     private User $user;
+
     private Product $product;
+
     private Category $category;
+
     private Supplier $supplier;
+
     private Todo $todo;
 
     protected function setUp(): void

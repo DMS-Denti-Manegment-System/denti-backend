@@ -29,4 +29,4 @@ foreach ($companies as $company) {
     }
 }
 
-echo "Default categories have been created/updated for " . $companies->count() . " companies.\n";
+echo 'Default categories have been created/updated for '.$companies->count()." companies.\n";

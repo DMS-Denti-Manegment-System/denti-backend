@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CategorySeeder extends Seeder
@@ -30,7 +29,7 @@ class CategorySeeder extends Seeder
                 \App\Models\Category::updateOrCreate(
                     [
                         'name' => $category['name'],
-                        'company_id' => $company->id
+                        'company_id' => $company->id,
                     ],
                     [
                         'color' => $category['color'],

@@ -1,4 +1,5 @@
 <?php
+
 // ==============================================
 // 6. StockAlert Model
 // app/Modules/Stock/Models/StockAlert.php
@@ -6,7 +7,6 @@
 
 namespace App\Models;
 
-use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -14,13 +14,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockAlert extends Model
 {
-    use Tenantable, SoftDeletes;
+    use SoftDeletes, Tenantable;
 
     protected $fillable = [
         'product_id', 'stock_id', 'clinic_id', 'type', 'title', 'message',
         'current_stock_level', 'threshold_level', 'expiry_date',
         'is_active', 'is_resolved', 'resolved_at', 'resolved_by',
-        'company_id'
+        'company_id',
     ];
 
     protected $casts = [
@@ -42,7 +42,7 @@ class StockAlert extends Model
      */
     public function getSeverityAttribute(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'critical_stock', 'expired' => 'critical',
             'low_stock', 'near_expiry' => 'high',
             default => 'medium'
@@ -76,7 +76,7 @@ class StockAlert extends Model
 
     public function getTypeTextAttribute()
     {
-        return match($this->type) {
+        return match ($this->type) {
             'low_stock' => 'Düşük Stok',
             'critical_stock' => 'Kritik Stok',
             'expired' => 'Süresi Geçen',
@@ -87,7 +87,7 @@ class StockAlert extends Model
 
     public function getTypeColorAttribute()
     {
-        return match($this->type) {
+        return match ($this->type) {
             'low_stock' => 'orange',
             'critical_stock' => 'red',
             'expired' => 'red',

@@ -1,9 +1,9 @@
 <?php
+
 // app/Models/Category.php
 
 namespace App\Models;
 
-use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -17,11 +17,11 @@ class Category extends Model
         'color',
         'description',
         'is_active',
-        'company_id'
+        'company_id',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 
     public function company(): BelongsTo

@@ -32,7 +32,7 @@ class ProductFactory extends Factory
             'company_id' => \App\Models\Company::factory(),
             'clinic_id' => null, // Optional
             'name' => $product['name'],
-            'sku' => $product['sku'] . '-' . $this->faker->randomNumber(3),
+            'sku' => $product['sku'].'-'.$this->faker->randomNumber(3),
             'description' => $this->faker->sentence(),
             'unit' => $product['unit'],
             'category' => $product['category'],

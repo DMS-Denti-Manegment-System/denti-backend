@@ -11,7 +11,6 @@ use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-
     /**
      * List all roles for the current user's company.
      */
@@ -19,13 +18,13 @@ class RoleController extends Controller
     {
         // Şirkete özel roller + Sistem genelindeki roller (Super Admin vb.)
         $roles = Role::withoutGlobalScopes()
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->where('company_id', auth()->user()->company_id)
-                      ->orWhereNull('company_id');
+                    ->orWhereNull('company_id');
             })
             ->with('permissions')
             ->get();
-            
+
         return $this->success($roles, 'Roles retrieved successfully.');
     }
 
@@ -35,14 +34,27 @@ class RoleController extends Controller
     public function permissions(): JsonResponse
     {
         $permissions = Permission::all();
-        
+
         $grouped = $permissions->groupBy(function ($permission) {
-            if (str_contains($permission->name, 'stocks')) return 'Stocks';
-            if (str_contains($permission->name, 'clinics')) return 'Clinics';
-            if (str_contains($permission->name, 'reports')) return 'Reports';
-            if (str_contains($permission->name, 'users')) return 'User Management';
-            if (str_contains($permission->name, 'company')) return 'Company Management';
-            if (str_contains($permission->name, 'audit')) return 'Logs';
+            if (str_contains($permission->name, 'stocks')) {
+                return 'Stocks';
+            }
+            if (str_contains($permission->name, 'clinics')) {
+                return 'Clinics';
+            }
+            if (str_contains($permission->name, 'reports')) {
+                return 'Reports';
+            }
+            if (str_contains($permission->name, 'users')) {
+                return 'User Management';
+            }
+            if (str_contains($permission->name, 'company')) {
+                return 'Company Management';
+            }
+            if (str_contains($permission->name, 'audit')) {
+                return 'Logs';
+            }
+
             return 'General';
         });
 
@@ -51,7 +63,7 @@ class RoleController extends Controller
         foreach ($grouped as $module => $perms) {
             $formatted[] = [
                 'module' => $module,
-                'permissions' => $perms
+                'permissions' => $perms,
             ];
         }
 
@@ -70,9 +82,9 @@ class RoleController extends Controller
         ]);
 
         $requestedPermissions = $request->permissions;
-        
+
         // Eğer Super Admin değilse, sadece kendi sahip olduğu izinleri verebilir (Güvenlik)
-        if (!auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->hasRole('Super Admin')) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }
@@ -103,7 +115,7 @@ class RoleController extends Controller
             return $this->error('Unauthorized', 403);
         }
 
-        if ($role->company_id === null && !auth()->user()->hasRole('Super Admin')) {
+        if ($role->company_id === null && ! auth()->user()->hasRole('Super Admin')) {
             return $this->error('System roles cannot be modified.', 403);
         }
 
@@ -112,9 +124,9 @@ class RoleController extends Controller
         ]);
 
         $requestedPermissions = $request->permissions;
-        
+
         // Eğer Super Admin değilse, sadece kendi sahip olduğu izinleri verebilir (Güvenlik)
-        if (!auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->hasRole('Super Admin')) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }
@@ -142,6 +154,7 @@ class RoleController extends Controller
         }
 
         $role->delete();
+
         return $this->success(null, 'Role deleted successfully.');
     }
 }

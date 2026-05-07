@@ -14,11 +14,12 @@ class StockTransactionFactory extends Factory
     {
         $quantity = $this->faker->numberBetween(1, 100);
         $stock = Stock::factory();
+
         return [
             'stock_id' => $stock,
             'clinic_id' => \App\Models\Clinic::factory(),
             'company_id' => fn (array $attributes) => \App\Models\Stock::find($attributes['stock_id'])->company_id,
-            'transaction_number' => 'TRX-' . $this->faker->unique()->numberBetween(1000, 99999),
+            'transaction_number' => 'TRX-'.$this->faker->unique()->numberBetween(1000, 99999),
             'quantity' => $quantity,
             'previous_stock' => 0,
             'new_stock' => $quantity,

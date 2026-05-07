@@ -3,10 +3,9 @@
 namespace App\Services;
 
 use App\Models\User;
-use PragmaRX\Google2FA\Google2FA;
-use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use PragmaRX\Google2FA\Google2FA;
 
 class TwoFactorService
 {
@@ -14,7 +13,7 @@ class TwoFactorService
 
     public function __construct()
     {
-        $this->google2fa = new Google2FA();
+        $this->google2fa = new Google2FA;
     }
 
     /**
@@ -23,7 +22,7 @@ class TwoFactorService
     public function generateSecret(User $user): string
     {
         $secret = $this->google2fa->generateSecretKey();
-        
+
         $user->update([
             'two_factor_secret' => $secret,
             'two_factor_confirmed_at' => null, // Reset confirmation if re-generating
@@ -49,7 +48,7 @@ class TwoFactorService
      */
     public function verifyCode(User $user, string $code): bool
     {
-        if (!$user->two_factor_secret) {
+        if (! $user->two_factor_secret) {
             return false;
         }
 
@@ -67,7 +66,7 @@ class TwoFactorService
             ]);
 
             // Generate initial recovery codes if they don't exist
-            if (!$user->two_factor_recovery_codes) {
+            if (! $user->two_factor_recovery_codes) {
                 $this->generateRecoveryCodes($user);
             }
 
@@ -84,7 +83,7 @@ class TwoFactorService
     {
         $codes = [];
         for ($i = 0; $i < 8; $i++) {
-            $codes[] = Str::random(10) . '-' . Str::random(10);
+            $codes[] = Str::random(10).'-'.Str::random(10);
         }
 
         $user->update([
@@ -106,7 +105,7 @@ class TwoFactorService
             // Satiri kilitle: baska bir islem ayni anda bu kullanicinin kodlarini degistiremez
             $freshUser = User::lockForUpdate()->find($user->id);
 
-            if (!$freshUser) {
+            if (! $freshUser) {
                 return false;
             }
 

@@ -1,16 +1,18 @@
 <?php
+
 // app/Services/CategoryService.php
 
 namespace App\Services;
 
+use App\Models\Category;
 use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Repositories\Interfaces\TodoRepositoryInterface;
-use App\Models\Category;
 use Illuminate\Database\Eloquent\Collection;
 
 class CategoryService
 {
     protected $categoryRepository;
+
     protected $todoRepository;
 
     public function __construct(
@@ -48,7 +50,7 @@ class CategoryService
     public function deleteCategory(int $id): bool
     {
         $category = $this->categoryRepository->find($id);
-        if (!$category) {
+        if (! $category) {
             return false;
         }
 
@@ -62,7 +64,7 @@ class CategoryService
     public function getCategoryStats(int $id): array
     {
         $category = $this->categoryRepository->find($id);
-        if (!$category) {
+        if (! $category) {
             throw new \Exception('Kategori bulunamadı');
         }
 
@@ -73,15 +75,15 @@ class CategoryService
                 'id' => $category->id,
                 'name' => $category->name,
                 'color' => $category->color,
-                'is_active' => $category->is_active
+                'is_active' => $category->is_active,
             ],
             'stats' => [
                 'total' => $todos->count(),
                 'completed' => $todos->where('completed', true)->count(),
                 'pending' => $todos->where('completed', false)->count(),
                 'completion_rate' => $todos->count() > 0 ?
-                    round(($todos->where('completed', true)->count() / $todos->count()) * 100, 2) : 0
-            ]
+                    round(($todos->where('completed', true)->count() / $todos->count()) * 100, 2) : 0,
+            ],
         ];
     }
 }

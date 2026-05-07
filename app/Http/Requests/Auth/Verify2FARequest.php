@@ -3,8 +3,8 @@
 namespace App\Http\Requests\Auth;
 
 use App\Traits\JsonResponseTrait;
-use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class Verify2FARequest extends FormRequest

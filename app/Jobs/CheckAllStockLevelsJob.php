@@ -13,12 +13,12 @@ use Illuminate\Queue\SerializesModels;
 class CheckAllStockLevelsJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
-    
+
     /**
      * İşlem başarısız olursa kaç kez tekrar deneneceği.
      */
     public int $tries = 3;
-    
+
     /**
      * Tekrar denemeden önce beklenecek saniye.
      */
@@ -43,11 +43,11 @@ class CheckAllStockLevelsJob implements ShouldQueue
             $seenProductIds[$stock->product_id] = true;
 
             $alerts = $stockAlertService->checkAndGetAlerts($stock);
-            if (!empty($alerts)) {
+            if (! empty($alerts)) {
                 $companyId = $stock->company_id;
                 $lowStocks[$companyId][] = [
                     'stock' => $stock,
-                    'alerts' => $alerts
+                    'alerts' => $alerts,
                 ];
             }
         }

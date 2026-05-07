@@ -1,298 +1,149 @@
 <?php
 
-// ==============================================
-// 4. StockRequestController
-// app/Modules/Stock/Controllers/StockRequestController.php
-// ==============================================
-
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use App\Services\StockRequestService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class StockRequestController extends Controller
 {
-    protected $stockRequestService;
-
-    public function __construct(StockRequestService $stockRequestService)
-    {
-        $this->stockRequestService = $stockRequestService;
-    }
+    public function __construct(protected StockRequestService $stockRequestService) {}
 
     public function index(Request $request)
     {
         $filters = $request->only(['search', 'status', 'requester_clinic_id', 'requested_from_clinic_id', 'type', 'clinic_id']);
-        
-        $perPage = min((int)$request->get('per_page', 15), 100);
+        $perPage = min((int) $request->get('per_page', 15), 100);
         $requests = $this->stockRequestService->getAllWithFilters($filters, $perPage);
 
-        return response()->json([
-            'success' => true,
-            'data' => $requests
-        ]);
+        return $this->success($requests, 'Success', 200, ['pagination' => true]);
     }
 
     public function store(Request $request)
     {
         $user = auth()->user();
-        
         $data = $request->all();
-        
-        // Kullanıcının klinik ataması var mı kontrol et
+
         if (is_null($user->clinic_id)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Kullanıcıya atanmış bir klinik bulunmuyor. Lütfen yöneticinize başvurun.'
-            ], 403);
+            return $this->error('Kullaniciya atanmis bir klinik bulunmuyor. Lutfen yoneticinize basvurun.', 403);
         }
 
-        // Auto-fill requester clinic if not provided
-        if (!isset($data['requester_clinic_id'])) {
+        if (! isset($data['requester_clinic_id'])) {
             $data['requester_clinic_id'] = $user->clinic_id;
         }
 
-        // Restrict requester clinic if user is not Super Admin
-        if (isset($data['requester_clinic_id']) && $data['requester_clinic_id'] != $user->clinic_id) {
-            if (!$user->hasRole(\App\Models\User::ROLE_SUPER_ADMIN)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Sadece kendi kliniğiniz için talep oluşturabilirsiniz.'
-                ], 403);
-            }
+        if (isset($data['requester_clinic_id']) && $data['requester_clinic_id'] != $user->clinic_id && ! $user->hasRole(User::ROLE_SUPER_ADMIN)) {
+            return $this->error('Sadece kendi kliniginiz icin talep olusturabilirsiniz.', 403);
         }
 
-        // Auto-fill requester name if not provided
-        if (!isset($data['requested_by'])) {
+        if (! isset($data['requested_by'])) {
             $data['requested_by'] = $user->name;
         }
 
-        $validator = Validator::make($data, [
+        $validated = validator($data, [
             'requester_clinic_id' => 'required|exists:clinics,id',
             'requested_from_clinic_id' => 'required|exists:clinics,id|different:requester_clinic_id',
             'stock_id' => 'required|exists:stocks,id',
             'requested_quantity' => 'required|integer|min:1',
             'request_reason' => 'nullable|string|max:500',
-            'requested_by' => 'required|string|max:255'
-        ]);
+            'requested_by' => 'required|string|max:255',
+        ])->validate();
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
-        }
+        $stockRequest = $this->stockRequestService->createRequest($validated);
 
-        try {
-            $stockRequest = $this->stockRequestService->createRequest($validator->validated());
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Stok talebi başarıyla oluşturuldu',
-                'data' => $stockRequest
-            ], 201);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        return $this->success($stockRequest, 'Stok talebi basariyla olusturuldu', 201);
     }
 
     public function show($id)
     {
-        $request = $this->stockRequestService->getRequestById((int)$id);
+        $request = $this->stockRequestService->getRequestById((int) $id);
 
-        if (!$request) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Talep bulunamadı'
-            ], 404);
+        if (! $request) {
+            return $this->error('Talep bulunamadi', 404);
         }
 
-        return response()->json([
-            'success' => true,
-            'data' => $request
-        ]);
+        return $this->success($request);
     }
 
     public function approve(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'approved_quantity' => 'required|integer|min:1',
             'approved_by' => 'required|string|max:255',
-            'notes' => 'nullable|string|max:500'
+            'notes' => 'nullable|string|max:500',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+        $result = $this->stockRequestService->approveRequest(
+            (int) $id,
+            $validated['approved_quantity'],
+            $validated['approved_by'],
+            $validated['notes'] ?? null
+        );
+
+        if (! $result) {
+            return $this->error('Talep onaylanamadi. Yetersiz stok veya gecersiz talep.', 400);
         }
 
-        try {
-            $result = $this->stockRequestService->approveRequest(
-                (int)$id,
-                $validator->validated()['approved_quantity'],
-                $validator->validated()['approved_by'],
-                $validator->validated()['notes'] ?? null
-            );
-
-            if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Talep onaylanamadı. Yetersiz stok veya geçersiz talep.'
-                ], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Talep başarıyla onaylandı'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        return $this->success(null, 'Talep basariyla onaylandi');
     }
 
     public function reject(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
+        $validated = $request->validate([
             'rejection_reason' => 'required|string|max:500',
-            'rejected_by' => 'required|string|max:255'
+            'rejected_by' => 'required|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+        $result = $this->stockRequestService->rejectRequest((int) $id, $validated['rejection_reason'], $validated['rejected_by']);
+
+        if (! $result) {
+            return $this->error('Talep reddedilemedi', 400);
         }
 
-        try {
-            $result = $this->stockRequestService->rejectRequest(
-                (int)$id,
-                $validator->validated()['rejection_reason'],
-                $validator->validated()['rejected_by']
-            );
-
-            if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Talep reddedilemedi'
-                ], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Talep reddedildi'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        return $this->success(null, 'Talep reddedildi');
     }
 
     public function ship(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'performed_by' => 'required|string|max:255'
+        $validated = $request->validate([
+            'performed_by' => 'required|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+        $result = $this->stockRequestService->shipRequest((int) $id, $validated['performed_by']);
+
+        if (! $result) {
+            return $this->error('Transfer baslatilamadi', 400);
         }
 
-        try {
-            $result = $this->stockRequestService->shipRequest(
-                (int)$id,
-                $validator->validated()['performed_by']
-            );
-
-            if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Transfer başlatılamadı'
-                ], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Transfer süreci başlatıldı'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        return $this->success(null, 'Transfer sureci baslatildi');
     }
 
     public function complete(Request $request, $id)
     {
-        $validator = Validator::make($request->all(), [
-            'performed_by' => 'required|string|max:255'
+        $validated = $request->validate([
+            'performed_by' => 'required|string|max:255',
         ]);
 
-        if ($validator->fails()) {
-            return response()->json([
-                'success' => false,
-                'errors' => $validator->errors()
-            ], 422);
+        $result = $this->stockRequestService->completeRequest((int) $id, $validated['performed_by']);
+
+        if (! $result) {
+            return $this->error('Talep tamamlanamadi', 400);
         }
 
-        try {
-            $result = $this->stockRequestService->completeRequest(
-                (int)$id,
-                $validator->validated()['performed_by']
-            );
-
-            if (!$result) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Talep tamamlanamadı'
-                ], 400);
-            }
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Transfer başarıyla tamamlandı'
-            ]);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => $e->getMessage()
-            ], 400);
-        }
+        return $this->success(null, 'Transfer basariyla tamamlandi');
     }
 
     public function getPendingRequests(Request $request)
     {
-        $clinicId = $request->query('clinic_id');
+        $clinicId = $request->integer('clinic_id') ?: null;
         $requests = $this->stockRequestService->getPendingRequests($clinicId);
 
-        return response()->json([
-            'success' => true,
-            'data' => $requests
-        ]);
+        return $this->success($requests);
     }
 
     public function getStats()
     {
-        $stats = $this->stockRequestService->getRequestStats();
-
-        return response()->json([
-            'success' => true,
-            'data' => $stats
-        ]);
+        return $this->success($this->stockRequestService->getRequestStats());
     }
 }

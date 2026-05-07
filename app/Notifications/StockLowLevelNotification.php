@@ -4,8 +4,8 @@ namespace App\Notifications;
 
 use App\Models\StockAlert;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class StockLowLevelNotification extends Notification
 {
@@ -28,14 +28,14 @@ class StockLowLevelNotification extends Notification
         $color = $this->alert->type === 'critical_stock' ? 'red' : 'orange';
 
         return (new MailMessage)
-                    ->subject($this->alert->title)
-                    ->greeting('Stok Uyarısı!')
-                    ->line($this->alert->message)
-                    ->line("Klinik: {$this->alert->clinic->name}")
-                    ->line("Mevcut Seviye: {$this->alert->current_stock_level}")
-                    ->line("Eşik Seviye: {$this->alert->threshold_level}")
-                    ->action('Stoku Görüntüle', url('/stocks/' . $this->alert->stock_id))
-                    ->line('Lütfen gerekli aksiyonu alın.');
+            ->subject($this->alert->title)
+            ->greeting('Stok Uyarısı!')
+            ->line($this->alert->message)
+            ->line("Klinik: {$this->alert->clinic->name}")
+            ->line("Mevcut Seviye: {$this->alert->current_stock_level}")
+            ->line("Eşik Seviye: {$this->alert->threshold_level}")
+            ->action('Stoku Görüntüle', url('/stocks/'.$this->alert->stock_id))
+            ->line('Lütfen gerekli aksiyonu alın.');
     }
 
     public function toDatabase($notifiable)
@@ -46,7 +46,7 @@ class StockLowLevelNotification extends Notification
             'alert_type' => $this->alert->type,
             'stock_name' => $this->alert->stock->name,
             'clinic_name' => $this->alert->clinic->name,
-            'message' => $this->alert->message
+            'message' => $this->alert->message,
         ];
     }
 }

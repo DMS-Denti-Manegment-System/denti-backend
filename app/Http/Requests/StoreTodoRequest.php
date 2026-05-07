@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Traits\JsonResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class StoreTodoRequest extends FormRequest
@@ -21,7 +21,7 @@ class StoreTodoRequest extends FormRequest
         return [
             'title' => 'required|string|min:3|max:255',
             'description' => 'nullable|string|max:1000',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
         ];
     }
 

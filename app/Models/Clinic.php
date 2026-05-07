@@ -1,4 +1,5 @@
 <?php
+
 // ==============================================
 // 3. Clinic Model
 // app/Modules/Stock/Models/Clinic.php
@@ -6,7 +7,6 @@
 
 namespace App\Models;
 
-use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,13 +16,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Clinic extends Model
 {
-    use HasFactory, Tenantable, SoftDeletes;
+    use HasFactory, SoftDeletes, Tenantable;
 
     protected $fillable = [
         'name', 'description', 'responsible_person',
         'phone', 'location', 'is_active', 'company_id',
         'email', 'address', 'city', 'district',
-        'postal_code', 'website', 'opening_hours'
+        'postal_code', 'website', 'opening_hours',
     ];
 
     /**

@@ -52,10 +52,10 @@ class StockResource extends JsonResource
                 'has_expiration_date' => $this->product?->has_expiration_date,
             ],
             'total_base_units' => $this->total_base_units,
-            'stock_status'     => $this->stock_status,
-            'is_expired'       => $this->is_expired,
-            'is_near_expiry'   => $this->is_near_expiry,
-            'days_to_expiry'   => $this->days_to_expiry,
+            'stock_status' => $this->stock_status,
+            'is_expired' => $this->is_expired,
+            'is_near_expiry' => $this->is_near_expiry,
+            'days_to_expiry' => $this->days_to_expiry,
         ];
     }
 }

@@ -2,9 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
 use App\Events\Stock\StockLevelChanged;
 use App\Listeners\Stock\CheckStockAlertsListener;
 use App\Listeners\Stock\ClearStockCacheListener;
@@ -13,6 +10,9 @@ use App\Models\StockTransaction;
 use App\Observers\StockAlertObserver;
 use App\Observers\StockTransactionObserver;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -74,7 +74,7 @@ class AppServiceProvider extends ServiceProvider
 
         // 🛡️ CRITICAL FIX: StockTransaction Observer'ı register et
         StockTransaction::observe(StockTransactionObserver::class);
-        
+
         // 📧 StockAlert Observer - Mail bildirimleri için
         StockAlert::observe(StockAlertObserver::class);
 

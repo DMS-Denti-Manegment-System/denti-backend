@@ -1,11 +1,13 @@
 <?php
+
 // app/Modules/Stock/Database/Migrations/2024_12_15_000003_create_stocks_table.php
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up()
     {
         Schema::create('stocks', function (Blueprint $table) {

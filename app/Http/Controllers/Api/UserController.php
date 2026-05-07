@@ -3,33 +3,31 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\UpdateUserRequest;
 use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use App\Models\Role;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
-
     public function index(\Illuminate\Http\Request $request): JsonResponse
     {
         $user = Auth::user();
-        
+
         // Super Admin ise tüm kullanıcıları görebilir, değilse sadece kendi şirketini
         $query = User::query();
-        if (!$user->hasRole(User::ROLE_SUPER_ADMIN)) {
+        if (! $user->hasRole(User::ROLE_SUPER_ADMIN)) {
             $query->where('company_id', $user->company_id);
         }
 
         // Frontend'den gelen arama (search) parametresi
-        if ($request->has('search') && !empty($request->search)) {
+        if ($request->has('search') && ! empty($request->search)) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('username', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
+                    ->orWhere('username', 'like', "%{$search}%")
+                    ->orWhere('email', 'like', "%{$search}%");
             });
         }
 
@@ -76,7 +74,7 @@ class UserController extends Controller
             ->with('permissions')
             ->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->error('User not found or unauthorized access.', 404);
         }
 
@@ -88,21 +86,21 @@ class UserController extends Controller
      */
     public function update(UpdateUserRequest $request, int $id): JsonResponse
     {
-        if (!Auth::user()->can('manage-users')) {
+        if (! Auth::user()->can('manage-users')) {
             return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
         }
 
         $currentUser = Auth::user();
         $query = User::query();
-        
+
         // SECURITY: Non-Super Admins can only update users within their own company
-        if (!$currentUser->hasRole(User::ROLE_SUPER_ADMIN)) {
+        if (! $currentUser->hasRole(User::ROLE_SUPER_ADMIN)) {
             $query->where('company_id', $currentUser->company_id);
         }
 
         $user = $query->find($id);
 
-        if (!$user) {
+        if (! $user) {
             return $this->error('User not found or unauthorized access.', 404);
         }
 
@@ -124,7 +122,7 @@ class UserController extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        if (!Auth::user()->can('manage-users')) {
+        if (! Auth::user()->can('manage-users')) {
             return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
         }
 
@@ -133,7 +131,7 @@ class UserController extends Controller
 
         $userToDelete = User::where('company_id', $companyId)->find($id);
 
-        if (!$userToDelete) {
+        if (! $userToDelete) {
             return $this->error('User not found or unauthorized access.', 404);
         }
 

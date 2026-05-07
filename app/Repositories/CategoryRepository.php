@@ -1,4 +1,5 @@
 <?php
+
 // app/Repositories/CategoryRepository.php
 
 namespace App\Repositories;
@@ -36,14 +37,17 @@ class CategoryRepository implements CategoryRepositoryInterface
         $category = $this->find($id);
         if ($category) {
             $category->update($data);
+
             return $category;
         }
+
         return null;
     }
 
     public function delete(int $id): bool
     {
         $category = $this->find($id);
+
         return $category ? $category->delete() : false;
     }
 

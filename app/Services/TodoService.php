@@ -2,14 +2,15 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\TodoRepositoryInterface;
-use App\Repositories\Interfaces\CategoryRepositoryInterface;
 use App\Models\Todo;
+use App\Repositories\Interfaces\CategoryRepositoryInterface;
+use App\Repositories\Interfaces\TodoRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
 class TodoService
 {
     protected $todoRepository;
+
     protected $categoryRepository;
 
     public function __construct(
@@ -38,7 +39,7 @@ class TodoService
         // Category kontrolü
         if (isset($data['category_id'])) {
             $category = $this->categoryRepository->find($data['category_id']);
-            if (!$category || !$category->is_active) {
+            if (! $category || ! $category->is_active) {
                 throw new \Exception('Geçersiz veya aktif olmayan kategori');
             }
         }
@@ -51,14 +52,14 @@ class TodoService
         // Tamamlanma tarihi
         if (isset($data['completed']) && $data['completed']) {
             $data['completed_at'] = now();
-        } elseif (isset($data['completed']) && !$data['completed']) {
+        } elseif (isset($data['completed']) && ! $data['completed']) {
             $data['completed_at'] = null;
         }
 
         // Category kontrolü
         if (isset($data['category_id'])) {
             $category = $this->categoryRepository->find($data['category_id']);
-            if (!$category || !$category->is_active) {
+            if (! $category || ! $category->is_active) {
                 throw new \Exception('Geçersiz veya aktif olmayan kategori');
             }
         }
@@ -69,7 +70,7 @@ class TodoService
     public function deleteTodo(int $id): bool
     {
         $todo = $this->todoRepository->find($id);
-        if (!$todo) {
+        if (! $todo) {
             return false;
         }
 
@@ -84,9 +85,11 @@ class TodoService
     {
         $todo = $this->todoRepository->find($id);
         if ($todo) {
-            $newStatus = !$todo->completed;
+            $newStatus = ! $todo->completed;
+
             return $this->updateTodo($id, ['completed' => $newStatus]);
         }
+
         return null;
     }
 
@@ -110,7 +113,7 @@ class TodoService
                 'name' => $category->name,
                 'color' => $category->color,
                 'total' => $category->todos->count(),
-                'completed' => $category->todos->where('completed', true)->count()
+                'completed' => $category->todos->where('completed', true)->count(),
             ];
         }
 
@@ -120,7 +123,7 @@ class TodoService
             'pending' => $pending->count(),
             'completion_rate' => $all->count() > 0 ?
                 round(($completed->count() / $all->count()) * 100, 2) : 0,
-            'categories' => $categoryStats
+            'categories' => $categoryStats,
         ];
     }
 }

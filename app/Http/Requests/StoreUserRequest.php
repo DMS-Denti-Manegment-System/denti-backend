@@ -4,7 +4,6 @@ namespace App\Http\Requests;
 
 use App\Http\Requests\Traits\UserValidationRules;
 use Illuminate\Foundation\Http\FormRequest;
-
 use Illuminate\Validation\Rule;
 
 class StoreUserRequest extends FormRequest

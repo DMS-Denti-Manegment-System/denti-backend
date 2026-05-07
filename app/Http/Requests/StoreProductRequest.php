@@ -24,7 +24,7 @@ class StoreProductRequest extends FormRequest
                 'max:50',
                 Rule::unique('products')->where(function ($query) use ($companyId) {
                     return $query->where('company_id', $companyId);
-                })
+                }),
             ],
             'description' => 'nullable|string',
             'unit' => 'required|string|max:20',
@@ -40,12 +40,12 @@ class StoreProductRequest extends FormRequest
             'clinic_id' => [
                 'nullable',
                 'integer',
-                new \App\Rules\CompanyOwned('clinics')
+                new \App\Rules\CompanyOwned('clinics'),
             ],
             'supplier_id' => [
                 'nullable',
                 'integer',
-                new \App\Rules\CompanyOwned('suppliers')
+                new \App\Rules\CompanyOwned('suppliers'),
             ],
             'purchase_price' => 'nullable|numeric|min:0',
             'currency' => 'nullable|string|max:10',

@@ -23,7 +23,7 @@ return new class extends Migration
                 'has_sub_unit',
                 'sub_unit_name',
                 'sub_unit_multiplier',
-                'current_sub_stock'
+                'current_sub_stock',
             ]);
         });
     }

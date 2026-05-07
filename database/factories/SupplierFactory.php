@@ -15,7 +15,7 @@ class SupplierFactory extends Factory
     {
         return [
             'company_id' => \App\Models\Company::factory(),
-            'name' => $this->faker->company() . ' Tedarik',
+            'name' => $this->faker->company().' Tedarik',
             'contact_person' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
             'email' => $this->faker->companyEmail(),

@@ -10,15 +10,15 @@ return new class extends Migration
     {
         Schema::table('stock_alerts', function (Blueprint $table) {
             // Ürün bazlı uyarı sistemi için product_id kolonu (eğer yoksa)
-            if (!Schema::hasColumn('stock_alerts', 'product_id')) {
+            if (! Schema::hasColumn('stock_alerts', 'product_id')) {
                 $table->foreignId('product_id')->nullable()->after('stock_id')->constrained()->onDelete('cascade');
             }
-            
+
             // Multi-tenant için company_id (eğer yoksa)
-            if (!Schema::hasColumn('stock_alerts', 'company_id')) {
+            if (! Schema::hasColumn('stock_alerts', 'company_id')) {
                 $table->foreignId('company_id')->nullable()->after('clinic_id');
             }
-            
+
             // critical_expiry tipi için enum güncellemesi
             // SQLite'da enum değiştirme desteklenmez, sadece MySQL/MariaDB için
             if (Schema::getConnection()->getDriverName() !== 'sqlite') {
@@ -27,15 +27,15 @@ return new class extends Migration
                     'critical_stock',
                     'expired',
                     'near_expiry',
-                    'critical_expiry'
+                    'critical_expiry',
                 ])->change();
             }
-            
+
             // Yeni index'ler (eğer yoksa)
-            if (!Schema::hasIndex('stock_alerts', 'idx_stock_alerts_product_active')) {
+            if (! Schema::hasIndex('stock_alerts', 'idx_stock_alerts_product_active')) {
                 $table->index(['product_id', 'is_active'], 'idx_stock_alerts_product_active');
             }
-            if (!Schema::hasIndex('stock_alerts', 'idx_stock_alerts_company_active')) {
+            if (! Schema::hasIndex('stock_alerts', 'idx_stock_alerts_company_active')) {
                 $table->index(['company_id', 'is_active'], 'idx_stock_alerts_company_active');
             }
         });
@@ -46,16 +46,16 @@ return new class extends Migration
         Schema::table('stock_alerts', function (Blueprint $table) {
             $table->dropForeign(['product_id']);
             $table->dropColumn('product_id');
-            
+
             $table->dropColumn('company_id');
-            
+
             $table->enum('type', [
                 'low_stock',
                 'critical_stock',
                 'expired',
-                'near_expiry'
+                'near_expiry',
             ])->change();
-            
+
             $table->dropIndex('idx_stock_alerts_product_active');
             $table->dropIndex('idx_stock_alerts_company_active');
         });

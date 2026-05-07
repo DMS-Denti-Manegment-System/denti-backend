@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Repositories\ProductRepository;
 use App\Models\Product;
+use App\Repositories\ProductRepository;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ProductService
@@ -44,7 +44,7 @@ class ProductService
             // Product fields only
             $productFields = ['name', 'sku', 'description', 'unit', 'category', 'brand', 'min_stock_level', 'critical_stock_level', 'yellow_alert_level', 'red_alert_level', 'is_active', 'has_expiration_date', 'clinic_id', 'company_id'];
             $productData = array_intersect_key($data, array_flip($productFields));
-            
+
             $product = $this->productRepository->create($productData);
 
             if ($stockData['clinic_id'] !== null) {

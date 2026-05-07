@@ -1,15 +1,14 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\AuthController;
-use App\Http\Controllers\Api\TwoFactorAuthController;
-use App\Http\Controllers\Api\UserInvitationController;
 use App\Http\Controllers\Api\Admin\CompanyController;
-use App\Http\Controllers\Api\RoleController;
-
-use App\Http\Controllers\Api\UserController;
-use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ProfileController;
+use App\Http\Controllers\Api\RoleController;
+use App\Http\Controllers\Api\TwoFactorAuthController;
+use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\UserInvitationController;
+use Illuminate\Support\Facades\Route;
 
 // Auth Routes (Public)
 Route::post('/login', [AuthController::class, 'login']);

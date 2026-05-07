@@ -33,7 +33,7 @@ class StockAlertResource extends JsonResource
             'resolution_notes' => $this->resolution_notes,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            
+
             // Relations
             'stock' => $this->stock ? [
                 'id' => $this->stock->id,

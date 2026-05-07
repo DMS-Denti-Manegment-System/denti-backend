@@ -12,12 +12,10 @@ use App\Models\StockRequest;
 use App\Models\Supplier;
 use App\Models\Todo;
 use App\Models\User;
+use App\Services\ProductService;
 use App\Services\StockAlertService;
 use App\Services\StockRequestService;
 use App\Services\StockService;
-use App\Services\ProductService;
-use App\Models\StockTransfer;
-use App\Models\StockTransaction;
 use App\Services\TwoFactorService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
@@ -27,7 +25,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 
 class OperationsPageController extends Controller
@@ -52,7 +49,7 @@ class OperationsPageController extends Controller
         $product = Product::with(['batches.supplier', 'batches.clinic', 'clinic', 'company'])
             ->where('company_id', auth()->user()->company_id)
             ->findOrFail($id);
-        
+
         // Fetch transactions for the product (across all batches)
         $transactions = \App\Models\StockTransaction::whereIn('stock_id', $product->batches->pluck('id'))
             ->with(['user', 'clinic', 'stock'])
@@ -75,11 +72,11 @@ class OperationsPageController extends Controller
             $date = now()->subDays($i)->format('Y-m-d');
             $chartData[] = [
                 'date' => $date,
-                'value' => $currentTotal
+                'value' => $currentTotal,
             ];
 
             // Reconstruct previous day's stock by reversing transactions of the current date
-            $dayTxns = $allTxns->filter(fn($t) => $t->transaction_date->format('Y-m-d') === $date);
+            $dayTxns = $allTxns->filter(fn ($t) => $t->transaction_date->format('Y-m-d') === $date);
             foreach ($dayTxns as $txn) {
                 // To go back in time: subtract if it was an increase, add if it was a decrease
                 $isPositive = in_array($txn->type, ['purchase', 'adjustment_increase', 'transfer_in', 'return_in'], true);
@@ -104,9 +101,9 @@ class OperationsPageController extends Controller
             'chartData' => $chartData,
             'stockStats' => [
                 'total_usage' => $product->batches->sum('internal_usage_count'),
-                'total_value' => $product->batches->sum(fn($b) => $b->current_stock * $b->purchase_price),
+                'total_value' => $product->batches->sum(fn ($b) => $b->current_stock * $b->purchase_price),
                 'batch_count' => $product->batches->count(),
-            ]
+            ],
         ]);
     }
 
@@ -182,7 +179,7 @@ class OperationsPageController extends Controller
                 (int) $validated['quantity'],
                 auth()->user()->name,
                 auth()->id(),
-                trim(($validated['reason'] ?? 'Web panel kullanımı') . (!empty($validated['notes']) ? ' - ' . $validated['notes'] : ''))
+                trim(($validated['reason'] ?? 'Web panel kullanımı').(! empty($validated['notes']) ? ' - '.$validated['notes'] : ''))
             );
 
             return redirect()->route('products.show', $productId)->with('status', 'Stok kullanımı kaydedildi.');
@@ -197,7 +194,7 @@ class OperationsPageController extends Controller
     {
         $categories = Category::query()
             ->withCount('todos')
-            ->when($request->filled('search'), fn (Builder $query) => $query->where('name', 'like', '%' . $request->string('search') . '%'))
+            ->when($request->filled('search'), fn (Builder $query) => $query->where('name', 'like', '%'.$request->string('search').'%'))
             ->orderBy('name')
             ->paginate($request->integer('per_page', 20))
             ->withQueryString();
@@ -612,7 +609,7 @@ class OperationsPageController extends Controller
     {
         $todos = Todo::query()
             ->with('category')
-            ->when($request->filled('search'), fn (Builder $query) => $query->where('title', 'like', '%' . $request->string('search') . '%'))
+            ->when($request->filled('search'), fn (Builder $query) => $query->where('title', 'like', '%'.$request->string('search').'%'))
             ->when($request->filled('status'), fn (Builder $query) => $query->where('completed', $request->string('status') === 'completed'))
             ->latest()
             ->paginate($request->integer('per_page', 20))
@@ -688,7 +685,7 @@ class OperationsPageController extends Controller
 
     public function todoToggle(Request $request, Todo $todo): RedirectResponse|JsonResponse
     {
-        $completed = !$todo->completed;
+        $completed = ! $todo->completed;
         $todo->update([
             'completed' => $completed,
             'completed_at' => $completed ? now() : null,
@@ -793,7 +790,7 @@ class OperationsPageController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'nullable|email|max:255|unique:users,email,' . $user->id,
+            'email' => 'nullable|email|max:255|unique:users,email,'.$user->id,
             'password' => 'nullable|string|min:8|confirmed',
             'clinic_id' => ['nullable', Rule::exists('clinics', 'id')->where(fn ($query) => $query->where('company_id', $companyId))],
             'is_active' => 'nullable|boolean',
@@ -808,7 +805,7 @@ class OperationsPageController extends Controller
             'is_active' => $request->boolean('is_active', false),
         ];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $payload['password'] = Hash::make($validated['password']);
         }
 
@@ -912,7 +909,7 @@ class OperationsPageController extends Controller
         ]);
 
         $batch = $product->batches()->latest('id')->first();
-        if (!$batch) {
+        if (! $batch) {
             if ($request->ajax()) {
                 return response()->json([
                     'message' => 'Bu urun icin ayarlanabilir stok partisi bulunamadi.',
@@ -924,8 +921,8 @@ class OperationsPageController extends Controller
         }
 
         $reason = $validated['reason'];
-        if (!empty($validated['notes'])) {
-            $reason .= ' - ' . $validated['notes'];
+        if (! empty($validated['notes'])) {
+            $reason .= ' - '.$validated['notes'];
         }
 
         app(StockService::class)->adjustStock(
@@ -1020,7 +1017,7 @@ class OperationsPageController extends Controller
 
         if ($editingBatch) {
             app(\App\Services\StockService::class)->updateStock($editingBatch->id, $batchPayload);
-        } elseif (!empty($validated['clinic_id'])) {
+        } elseif (! empty($validated['clinic_id'])) {
             app(\App\Services\StockService::class)->createStock([
                 'product_id' => $product->id,
                 'company_id' => $companyId,
@@ -1068,9 +1065,9 @@ class OperationsPageController extends Controller
 
         $movements = \App\Models\StockTransaction::query()
             ->with(['clinic', 'stock.product', 'user'])
-            ->when($clinicId, fn($q) => $q->where('clinic_id', $clinicId))
-            ->when($dateFrom, fn($q) => $q->whereDate('transaction_date', '>=', $dateFrom))
-            ->when($dateTo, fn($q) => $q->whereDate('transaction_date', '<=', $dateTo))
+            ->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))
+            ->when($dateFrom, fn ($q) => $q->whereDate('transaction_date', '>=', $dateFrom))
+            ->when($dateTo, fn ($q) => $q->whereDate('transaction_date', '<=', $dateTo))
             ->latest('transaction_date')
             ->paginate($request->integer('per_page', 20))
             ->withQueryString();
@@ -1083,6 +1080,7 @@ class OperationsPageController extends Controller
     public function profile(): View
     {
         $user = Auth::user()->load(['company', 'clinic', 'roles']);
+
         return view('operations.profile.index', compact('user'));
     }
 
@@ -1090,7 +1088,7 @@ class OperationsPageController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . auth()->id(),
+            'email' => 'required|string|email|max:255|unique:users,email,'.auth()->id(),
         ]);
 
         auth()->user()->update($validated);
@@ -1105,7 +1103,7 @@ class OperationsPageController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        if (!Hash::check($validated['current_password'], auth()->user()->password)) {
+        if (! Hash::check($validated['current_password'], auth()->user()->password)) {
             return back()->withErrors(['current_password' => 'Mevcut sifre dogru degil.']);
         }
 
@@ -1239,7 +1237,6 @@ class OperationsPageController extends Controller
         return redirect()->route($route)->withErrors([$key => $message]);
     }
 
-
     public function profile2faGenerate(Request $request): JsonResponse
     {
         $service = app(TwoFactorService::class);
@@ -1255,7 +1252,7 @@ class OperationsPageController extends Controller
     public function profile2faConfirm(Request $request): JsonResponse
     {
         $request->validate(['code' => 'required|string']);
-        
+
         $success = app(TwoFactorService::class)->confirm2FA(auth()->user(), $request->code);
 
         return response()->json([
@@ -1279,6 +1276,7 @@ class OperationsPageController extends Controller
     public function profile2faRecoveryCodes(Request $request): JsonResponse
     {
         $codes = app(TwoFactorService::class)->generateRecoveryCodes(auth()->user());
+
         return response()->json(['recoveryCodes' => $codes]);
     }
 
@@ -1286,6 +1284,7 @@ class OperationsPageController extends Controller
     {
         $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
         app(StockAlertService::class)->bulkResolve($request->ids, auth()->user()->name);
+
         return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar cozuldu.');
     }
 
@@ -1293,6 +1292,7 @@ class OperationsPageController extends Controller
     {
         $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
         app(StockAlertService::class)->bulkDismiss($request->ids);
+
         return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar yoksayildi.');
     }
 
@@ -1300,12 +1300,14 @@ class OperationsPageController extends Controller
     {
         $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
         app(StockAlertService::class)->bulkDelete($request->ids);
+
         return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar silindi.');
     }
 
     public function alertSync(Request $request): RedirectResponse|JsonResponse
     {
         $count = app(StockAlertService::class)->syncAlerts();
+
         return $this->actionResponse($request, 'alerts.index', "{$count} stok kaydi tarandi ve uyarilar guncellendi.");
     }
 

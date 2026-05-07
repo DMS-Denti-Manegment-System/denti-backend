@@ -6,7 +6,7 @@ use RuntimeException;
 
 class StockNotFoundException extends RuntimeException
 {
-    public function __construct(int $id = null)
+    public function __construct(?int $id = null)
     {
         $message = $id
             ? "Stok bulunamadı (ID: {$id})"

@@ -29,12 +29,12 @@ class SupplierRepository implements SupplierRepositoryInterface
     {
         $query = $this->model->newQuery();
 
-        if (!empty($filters['search']) || !empty($filters['name'])) {
-            $search = '%' . ($filters['search'] ?? $filters['name']) . '%';
+        if (! empty($filters['search']) || ! empty($filters['name'])) {
+            $search = '%'.($filters['search'] ?? $filters['name']).'%';
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', $search)
-                  ->orWhere('contact_person', 'like', $search)
-                  ->orWhere('email', 'like', $search);
+                    ->orWhere('contact_person', 'like', $search)
+                    ->orWhere('email', 'like', $search);
             });
         }
 
@@ -42,9 +42,13 @@ class SupplierRepository implements SupplierRepositoryInterface
             $query->where('is_active', $filters['is_active']);
         }
 
-        if (!empty($filters['status'])) {
-            if ($filters['status'] === 'active') $query->where('is_active', true);
-            if ($filters['status'] === 'inactive') $query->where('is_active', false);
+        if (! empty($filters['status'])) {
+            if ($filters['status'] === 'active') {
+                $query->where('is_active', true);
+            }
+            if ($filters['status'] === 'inactive') {
+                $query->where('is_active', false);
+            }
         }
 
         return $query->orderBy('name')->get();
@@ -65,19 +69,24 @@ class SupplierRepository implements SupplierRepositoryInterface
         $supplier = $this->find($id);
         if ($supplier) {
             $supplier->update($data);
+
             return $supplier;
         }
+
         return null;
     }
 
     public function delete(int $id): bool
     {
         $supplier = $this->find($id);
-        if (!$supplier) return false;
+        if (! $supplier) {
+            return false;
+        }
 
         return \Illuminate\Support\Facades\DB::transaction(function () use ($supplier) {
             // Tedarikçi silindiğinde stoklarını da pasif/silinmiş yapalım
-            $supplier->stocks()->delete(); 
+            $supplier->stocks()->delete();
+
             return $supplier->delete();
         });
     }
@@ -89,11 +98,12 @@ class SupplierRepository implements SupplierRepositoryInterface
 
     public function search(string $term): Collection
     {
-        $search = '%' . $term . '%';
+        $search = '%'.$term.'%';
+
         return $this->model->where('name', 'like', $search)
-                          ->orWhere('contact_person', 'like', $search)
-                          ->orWhere('email', 'like', $search)
-                          ->orderBy('name')
-                          ->get();
+            ->orWhere('contact_person', 'like', $search)
+            ->orWhere('email', 'like', $search)
+            ->orderBy('name')
+            ->get();
     }
 }

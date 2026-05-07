@@ -1,4 +1,5 @@
 <?php
+
 // app/Modules/Stock/Database/Migrations/2024_12_15_000004_create_stock_requests_table.php
 
 use Illuminate\Database\Migrations\Migration;
@@ -24,7 +25,7 @@ return new class extends Migration
 
             // Durum
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed', 'cancelled'])
-                  ->default('pending');
+                ->default('pending');
 
             // Açıklamalar
             $table->text('request_reason')->nullable();

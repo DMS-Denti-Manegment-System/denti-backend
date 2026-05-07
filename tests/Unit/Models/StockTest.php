@@ -11,7 +11,7 @@ class StockTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_total_base_units_correctly()
     {
         $stock = Stock::factory()->create([
@@ -25,7 +25,7 @@ class StockTest extends TestCase
         $this->assertEquals(53, $stock->total_base_units);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_current_stock_when_no_sub_units()
     {
         $stock = Stock::factory()->create([
@@ -36,7 +36,7 @@ class StockTest extends TestCase
         $this->assertEquals(15, $stock->total_base_units);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_checks_if_stock_is_expired()
     {
         $stock = Stock::factory()->create([
@@ -46,7 +46,7 @@ class StockTest extends TestCase
         $this->assertTrue($stock->is_expired);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_checks_if_stock_is_near_expiry()
     {
         $stock = Stock::factory()->create([
@@ -58,7 +58,7 @@ class StockTest extends TestCase
         $this->assertTrue($stock->is_near_expiry);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_days_to_expiry()
     {
         $stock = Stock::factory()->create([
@@ -69,7 +69,7 @@ class StockTest extends TestCase
         $this->assertEqualsWithDelta(10, $stock->days_to_expiry, 1);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_zero_days_to_expiry_when_no_expiry_date()
     {
         $stock = Stock::factory()->create([
@@ -79,7 +79,7 @@ class StockTest extends TestCase
         $this->assertEquals(0, $stock->days_to_expiry);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_available_stock()
     {
         $stock = Stock::factory()->create([
@@ -90,7 +90,7 @@ class StockTest extends TestCase
         $this->assertEquals(80, $stock->available_stock);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_belongs_to_a_product()
     {
         $product = Product::factory()->create();
@@ -102,11 +102,11 @@ class StockTest extends TestCase
         $this->assertEquals($product->id, $stock->product->id);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_has_many_transactions()
     {
         $stock = Stock::factory()->create();
-        
+
         \App\Models\StockTransaction::factory()->create([
             'stock_id' => $stock->id,
             'quantity' => 10,
@@ -116,7 +116,7 @@ class StockTest extends TestCase
         $this->assertCount(1, $stock->fresh()->transactions);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_negative_available_stock_if_over_reserved()
     {
         $stock = Stock::factory()->create([
@@ -127,7 +127,7 @@ class StockTest extends TestCase
         $this->assertEquals(-5, $stock->available_stock);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_handles_missing_multiplier_in_total_base_units()
     {
         $stock = Stock::factory()->create([

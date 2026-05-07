@@ -16,7 +16,7 @@ return new class extends Migration
         });
 
         Schema::table('stock_transactions', function (Blueprint $table) {
-            if (!Schema::hasColumn('stock_transactions', 'notes')) {
+            if (! Schema::hasColumn('stock_transactions', 'notes')) {
                 $table->string('notes')->nullable()->after('description');
             }
         });

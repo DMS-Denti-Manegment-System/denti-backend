@@ -20,13 +20,13 @@ return new class extends Migration
             'stock_transactions',
             'stock_alerts',
             'categories',
-            'todos'
+            'todos',
         ];
 
         foreach ($tables as $tableName) {
             Schema::table($tableName, function (Blueprint $table) use ($tableName) {
                 // Eğer company_id kolonu yoksa ekle
-                if (!Schema::hasColumn($tableName, 'company_id')) {
+                if (! Schema::hasColumn($tableName, 'company_id')) {
                     $table->foreignId('company_id')->after('id')->nullable()->constrained('companies')->onDelete('cascade');
                     $table->index('company_id');
                 }
@@ -48,7 +48,7 @@ return new class extends Migration
             'stock_transactions',
             'stock_alerts',
             'categories',
-            'todos'
+            'todos',
         ];
 
         foreach ($tables as $tableName) {

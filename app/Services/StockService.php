@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
+use App\Events\Stock\StockLevelChanged;
 use App\Exceptions\Stock\InsufficientStockException;
 use App\Exceptions\Stock\StockNotFoundException;
-use App\Events\Stock\StockLevelChanged;
-use App\Repositories\Interfaces\StockRepositoryInterface;
 use App\Models\Stock;
+use App\Repositories\Interfaces\StockRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class StockService
@@ -34,10 +33,12 @@ class StockService
     {
         return DB::transaction(function () use ($id, $data) {
             $stock = $this->stockRepository->find($id);
-            if (!$stock) return null;
+            if (! $stock) {
+                return null;
+            }
 
             if (isset($data['current_stock']) || isset($data['reserved_stock'])) {
-                $currentStock  = $data['current_stock']  ?? $stock->current_stock;
+                $currentStock = $data['current_stock'] ?? $stock->current_stock;
                 $reservedStock = $data['reserved_stock'] ?? $stock->reserved_stock;
                 $data['available_stock'] = $currentStock - $reservedStock;
             }
@@ -62,7 +63,7 @@ class StockService
     {
         return DB::transaction(function () use ($stockId, $delta, $reason, $performedBy, $isSubUnit, $type, $targetQuantity) {
             $stock = $this->stockRepository->findAndLock($stockId);
-            if (!$stock) {
+            if (! $stock) {
                 throw new StockNotFoundException($stockId);
             }
 
@@ -72,7 +73,9 @@ class StockService
             if ($type === 'sync') {
                 $current = $isSubUnit ? $stock->current_sub_stock : $stock->current_stock;
                 $delta = $targetQuantity - $current;
-                if ($delta === 0) return true;
+                if ($delta === 0) {
+                    return true;
+                }
             } elseif ($type === 'decrease') {
                 $delta = -abs($delta);
             } else {
@@ -88,7 +91,7 @@ class StockService
                 );
 
                 if (
-                    !$newLevels ||
+                    ! $newLevels ||
                     ($newLevels['current_stock'] ?? 0) < 0 ||
                     ($newLevels['current_sub_stock'] ?? 0) < 0
                 ) {
@@ -104,16 +107,16 @@ class StockService
             }
 
             $this->createTransaction([
-                'stock_id'         => $stockId,
-                'clinic_id'        => $stock->clinic_id,
-                'type'             => $delta > 0 ? 'adjustment_increase' : 'adjustment_decrease',
-                'quantity'         => abs($delta),
-                'previous_stock'   => $previousTotal,
-                'new_stock'        => $previousTotal + $delta,
-                'description'      => ($isSubUnit ? 'Alt Birim Düzeltme: ' : 'Ana Birim Düzeltme: ') . $reason,
-                'performed_by'     => $performedBy,
+                'stock_id' => $stockId,
+                'clinic_id' => $stock->clinic_id,
+                'type' => $delta > 0 ? 'adjustment_increase' : 'adjustment_decrease',
+                'quantity' => abs($delta),
+                'previous_stock' => $previousTotal,
+                'new_stock' => $previousTotal + $delta,
+                'description' => ($isSubUnit ? 'Alt Birim Düzeltme: ' : 'Ana Birim Düzeltme: ').$reason,
+                'performed_by' => $performedBy,
                 'transaction_date' => now(),
-                'is_sub_unit'      => $isSubUnit
+                'is_sub_unit' => $isSubUnit,
             ]);
 
             return true;
@@ -124,22 +127,22 @@ class StockService
      * Stok kullanımı yapar.
      * Race condition'a karşı pessimistic locking (lockForUpdate) kullanır.
      *
-     * @throws StockNotFoundException    Stok bulunamazsa
+     * @throws StockNotFoundException Stok bulunamazsa
      * @throws InsufficientStockException Yeterli stok yoksa
      */
-    public function useStock(int $stockId, int $quantity, string $performedBy, int $userId = null, string $notes = null, bool $isFromReserved = false): bool
+    public function useStock(int $stockId, int $quantity, string $performedBy, ?int $userId = null, ?string $notes = null, bool $isFromReserved = false): bool
     {
         try {
             return DB::transaction(function () use ($stockId, $quantity, $performedBy, $userId, $notes, $isFromReserved) {
                 // 🔒 Pessimistic lock: eşzamanlı kullanımlarda veri bütünlüğünü korur
                 $stock = $this->stockRepository->findAndLock($stockId);
-                if (!$stock) {
+                if (! $stock) {
                     throw new StockNotFoundException($stockId);
                 }
 
                 // ⚠️ SKT Kontrolü
                 if ($stock->expiry_date && $stock->expiry_date->isPast()) {
-                    throw new \Exception("Bu stok partisinin son kullanma tarihi (" . $stock->expiry_date->format('d/m/Y') . ") geçmiştir. Kullanılamaz!");
+                    throw new \Exception('Bu stok partisinin son kullanma tarihi ('.$stock->expiry_date->format('d/m/Y').') geçmiştir. Kullanılamaz!');
                 }
 
                 // 🛡️ Rezerve kontrolü
@@ -148,7 +151,7 @@ class StockService
                 }
 
                 $isSubUnitUsage = $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
-                $previousTotal  = $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock;
+                $previousTotal = $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock;
 
                 // 🛡️ Rezerve stok manuel yonetilir cunku TransactionObserver sadece current_stock'u etkiler.
                 // Rezerve stoktan dusum yapiliyorsa rezerve miktarini azalt.
@@ -159,27 +162,27 @@ class StockService
                 }
 
                 $this->createTransaction([
-                    'stock_id'         => $stockId,
-                    'clinic_id'        => $stock->clinic_id,
-                    'type'             => 'usage',
-                    'quantity'         => $quantity,
-                    'previous_stock'   => $previousTotal,
-                    'new_stock'        => $previousTotal - $quantity,
-                    'notes'            => $notes,
-                    'performed_by'     => $performedBy,
-                    'user_id'          => $userId,
+                    'stock_id' => $stockId,
+                    'clinic_id' => $stock->clinic_id,
+                    'type' => 'usage',
+                    'quantity' => $quantity,
+                    'previous_stock' => $previousTotal,
+                    'new_stock' => $previousTotal - $quantity,
+                    'notes' => $notes,
+                    'performed_by' => $performedBy,
+                    'user_id' => $userId,
                     'transaction_date' => now(),
-                    'is_sub_unit'      => $isSubUnitUsage
+                    'is_sub_unit' => $isSubUnitUsage,
                 ]);
 
                 return true;
             });
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Stock Usage Error: ' . $e->getMessage(), [
+            \Illuminate\Support\Facades\Log::error('Stock Usage Error: '.$e->getMessage(), [
                 'stock_id' => $stockId,
                 'quantity' => $quantity,
-                'user_id'  => auth()->id(),
-                'trace'    => substr($e->getTraceAsString(), 0, 500)
+                'user_id' => auth()->id(),
+                'trace' => substr($e->getTraceAsString(), 0, 500),
             ]);
             throw $e;
         }
@@ -194,33 +197,33 @@ class StockService
             $stock->sub_unit_multiplier
         );
 
-        if (!$newLevels) {
+        if (! $newLevels) {
             throw new InsufficientStockException($stock->total_base_units, $quantity);
         }
 
         // 🛡️ DIVISION BY ZERO PROTECTION
         $multiplier = max(1, (int) ($stock->sub_unit_multiplier ?? 1));
-        
+
         // 🛡️ KRITIK DÜZELTME: Rezerve stok sadece ANA BIRIM üzerinden takip ediliyor.
-        // Alt birim kullanımı durumunda rezerve düşmek istiyorsak, 
+        // Alt birim kullanımı durumunda rezerve düşmek istiyorsak,
         // ya tam birim düşmeliyiz ya da bu işleme izin vermemeliyiz.
         // Şimdilik alt birimden rezerve kullanımını engelliyoruz (unit mismatch önlemek için).
         if ($isFromReserved) {
-             throw new \Exception('Alt birim kullanımı için rezerve stoktan düşüm yapılamaz. Lütfen ana birim üzerinden işlem yapın.');
+            throw new \Exception('Alt birim kullanımı için rezerve stoktan düşüm yapılamaz. Lütfen ana birim üzerinden işlem yapın.');
         }
 
         $newReservedStock = $stock->reserved_stock;
 
         return array_merge($newLevels, [
-            'reserved_stock'       => $newReservedStock,
-            'available_stock'      => $newLevels['current_stock'] - $newReservedStock,
-            'internal_usage_count' => $stock->internal_usage_count + $quantity
+            'reserved_stock' => $newReservedStock,
+            'available_stock' => $newLevels['current_stock'] - $newReservedStock,
+            'internal_usage_count' => $stock->internal_usage_count + $quantity,
         ]);
     }
 
     private function handleMainUnitUsage(Stock $stock, int $quantity, bool $isFromReserved): array
     {
-        if (!$isFromReserved && $stock->available_stock < $quantity) {
+        if (! $isFromReserved && $stock->available_stock < $quantity) {
             throw new InsufficientStockException($stock->available_stock, $quantity);
         }
 
@@ -228,14 +231,14 @@ class StockService
             throw new InsufficientStockException($stock->current_stock, $quantity);
         }
 
-        $newMainStock     = $stock->current_stock - $quantity;
+        $newMainStock = $stock->current_stock - $quantity;
         $newReservedStock = $isFromReserved ? ($stock->reserved_stock - $quantity) : $stock->reserved_stock;
 
         return [
-            'current_stock'        => $newMainStock,
-            'reserved_stock'       => $newReservedStock,
-            'available_stock'      => $newMainStock - $newReservedStock,
-            'internal_usage_count' => $stock->internal_usage_count + $quantity
+            'current_stock' => $newMainStock,
+            'reserved_stock' => $newReservedStock,
+            'available_stock' => $newMainStock - $newReservedStock,
+            'internal_usage_count' => $stock->internal_usage_count + $quantity,
         ];
     }
 
@@ -243,30 +246,30 @@ class StockService
     {
         return DB::transaction(function () use ($data) {
             $data['company_id'] = $data['company_id'] ?? auth()->user()?->company_id;
-            
+
             $initialQuantity = $data['current_stock'] ?? 0;
-            
+
             // Başlangıç stoğunu 0 olarak kaydediyoruz, çünkü StockTransaction oluşturulduğunda
             // StockTransactionObserver otomatik olarak stoğu olması gereken değere yükseltecek.
             // Böylece stok iki kere (çift) sayılmamış olacak.
             $data['current_stock'] = 0;
             $data['available_stock'] = 0;
             $data['current_sub_stock'] = $data['current_sub_stock'] ?? 0;
-            
+
             $stock = $this->stockRepository->create($data);
 
             if ($initialQuantity > 0) {
                 $this->createTransaction([
-                    'stock_id'         => $stock->id,
-                    'clinic_id'        => $stock->clinic_id,
-                    'type'             => 'purchase',
-                    'quantity'         => $initialQuantity,
-                    'previous_stock'   => 0,
-                    'new_stock'        => $initialQuantity,
-                    'description'      => 'İlk stok girişi',
-                    'performed_by'     => auth()->user()?->name ?? 'Sistem',
+                    'stock_id' => $stock->id,
+                    'clinic_id' => $stock->clinic_id,
+                    'type' => 'purchase',
+                    'quantity' => $initialQuantity,
+                    'previous_stock' => 0,
+                    'new_stock' => $initialQuantity,
+                    'description' => 'İlk stok girişi',
+                    'performed_by' => auth()->user()?->name ?? 'Sistem',
                     'transaction_date' => now(),
-                    'is_sub_unit'      => false
+                    'is_sub_unit' => false,
                 ]);
             } else {
                 DB::afterCommit(function () use ($stock) {
@@ -283,13 +286,17 @@ class StockService
         try {
             return DB::transaction(function () use ($id) {
                 $stock = $this->stockRepository->find($id);
-                if (!$stock) return false;
+                if (! $stock) {
+                    return false;
+                }
 
                 $stock->alerts()->delete();
+
                 return $this->stockRepository->delete($id);
             });
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Stock Deletion Error: ' . $e->getMessage(), ['id' => $id]);
+            \Illuminate\Support\Facades\Log::error('Stock Deletion Error: '.$e->getMessage(), ['id' => $id]);
+
             return false;
         }
     }
@@ -299,21 +306,22 @@ class StockService
         try {
             return $this->stockRepository->forceDelete($id);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Stock Force Deletion Error: ' . $e->getMessage(), ['id' => $id]);
+            \Illuminate\Support\Facades\Log::error('Stock Force Deletion Error: '.$e->getMessage(), ['id' => $id]);
+
             return false;
         }
     }
 
-    public function getStockStats(int $companyId, int $clinicId = null): array
+    public function getStockStats(int $companyId, ?int $clinicId = null): array
     {
-        $cacheKey = "stock_stats_{$companyId}_" . ($clinicId ?? 'all');
-        
+        $cacheKey = "stock_stats_{$companyId}_".($clinicId ?? 'all');
+
         return \Illuminate\Support\Facades\Cache::remember($cacheKey, 900, function () use ($companyId, $clinicId) {
             return $this->calculateStockStats($companyId, $clinicId);
         });
     }
 
-    protected function calculateStockStats(int $companyId, int $clinicId = null): array
+    protected function calculateStockStats(int $companyId, ?int $clinicId = null): array
     {
         try {
             $baseQuery = Stock::query();
@@ -328,13 +336,13 @@ class StockService
             $isSqlite = DB::getDriverName() === 'sqlite';
 
             // SQLite ve MySQL için farklı tarih fonksiyonları
-            $redDaysSql = $isSqlite 
+            $redDaysSql = $isSqlite
                 ? "date(?, '+' || COALESCE(stocks.expiry_red_days, 15) || ' days')"
-                : "DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_red_days, 15) DAY)";
-            
+                : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_red_days, 15) DAY)';
+
             $yellowDaysSql = $isSqlite
                 ? "date(?, '+' || COALESCE(stocks.expiry_yellow_days, 30) || ' days')"
-                : "DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_yellow_days, 30) DAY)";
+                : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_yellow_days, 30) DAY)';
 
             $stats = $baseQuery->join('products', 'stocks.product_id', '=', 'products.id')
                 ->selectRaw("
@@ -363,37 +371,38 @@ class StockService
                 ", [$now, $now, $now])->first();
 
             return [
-                'total_items'             => (int) ($stats->total_items             ?? 0),
-                'low_stock_items'         => (int) ($stats->low_stock_items         ?? 0),
-                'critical_stock_items'    => (int) ($stats->critical_stock_items    ?? 0),
-                'low_expiring_items'      => (int) ($stats->low_expiring_items      ?? 0),
+                'total_items' => (int) ($stats->total_items ?? 0),
+                'low_stock_items' => (int) ($stats->low_stock_items ?? 0),
+                'critical_stock_items' => (int) ($stats->critical_stock_items ?? 0),
+                'low_expiring_items' => (int) ($stats->low_expiring_items ?? 0),
                 'critical_expiring_items' => (int) ($stats->critical_expiring_items ?? 0),
-                'total_value'             => round((float) ($stats->total_value     ?? 0), 2)
+                'total_value' => round((float) ($stats->total_value ?? 0), 2),
             ];
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Stock Stats Error: ' . $e->getMessage(), ['company_id' => $companyId]);
+            \Illuminate\Support\Facades\Log::error('Stock Stats Error: '.$e->getMessage(), ['company_id' => $companyId]);
+
             return [
-                'total_items' => 0, 
-                'low_stock_items' => 0, 
-                'critical_stock_items' => 0, 
-                'low_expiring_items' => 0, 
-                'critical_expiring_items' => 0, 
-                'total_value' => 0
+                'total_items' => 0,
+                'low_stock_items' => 0,
+                'critical_stock_items' => 0,
+                'low_expiring_items' => 0,
+                'critical_expiring_items' => 0,
+                'total_value' => 0,
             ];
         }
     }
 
-    public function getLowStockItems(int $clinicId = null): Collection
+    public function getLowStockItems(?int $clinicId = null): Collection
     {
         return $this->stockRepository->getLowStockItems($clinicId);
     }
 
-    public function getCriticalStockItems(int $clinicId = null): Collection
+    public function getCriticalStockItems(?int $clinicId = null): Collection
     {
         return $this->stockRepository->getCriticalStockItems($clinicId);
     }
 
-    public function getExpiringItems(int $days = 30, int $clinicId = null): Collection
+    public function getExpiringItems(int $days = 30, ?int $clinicId = null): Collection
     {
         return $this->stockRepository->getExpiringItems($days, $clinicId);
     }
@@ -405,15 +414,15 @@ class StockService
             ->orderByDesc('transaction_date');
 
         // Type filter
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
             $query->where('type', $filters['type']);
         }
 
         // Date range filter
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->whereDate('transaction_date', '>=', $filters['date_from']);
         }
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->whereDate('transaction_date', '<=', $filters['date_to']);
         }
 
@@ -438,7 +447,7 @@ class StockService
      */
     protected function generateTransactionNumber(): string
     {
-        return 'TXN-' . now()->format('Ymd') . '-' . strtoupper(Str::random(12));
+        return 'TXN-'.now()->format('Ymd').'-'.strtoupper(Str::random(12));
     }
 
     public function reverseTransaction(int $transactionId): bool
@@ -447,12 +456,14 @@ class StockService
             return DB::transaction(function () use ($transactionId) {
                 $transaction = \App\Models\StockTransaction::findOrFail($transactionId);
                 $stock = $transaction->stock()->lockForUpdate()->first();
-                
-                if (!$stock) return false;
+
+                if (! $stock) {
+                    return false;
+                }
 
                 $positiveTypes = ['purchase', 'adjustment_increase', 'transfer_in', 'return_in'];
                 $negativeTypes = ['usage', 'adjustment_decrease', 'transfer_out', 'damaged', 'expired', 'return_out'];
-                
+
                 $isPositiveEffect = in_array($transaction->type, $positiveTypes);
                 $isNegativeEffect = in_array($transaction->type, $negativeTypes);
 
@@ -461,14 +472,14 @@ class StockService
                 if ($transaction->is_sub_unit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
                     // if it was negative (usage), we ADD it back. if positive (purchase), we SUBTRACT.
                     $delta = $isNegativeEffect ? $quantity : -$quantity;
-                    
+
                     $newLevels = $this->calculatorService->calculateAdjustment(
                         $stock->current_stock,
                         $stock->current_sub_stock,
                         $delta,
                         $stock->sub_unit_multiplier
                     );
-                    
+
                     $stock->current_stock = $newLevels['current_stock'];
                     $stock->current_sub_stock = $newLevels['current_sub_stock'];
                 } else {
@@ -481,13 +492,13 @@ class StockService
 
                 $stock->available_stock = $stock->current_stock - $stock->reserved_stock;
                 $stock->save();
-                
+
                 \App\Events\Stock\StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
 
                 return $transaction->delete();
             });
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Transaction Reversal Error: ' . $e->getMessage(), ['transaction_id' => $transactionId]);
+            \Illuminate\Support\Facades\Log::error('Transaction Reversal Error: '.$e->getMessage(), ['transaction_id' => $transactionId]);
             throw $e;
         }
     }

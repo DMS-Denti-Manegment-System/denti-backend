@@ -10,14 +10,13 @@ use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
 {
-
     /**
      * Update the user's profile information.
      */
     public function updateInfo(UpdateProfileInfoRequest $request): JsonResponse
     {
         $user = $request->user();
-        
+
         $user->update($request->validated());
 
         return $this->success($user, 'Profile information updated successfully.');
@@ -30,9 +29,9 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        if (!Hash::check($request->current_password, $user->password)) {
+        if (! Hash::check($request->current_password, $user->password)) {
             return $this->error('The provided password does not match your current password.', 422, [
-                'current_password' => ['The provided password does not match your current password.']
+                'current_password' => ['The provided password does not match your current password.'],
             ]);
         }
 

@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <link href="{{ asset('ui-kit/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('ui-kit/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
-    @vite(['resources/css/app.css'])
     @stack('styles')
 </head>
 <body id="kt_body" 
@@ -154,6 +153,32 @@
             showValidationErrors(errors) {
                 Object.values(errors || {}).flat().forEach((message) => this.notify('error', message));
             },
+            parseApiError(xhr) {
+                const payload = xhr?.responseJSON || {};
+                const status = xhr?.status || 0;
+
+                if (status === 401) {
+                    return { type: 'auth', message: 'Oturum gecersiz. Lutfen tekrar giris yapin.', errors: null };
+                }
+
+                if (status === 403) {
+                    return { type: 'forbidden', message: payload.message || 'Bu islem icin yetkiniz yok.', errors: null };
+                }
+
+                if (status === 422 && payload.errors) {
+                    return { type: 'validation', message: payload.message || 'Dogrulama hatasi.', errors: payload.errors };
+                }
+
+                return { type: 'generic', message: payload.message || 'Islem sirasinda bir hata olustu.', errors: payload.errors || null };
+            },
+            handleApiError(xhr) {
+                const parsed = this.parseApiError(xhr);
+                if (parsed.type === 'validation' && parsed.errors) {
+                    this.showValidationErrors(parsed.errors);
+                    return;
+                }
+                this.notify('error', parsed.message);
+            },
             createModule(config) {
                 if (!window.jQuery) {
                     console.error('jQuery bulunamadi, modül baslatilamadi.', config);
@@ -235,7 +260,7 @@
                         },
                         error(xhr) {
                             if (window.DentiUI.debug) console.error('[DentiUI] AJAX Error:', xhr);
-                            window.DentiUI.notify('error', 'Veriler yuklenirken bir hata olustu.');
+                            window.DentiUI.handleApiError(xhr);
                             $tableContainer.css('opacity', '1');
                         }
                     });
@@ -300,7 +325,7 @@
                         },
                         error(xhr) {
                             if (window.DentiUI.debug) console.error('[DentiUI] Modal AJAX Error:', xhr);
-                            window.DentiUI.notify('error', 'Modal yuklenirken bir hata olustu.');
+                            window.DentiUI.handleApiError(xhr);
                         }
                     });
                 }
@@ -354,13 +379,7 @@
                         },
                         error(xhr) {
                             if (window.DentiUI.debug) console.error('[DentiUI] Action AJAX Error:', xhr);
-                            if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                                window.DentiUI.showValidationErrors(xhr.responseJSON.errors);
-                            } else if (xhr.responseJSON?.message) {
-                                window.DentiUI.notify('error', xhr.responseJSON.message);
-                            } else {
-                                window.DentiUI.notify('error', 'Islem sirasinda bir hata olustu.');
-                            }
+                            window.DentiUI.handleApiError(xhr);
                         },
                         complete() {
                             $submit.removeAttr('data-kt-indicator').prop('disabled', false);
@@ -397,13 +416,7 @@
                         },
                         error(xhr) {
                             if (window.DentiUI.debug) console.error('[DentiUI] Modal Submit AJAX Error:', xhr);
-                            if (xhr.status === 422 && xhr.responseJSON?.errors) {
-                                window.DentiUI.showValidationErrors(xhr.responseJSON.errors);
-                            } else if (xhr.responseJSON?.message) {
-                                window.DentiUI.notify('error', xhr.responseJSON.message);
-                            } else {
-                                window.DentiUI.notify('error', 'Kayit sirasinda bir hata olustu.');
-                            }
+                            window.DentiUI.handleApiError(xhr);
                         },
                         complete() {
                             $submit.removeAttr('data-kt-indicator').prop('disabled', false);

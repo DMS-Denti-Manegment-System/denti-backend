@@ -14,23 +14,25 @@ class ProductApiTest extends TestCase
     use RefreshDatabase;
 
     private User $user;
+
     private Company $company;
+
     private Clinic $clinic;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->company = Company::factory()->create();
         $this->clinic = Clinic::factory()->create([
             'company_id' => $this->company->id,
         ]);
-        
+
         $this->user = User::factory()->create([
             'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
         ]);
-        
+
         // Permission'ları oluştur ve kullanıcıya ver (routes'deki doğru isimler)
         \Spatie\Permission\Models\Permission::create(['name' => 'view-stocks']);
         \Spatie\Permission\Models\Permission::create(['name' => 'create-stocks']);
@@ -39,11 +41,11 @@ class ProductApiTest extends TestCase
         $this->user->givePermissionTo(['view-stocks', 'create-stocks', 'update-stocks', 'delete-stocks']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function authenticated_user_can_list_products()
     {
         $this->actingAs($this->user);
-        
+
         Product::factory()->count(3)->create([
             'company_id' => $this->company->id,
         ]);
@@ -60,13 +62,13 @@ class ProductApiTest extends TestCase
                         'sku',
                         'unit',
                         'total_stock',
-                    ]
-                ]
+                    ],
+                ],
             ])
             ->assertJsonCount(3, 'data');
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_create_product()
     {
         $this->actingAs($this->user);
@@ -87,7 +89,7 @@ class ProductApiTest extends TestCase
                 'data' => [
                     'name' => 'Parol 500mg',
                     'sku' => 'PR-001',
-                ]
+                ],
             ]);
 
         $this->assertDatabaseHas('products', [
@@ -97,7 +99,7 @@ class ProductApiTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function product_creation_requires_name()
     {
         $this->actingAs($this->user);
@@ -111,7 +113,7 @@ class ProductApiTest extends TestCase
             ->assertJsonValidationErrors(['name']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function product_creation_requires_unit()
     {
         $this->actingAs($this->user);
@@ -125,11 +127,11 @@ class ProductApiTest extends TestCase
             ->assertJsonValidationErrors(['unit']);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_view_single_product()
     {
         $this->actingAs($this->user);
-        
+
         $product = Product::factory()->create([
             'company_id' => $this->company->id,
             'name' => 'Test Ürün',
@@ -143,11 +145,11 @@ class ProductApiTest extends TestCase
                 'data' => [
                     'id' => $product->id,
                     'name' => 'Test Ürün',
-                ]
+                ],
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_cannot_view_product_from_other_company()
     {
         $otherCompany = Company::factory()->create();
@@ -162,11 +164,11 @@ class ProductApiTest extends TestCase
         $response->assertStatus(404);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_update_product()
     {
         $this->actingAs($this->user);
-        
+
         $product = Product::factory()->create([
             'company_id' => $this->company->id,
             'name' => 'Eski İsim',
@@ -182,7 +184,7 @@ class ProductApiTest extends TestCase
                 'success' => true,
                 'data' => [
                     'name' => 'Yeni İsim',
-                ]
+                ],
             ]);
 
         $this->assertDatabaseHas('products', [
@@ -191,11 +193,11 @@ class ProductApiTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_delete_product()
     {
         $this->actingAs($this->user);
-        
+
         $product = Product::factory()->create([
             'company_id' => $this->company->id,
         ]);
@@ -213,16 +215,16 @@ class ProductApiTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_search_products()
     {
         $this->actingAs($this->user);
-        
+
         Product::factory()->create([
             'company_id' => $this->company->id,
             'name' => 'Parol 500mg',
         ]);
-        
+
         Product::factory()->create([
             'company_id' => $this->company->id,
             'name' => 'Aspirin',
@@ -236,11 +238,11 @@ class ProductApiTest extends TestCase
                 ->etc());
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function products_are_paginated()
     {
         $this->actingAs($this->user);
-        
+
         Product::factory()->count(5)->create([
             'company_id' => $this->company->id,
         ]);
@@ -251,7 +253,7 @@ class ProductApiTest extends TestCase
             ->assertJson(['success' => true]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_products()
     {
         $response = $this->getJson('/api/products');
@@ -259,20 +261,20 @@ class ProductApiTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_filter_by_clinic()
     {
         $this->actingAs($this->user);
-        
+
         $product1 = Product::factory()->create([
             'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
         ]);
-        
+
         $otherClinic = Clinic::factory()->create([
             'company_id' => $this->company->id,
         ]);
-        
+
         $product2 = Product::factory()->create([
             'company_id' => $this->company->id,
             'clinic_id' => $otherClinic->id,
@@ -286,7 +288,7 @@ class ProductApiTest extends TestCase
                 ->etc());
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_without_create_permission_cannot_create_product()
     {
         // Yetkileri olmayan yeni bir user

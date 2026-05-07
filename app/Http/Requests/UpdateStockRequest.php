@@ -22,7 +22,7 @@ class UpdateStockRequest extends FormRequest
             'supplier_id' => [
                 'sometimes',
                 'required',
-                new \App\Rules\CompanyOwned('suppliers')
+                new \App\Rules\CompanyOwned('suppliers'),
             ],
             'purchase_price' => 'nullable|numeric|min:0',
             'currency' => 'nullable|string|max:10',
@@ -39,7 +39,7 @@ class UpdateStockRequest extends FormRequest
             'has_sub_unit' => 'boolean',
             'sub_unit_name' => 'nullable|required_if:has_sub_unit,true|string|max:50',
             'sub_unit_multiplier' => 'nullable|required_if:has_sub_unit,true|integer|min:1',
-            'current_sub_stock' => 'nullable|integer|min:0'
+            'current_sub_stock' => 'nullable|integer|min:0',
         ];
     }
 }

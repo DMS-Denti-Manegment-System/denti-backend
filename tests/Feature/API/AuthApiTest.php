@@ -13,21 +13,23 @@ class AuthApiTest extends TestCase
     use RefreshDatabase;
 
     private Company $company;
+
     private Clinic $clinic;
+
     private User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
-        
+
         $this->company = Company::factory()->create([
             'code' => 'DEMO',
         ]);
-        
+
         $this->clinic = Clinic::factory()->create([
             'company_id' => $this->company->id,
         ]);
-        
+
         $this->user = User::factory()->create([
             'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
@@ -37,7 +39,7 @@ class AuthApiTest extends TestCase
         ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_login_with_valid_credentials()
     {
         $response = $this->postJson('/api/login', [
@@ -55,11 +57,11 @@ class AuthApiTest extends TestCase
                     'roles',
                     'permissions',
                     'company',
-                ]
+                ],
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_cannot_login_with_invalid_company_code()
     {
         $response = $this->postJson('/api/login', [
@@ -75,7 +77,7 @@ class AuthApiTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_cannot_login_with_invalid_password()
     {
         $response = $this->postJson('/api/login', [
@@ -91,7 +93,7 @@ class AuthApiTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function inactive_user_cannot_login()
     {
         $this->user->update(['is_active' => false]);
@@ -105,7 +107,7 @@ class AuthApiTest extends TestCase
         $response->assertStatus(422);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function authenticated_user_can_get_profile()
     {
         $this->actingAs($this->user);
@@ -120,11 +122,11 @@ class AuthApiTest extends TestCase
                     'roles',
                     'permissions',
                     'company',
-                ]
+                ],
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function guest_cannot_access_protected_routes()
     {
         $response = $this->getJson('/api/auth/me');
@@ -132,7 +134,7 @@ class AuthApiTest extends TestCase
         $response->assertStatus(401);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_logout()
     {
         $this->actingAs($this->user);
@@ -146,7 +148,7 @@ class AuthApiTest extends TestCase
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function login_is_rate_limited()
     {
         // 5 başarısız deneme
@@ -172,7 +174,7 @@ class AuthApiTest extends TestCase
             ->assertJsonPath('message', fn ($message) => str_starts_with($message, 'Çok fazla giriş denemesi'));
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_login_using_clinic_code_instead_of_company_code()
     {
         $response = $this->postJson('/api/login', [
@@ -187,11 +189,11 @@ class AuthApiTest extends TestCase
                 'data' => [
                     'user',
                     'company',
-                ]
+                ],
             ]);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function super_admin_can_login_without_clinic_or_company_code()
     {
         $superAdmin = User::factory()->create([
@@ -199,7 +201,7 @@ class AuthApiTest extends TestCase
             'password' => bcrypt('password123'),
             'is_active' => true,
         ]);
-        
+
         \Spatie\Permission\Models\Role::create(['name' => 'Super Admin']);
         $superAdmin->assignRole('Super Admin');
 
@@ -211,7 +213,7 @@ class AuthApiTest extends TestCase
         $response->assertStatus(200);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function normal_user_cannot_login_without_clinic_or_company_code()
     {
         $response = $this->postJson('/api/login', [

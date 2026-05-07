@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <link href="{{ asset('ui-kit/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('ui-kit/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
-    @vite(['resources/css/app.css'])
 </head>
 <body id="kt_body" class="auth-bg">
 <script>

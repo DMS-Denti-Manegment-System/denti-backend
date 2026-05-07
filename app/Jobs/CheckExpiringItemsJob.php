@@ -18,9 +18,9 @@ class CheckExpiringItemsJob implements ShouldQueue
     {
         // Son kullanma tarihi takip edilen ürünleri kontrol et
         $stocks = Stock::active()
-                      ->where('track_expiry', true)
-                      ->whereNotNull('expiry_date')
-                      ->get();
+            ->where('track_expiry', true)
+            ->whereNotNull('expiry_date')
+            ->get();
 
         foreach ($stocks as $stock) {
             $stockAlertService->checkAndCreateAlerts($stock);

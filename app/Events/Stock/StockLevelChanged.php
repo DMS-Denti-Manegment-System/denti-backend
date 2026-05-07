@@ -17,8 +17,8 @@ class StockLevelChanged
 
     public function __construct(
         public readonly Stock $stock,
-        ?int   $companyId = null,
-        ?int  $clinicId = null
+        ?int $companyId = null,
+        ?int $clinicId = null
     ) {
         $this->companyId = $companyId ?? $stock->company_id;
         $this->clinicId = $clinicId ?? $stock->clinic_id;

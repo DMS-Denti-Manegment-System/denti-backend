@@ -3,22 +3,21 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\RateLimiter;
-use App\Http\Requests\Auth\LoginRequest;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
-use App\Models\Company;
 
 class AuthController extends Controller
 {
-
     private function throttleKey(LoginRequest $request): string
     {
-        return Str::lower($request->input('username')) . '|' . $request->input('company_code') . '|' . $request->ip();
+        return Str::lower($request->input('username')).'|'.$request->input('company_code').'|'.$request->ip();
     }
 
     public function login(LoginRequest $request): JsonResponse
@@ -27,6 +26,7 @@ class AuthController extends Controller
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
+
             return $this->error("Çok fazla giriş denemesi. {$seconds} saniye sonra tekrar deneyin.", 429);
         }
 
@@ -35,23 +35,25 @@ class AuthController extends Controller
         // 1. Şirketi bul
         if (empty($clinicCode)) {
             RateLimiter::hit($throttleKey, 60);
+
             return $this->error('Şirket kodu gereklidir.', 422);
         }
 
         // Şirket koduna bakıyoruz (case-insensitive)
         $company = Company::whereRaw('LOWER(code) = ?', [strtolower($clinicCode)])->first();
-        
-        if (!$company) {
+
+        if (! $company) {
             RateLimiter::hit($throttleKey, 60);
+
             return $this->error('Geçersiz şirket kodu, kullanıcı adı veya şifre', 422);
         }
 
         // 2. Kullanıcıyı doğrula
         $credentials = [
-            'username'   => $request->username, 
-            'password'   => $request->password, 
+            'username' => $request->username,
+            'password' => $request->password,
             'company_id' => $company->id,
-            'is_active'  => true
+            'is_active' => true,
         ];
 
         if (Auth::attempt($credentials)) {
@@ -59,22 +61,24 @@ class AuthController extends Controller
             if ($request->hasSession()) {
                 $request->session()->regenerate();
             }
-            
-            $user = Auth::user()->load(['company', 'roles', 'clinic']);
+
+            /** @var User $user */
+            $user = Auth::user();
+            $user->load(['company', 'roles', 'clinic']);
 
             if ($user->hasTwoFactorEnabled()) {
                 return $this->success([
                     'requires_2fa' => true,
-                    'user' => ['id' => $user->id, 'username' => $user->username]
+                    'user' => ['id' => $user->id, 'username' => $user->username],
                 ], 'Two-factor authentication required');
             }
 
             return $this->success([
-                'user'        => $user,
-                'roles'       => $user->getRoleNames(),
+                'user' => $user,
+                'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
-                'company'     => $user->company,
-                'clinic'      => $user->clinic
+                'company' => $user->company,
+                'clinic' => $user->clinic,
             ], 'Login successful');
         }
 
@@ -90,18 +94,19 @@ class AuthController extends Controller
             'password' => 'required|string',
         ]);
 
-        $throttleKey = 'admin_login|' . $request->username . '|' . $request->ip();
+        $throttleKey = 'admin_login|'.$request->username.'|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
+
             return $this->error("Çok fazla giriş denemesi. {$seconds} saniye sonra tekrar deneyin.", 429);
         }
 
         $user = User::where('username', $request->username)->first();
 
-        if ($user && $user->hasRole('Super Admin') && \Hash::check($request->password, $user->password)) {
+        if ($user && $user->hasRole('Super Admin') && Hash::check((string) $request->input('password'), $user->password)) {
             RateLimiter::clear($throttleKey);
-            if (!$user->is_active) {
+            if (! $user->is_active) {
                 return $this->error('Hesabınız pasif durumdadır.', 403);
             }
 
@@ -109,14 +114,14 @@ class AuthController extends Controller
             if ($request->hasSession()) {
                 $request->session()->regenerate();
             }
-            
+
             $user->load(['company', 'roles']);
 
             return $this->success([
-                'user'        => $user,
-                'roles'       => $user->getRoleNames(),
+                'user' => $user,
+                'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
-                'company'     => $user->company
+                'company' => $user->company,
             ], 'Admin login successful');
         }
 
@@ -127,13 +132,15 @@ class AuthController extends Controller
 
     public function me(Request $request): JsonResponse
     {
-        $user = $request->user()->load(['company', 'roles']);
+        /** @var User $user */
+        $user = $request->user();
+        $user->load(['company', 'roles']);
 
         return $this->success([
-            'user'        => $user,
-            'roles'       => $user->getRoleNames(),
+            'user' => $user,
+            'roles' => $user->getRoleNames(),
             'permissions' => $user->getAllPermissions()->pluck('name'),
-            'company'     => $user->company
+            'company' => $user->company,
         ]);
     }
 

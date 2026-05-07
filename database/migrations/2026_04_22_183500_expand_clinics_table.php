@@ -26,9 +26,9 @@ return new class extends Migration
     {
         Schema::table('clinics', function (Blueprint $table) {
             $table->dropColumn([
-                'email', 'address', 'city', 'district', 
-                'manager_name', 'postal_code', 'website', 
-                'opening_hours', 'latitude', 'longitude'
+                'email', 'address', 'city', 'district',
+                'manager_name', 'postal_code', 'website',
+                'opening_hours', 'latitude', 'longitude',
             ]);
         });
     }

@@ -14,13 +14,13 @@ use Illuminate\Support\Str;
 
 class CompanyController extends Controller
 {
-
     /**
      * Display a listing of companies.
      */
     public function index(): JsonResponse
     {
         $companies = Company::withCount('users')->get();
+
         return $this->success($companies, 'Companies retrieved successfully.');
     }
 
@@ -36,7 +36,7 @@ class CompanyController extends Controller
 
                 // 2. Create Default User (Company Owner)
                 $temporaryPassword = Str::random(12);
-                
+
                 $user = User::create([
                     'name' => $request->owner_name,
                     'username' => $request->owner_username,
@@ -60,7 +60,7 @@ class CompanyController extends Controller
                 ], 'Company and owner created successfully.', 201);
             });
         } catch (\Exception $e) {
-            return $this->error('Failed to create company: ' . $e->getMessage());
+            return $this->error('Failed to create company: '.$e->getMessage());
         }
     }
 
@@ -70,6 +70,7 @@ class CompanyController extends Controller
     public function show(Company $company): JsonResponse
     {
         $company->load('users');
+
         return $this->success($company, 'Company details retrieved successfully.');
     }
 
@@ -79,6 +80,7 @@ class CompanyController extends Controller
     public function update(UpdateCompanyRequest $request, Company $company): JsonResponse
     {
         $company->update($request->validated());
+
         return $this->success($company, 'Company updated successfully.');
     }
 
@@ -89,6 +91,7 @@ class CompanyController extends Controller
     {
         // Add logic to check for dependencies if needed (e.g. if company has active subscriptions)
         $company->delete();
+
         return $this->success(null, 'Company deleted successfully.');
     }
 }

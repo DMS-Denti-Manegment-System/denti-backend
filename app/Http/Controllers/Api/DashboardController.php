@@ -3,27 +3,26 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\Product;
 use App\Models\Clinic;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
-
     public function index(): JsonResponse
     {
         $user = Auth::user();
         $companyId = $user->company_id;
 
-        if (!$companyId && !$user->isSuperAdmin()) {
+        if (! $companyId && ! $user->isSuperAdmin()) {
             return $this->error('Şirket bilgisi bulunamadı.', 404);
         }
 
         $cacheKey = $user->isSuperAdmin() ? 'admin_dashboard_stats' : "dashboard_stats_{$companyId}";
-        
+
         $stats = Cache::remember($cacheKey, 600, function () use ($user, $companyId) {
             if ($user->isSuperAdmin()) {
                 return [
@@ -34,7 +33,7 @@ class DashboardController extends Controller
                     'total_stock_items' => Product::count(),
                     'total_clinics' => Clinic::count(),
                     'total_suppliers' => \App\Models\Supplier::count(),
-                    'is_super_admin' => true
+                    'is_super_admin' => true,
                 ];
             }
 

@@ -1,4 +1,5 @@
 <?php
+
 // app/Modules/Stock/Database/Migrations/2024_12_15_000006_create_stock_alerts_table.php
 
 use Illuminate\Database\Migrations\Migration;
@@ -20,7 +21,7 @@ return new class extends Migration
                 'low_stock',      // Düşük stok (sarı)
                 'critical_stock', // Kritik stok (kırmızı)
                 'expired',        // Süresi geçen
-                'near_expiry'     // Süresi yaklaşan
+                'near_expiry',     // Süresi yaklaşan
             ]);
 
             // Alarm bilgileri

@@ -23,8 +23,8 @@ class StockAlertRepository implements StockAlertRepositoryInterface
     public function getAlerts(array $filters = []): Collection
     {
         return $this->applyFilters($this->model->with(['stock', 'clinic']), $filters)
-                    ->orderByDesc('created_at')
-                    ->get();
+            ->orderByDesc('created_at')
+            ->get();
     }
 
     public function find(int $id): ?StockAlert
@@ -42,48 +42,52 @@ class StockAlertRepository implements StockAlertRepositoryInterface
         $alert = $this->find($id);
         if ($alert) {
             $alert->update($data);
+
             return $alert->fresh(['stock', 'clinic']);
         }
+
         return null;
     }
 
     public function delete(int $id): bool
     {
         $alert = $this->find($id);
+
         return $alert ? $alert->delete() : false;
     }
 
     public function getActiveAlerts(array $filters = []): Collection
     {
         $query = $this->model->active()->with(['stock', 'clinic']);
+
         return $this->applyFilters($query, $filters)
-                    ->orderByDesc('created_at')
-                    ->get();
+            ->orderByDesc('created_at')
+            ->get();
     }
 
     protected function applyFilters($query, array $filters)
     {
-        if (!empty($filters['clinic_id'])) {
+        if (! empty($filters['clinic_id'])) {
             $query->where('clinic_id', $filters['clinic_id']);
         }
 
-        if (!empty($filters['type'])) {
+        if (! empty($filters['type'])) {
             $query->byType($filters['type']);
         }
 
-        if (!empty($filters['search'])) {
+        if (! empty($filters['search'])) {
             $search = $filters['search'];
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('message', 'like', "%{$search}%");
+                    ->orWhere('message', 'like', "%{$search}%");
             });
         }
 
-        if (!empty($filters['date_from'])) {
+        if (! empty($filters['date_from'])) {
             $query->whereDate('created_at', '>=', $filters['date_from']);
         }
 
-        if (!empty($filters['date_to'])) {
+        if (! empty($filters['date_to'])) {
             $query->whereDate('created_at', '<=', $filters['date_to']);
         }
 
@@ -93,21 +97,21 @@ class StockAlertRepository implements StockAlertRepositoryInterface
     public function resolveActiveAlerts(int $stockId): void
     {
         $this->model->where('stock_id', $stockId)
-                   ->where('is_active', true)
-                   ->where('is_resolved', false)
-                   ->update([
-                       'is_resolved' => true,
-                       'resolved_at' => now()
-                   ]);
+            ->where('is_active', true)
+            ->where('is_resolved', false)
+            ->update([
+                'is_resolved' => true,
+                'resolved_at' => now(),
+            ]);
     }
 
     public function deleteActiveAlerts(int $stockId): void
     {
         $this->model->where('stock_id', $stockId)
-                   ->delete();
+            ->delete();
     }
 
-    public function countActiveAlerts(int $clinicId = null): int
+    public function countActiveAlerts(?int $clinicId = null): int
     {
         $query = $this->model->active();
 
@@ -118,7 +122,7 @@ class StockAlertRepository implements StockAlertRepositoryInterface
         return $query->count();
     }
 
-    public function countAlertsByType(string $type, int $clinicId = null): int
+    public function countAlertsByType(string $type, ?int $clinicId = null): int
     {
         $query = $this->model->active()->byType($type);
 
@@ -133,8 +137,8 @@ class StockAlertRepository implements StockAlertRepositoryInterface
     {
         // 🛡️ Ürün bazlı uyarı temizleme - ürünün tüm aktif uyarılarını sil
         $this->model->where('product_id', $productId)
-                   ->where('is_active', true)
-                   ->delete();
+            ->where('is_active', true)
+            ->delete();
     }
 
     public function bulkResolve(array $ids, string $resolvedBy): int

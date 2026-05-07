@@ -1,4 +1,5 @@
 <?php
+
 // ==============================================
 // 1. SupplierService.php
 // app/Modules/Stock/Services/SupplierService.php
@@ -6,8 +7,8 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\SupplierRepositoryInterface;
 use App\Models\Supplier;
+use App\Repositories\Interfaces\SupplierRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 
 class SupplierService

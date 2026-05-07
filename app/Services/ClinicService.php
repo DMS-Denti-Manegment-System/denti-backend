@@ -7,8 +7,8 @@
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\ClinicRepositoryInterface;
 use App\Models\Clinic;
+use App\Repositories\Interfaces\ClinicRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Cache;
 
@@ -24,6 +24,7 @@ class ClinicService
     public function getAllClinics()
     {
         $companyId = auth()->user()->company_id ?? 'global';
+
         return Cache::remember("all_clinics_{$companyId}", 300, function () {
             return $this->clinicRepository->all();
         });
@@ -68,5 +69,4 @@ class ClinicService
     {
         return $this->clinicRepository->getGlobalStats();
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // app/Modules/Stock/Database/Migrations/2024_12_15_000001_create_suppliers_table.php
 
 use Illuminate\Database\Migrations\Migration;

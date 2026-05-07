@@ -15,7 +15,9 @@ class LowStockAlert extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public Product $product;
+
     public int $currentStock;
+
     public int $threshold;
 
     public function __construct(Product $product)

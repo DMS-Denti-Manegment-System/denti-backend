@@ -1,13 +1,13 @@
 <?php
+
 // app/Modules/Stock/Services/StockRequestService.php
 
 namespace App\Services;
 
-use App\Repositories\Interfaces\StockRequestRepositoryInterface;
-use App\Repositories\Interfaces\StockRepositoryInterface;
-use App\Services\StockTransactionService;
-use App\Models\StockRequest;
 use App\Jobs\SendStockRequestNotificationJob;
+use App\Models\StockRequest;
+use App\Repositories\Interfaces\StockRepositoryInterface;
+use App\Repositories\Interfaces\StockRequestRepositoryInterface;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
@@ -17,6 +17,7 @@ use Illuminate\Support\Str;
 class StockRequestService
 {
     protected $stockRequestRepository;
+
     protected $stockService;
 
     public function __construct(
@@ -65,26 +66,26 @@ class StockRequestService
      * Stok talebini onayla.
      * Sadece Company Owner veya Super Admin rolüne sahip kullanıcılar onaylayabilir.
      *
-     * @throws AuthorizationException   Yetki yoksa
-     * @throws \Exception               Talep geçersizse veya stok yetersizse
+     * @throws AuthorizationException Yetki yoksa
+     * @throws \Exception Talep geçersizse veya stok yetersizse
      */
-    public function approveRequest(int $requestId, int $approvedQuantity, string $approvedBy, string $notes = null): bool
+    public function approveRequest(int $requestId, int $approvedQuantity, string $approvedBy, ?string $notes = null): bool
     {
         $request = $this->stockRequestRepository->find($requestId);
-        if (!$request || $request->status !== 'pending') {
+        if (! $request || $request->status !== 'pending') {
             throw new \Exception('Geçersiz talep veya talep zaten işlenmiş');
         }
 
         // 🔒 GÜVENLİK: Sadece ürünü VERECEK olan klinik onaylayabilir.
         $user = Auth::user();
         $isSuperAdmin = $user->hasRole('Super Admin');
-        
-        if (!$isSuperAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+
+        if (! $isSuperAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
             throw new AuthorizationException('Bu talebi sadece ürünü gönderecek olan klinik onaylayabilir.');
         }
 
         // Yetki kontrolü (Rol bazlı)
-        if (!$isSuperAdmin && !$user->hasAnyRole(['Company Owner', 'Stock Manager', 'Clinic Manager', 'Admin'])) {
+        if (! $isSuperAdmin && ! $user->hasAnyRole(['Company Owner', 'Stock Manager', 'Clinic Manager', 'Admin'])) {
             throw new AuthorizationException('Bu talebi onaylama yetkiniz bulunmamaktadır.');
         }
 
@@ -100,7 +101,7 @@ class StockRequestService
                 'approved_quantity' => $approvedQuantity,
                 'approved_by' => $approvedBy,
                 'approved_at' => now(),
-                'admin_notes' => $notes
+                'admin_notes' => $notes,
             ]);
 
             // Stoku rezerve et
@@ -113,26 +114,26 @@ class StockRequestService
     public function shipRequest(int $requestId, string $performedBy): bool
     {
         $request = $this->stockRequestRepository->find($requestId);
-        if (!$request || $request->status !== 'approved') {
+        if (! $request || $request->status !== 'approved') {
             throw new \Exception('Talep bulunamadı veya onaylanmamış');
         }
 
         // GÜVENLİK: Sadece ürünü GÖNDEREN klinik transferi başlatabilir.
         $user = Auth::user();
-        if ($request->requested_from_clinic_id !== $user->clinic_id && !$user->hasRole('Super Admin')) {
+        if ($request->requested_from_clinic_id !== $user->clinic_id && ! $user->hasRole('Super Admin')) {
             throw new AuthorizationException('Bu işlemi sadece ürünü gönderen klinik başlatabilir.');
         }
 
         return (bool) $this->stockRequestRepository->update($requestId, [
             'status' => 'in_transit',
-            'updated_at' => now()
+            'updated_at' => now(),
         ]);
     }
 
     public function completeRequest(int $requestId, string $performedBy): bool
     {
         $request = $this->stockRequestRepository->find($requestId);
-        if (!$request || $request->status !== 'in_transit') {
+        if (! $request || $request->status !== 'in_transit') {
             throw new \Exception('Talep bulunamadı veya transfer sürecinde değil');
         }
 
@@ -140,11 +141,11 @@ class StockRequestService
         $user = Auth::user();
         $isSuperAdmin = $user->hasRole('Super Admin');
 
-        if (!$isSuperAdmin && $request->requester_clinic_id !== $user->clinic_id) {
+        if (! $isSuperAdmin && $request->requester_clinic_id !== $user->clinic_id) {
             throw new AuthorizationException('Bu işlemi sadece ürünü teslim alan klinik tamamlayabilir.');
         }
 
-        if (!$isSuperAdmin && !$user->hasAnyRole(['Company Owner', 'Stock Manager', 'Clinic Manager', 'Admin'])) {
+        if (! $isSuperAdmin && ! $user->hasAnyRole(['Company Owner', 'Stock Manager', 'Clinic Manager', 'Admin'])) {
             throw new AuthorizationException('Bu talebi tamamlama yetkiniz bulunmamaktadır.');
         }
 
@@ -155,7 +156,7 @@ class StockRequestService
             // Talebi tamamla
             $this->stockRequestRepository->update($requestId, [
                 'status' => 'completed',
-                'completed_at' => now()
+                'completed_at' => now(),
             ]);
 
             return true;
@@ -165,7 +166,7 @@ class StockRequestService
     public function rejectRequest(int $requestId, string $rejectionReason, string $rejectedBy): bool
     {
         $request = $this->stockRequestRepository->find($requestId);
-        if (!$request || $request->status !== 'pending') {
+        if (! $request || $request->status !== 'pending') {
             throw new \Exception('Talep bulunamadı veya zaten işlenmiş');
         }
 
@@ -173,7 +174,7 @@ class StockRequestService
         $user = Auth::user();
         $isSuperAdmin = $user->hasRole('Super Admin');
 
-        if (!$isSuperAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+        if (! $isSuperAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
             throw new AuthorizationException('Bu talebi sadece ürünü gönderecek olan klinik reddedebilir.');
         }
 
@@ -181,7 +182,7 @@ class StockRequestService
             'status' => 'rejected',
             'rejection_reason' => $rejectionReason,
             'approved_by' => $rejectedBy,
-            'approved_at' => now()
+            'approved_at' => now(),
         ]);
     }
 
@@ -191,7 +192,8 @@ class StockRequestService
     protected function generateRequestNumber(): string
     {
         $date = now()->format('Ymd');
-        return 'REQ-' . $date . '-' . strtoupper(substr(Str::uuid()->toString(), 0, 8));
+
+        return 'REQ-'.$date.'-'.strtoupper(substr(Str::uuid()->toString(), 0, 8));
     }
 
     /**
@@ -200,7 +202,8 @@ class StockRequestService
     protected function generateTransactionNumber(): string
     {
         $date = now()->format('Ymd');
-        return 'TXN-' . $date . '-' . strtoupper(substr(Str::uuid()->toString(), 0, 8));
+
+        return 'TXN-'.$date.'-'.strtoupper(substr(Str::uuid()->toString(), 0, 8));
     }
 
     // ✅ HATA DÜZELTİLDİ: Proper interface resolution
@@ -212,7 +215,7 @@ class StockRequestService
         if ($stock) {
             $stockRepository->update($stockId, [
                 'reserved_stock' => $stock->reserved_stock + $quantity,
-                'available_stock' => $stock->available_stock - $quantity
+                'available_stock' => $stock->available_stock - $quantity,
             ]);
         }
     }
@@ -237,7 +240,7 @@ class StockRequestService
             'stock_request_id' => $request->id,
             'description' => "Transfer to {$request->requesterClinic->name}",
             'performed_by' => $performedBy,
-            'transaction_date' => now()
+            'transaction_date' => now(),
         ]);
 
         // 🛡️ Sadece rezerve stoku güncelle (Observer sadece current_stock'u yönetir)
@@ -260,7 +263,7 @@ class StockRequestService
             'stock_request_id' => $request->id,
             'description' => "Transfer from {$request->requestedFromClinic->name}",
             'performed_by' => $performedBy,
-            'transaction_date' => now()
+            'transaction_date' => now(),
         ]);
 
         // Hedef stokta rezerve güncellemesine gerek yok (yeni giriş)
@@ -284,7 +287,7 @@ class StockRequestService
         // Eğer yukarıdaki kontrol bulamadıysa, yeni bir tane oluşturacağız
         $targetStock = $existingStock;
 
-        if (!$targetStock) {
+        if (! $targetStock) {
             // Yeni stok kaydı oluştur
             $stockData = $sourceStock->toArray();
             unset($stockData['id'], $stockData['created_at'], $stockData['updated_at']);
@@ -300,7 +303,7 @@ class StockRequestService
         return $targetStock;
     }
 
-    public function getPendingRequests(int $clinicId = null): Collection
+    public function getPendingRequests(?int $clinicId = null): Collection
     {
         return $this->stockRequestRepository->getPendingRequests($clinicId);
     }

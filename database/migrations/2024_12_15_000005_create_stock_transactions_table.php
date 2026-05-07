@@ -1,4 +1,5 @@
 <?php
+
 // app/Modules/Stock/Database/Migrations/2024_12_15_000005_create_stock_transactions_table.php
 
 use Illuminate\Database\Migrations\Migration;
@@ -25,7 +26,7 @@ return new class extends Migration
                 'adjustment',   // Düzeltme
                 'expired',      // Son kullanma tarihi geçen
                 'damaged',      // Hasarlı
-                'returned'      // İade
+                'returned',      // İade
             ]);
 
             // Miktarlar

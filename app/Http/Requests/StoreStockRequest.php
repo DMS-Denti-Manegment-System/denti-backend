@@ -3,7 +3,6 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\Rule;
 
 class StoreStockRequest extends FormRequest
 {
@@ -19,15 +18,15 @@ class StoreStockRequest extends FormRequest
         return [
             'product_id' => [
                 'required',
-                new \App\Rules\CompanyOwned('products')
+                new \App\Rules\CompanyOwned('products'),
             ],
             'supplier_id' => [
                 'required',
-                new \App\Rules\CompanyOwned('suppliers')
+                new \App\Rules\CompanyOwned('suppliers'),
             ],
             'clinic_id' => [
                 'required',
-                new \App\Rules\CompanyOwned('clinics')
+                new \App\Rules\CompanyOwned('clinics'),
             ],
             'purchase_price' => 'required|numeric|min:0',
             'currency' => 'nullable|string|max:10',
@@ -43,7 +42,7 @@ class StoreStockRequest extends FormRequest
             'has_sub_unit' => 'boolean',
             'sub_unit_name' => 'nullable|required_if:has_sub_unit,true|string|max:50',
             'sub_unit_multiplier' => 'nullable|required_if:has_sub_unit,true|integer|min:1',
-            'current_sub_stock' => 'nullable|integer|min:0'
+            'current_sub_stock' => 'nullable|integer|min:0',
         ];
     }
 }

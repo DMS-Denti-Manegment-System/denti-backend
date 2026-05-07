@@ -22,7 +22,7 @@ class CompanyOwned implements ValidationRule
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
         // 🛡️ CLI veya Schedule ortamında auth()->user() null olabilir.
-        if (!auth()->check()) {
+        if (! auth()->check()) {
             return;
         }
 
@@ -33,7 +33,7 @@ class CompanyOwned implements ValidationRule
             ->where('company_id', $companyId)
             ->exists();
 
-        if (!$exists) {
+        if (! $exists) {
             $fail("Seçilen {$attribute} geçersiz veya yetkiniz yok.");
         }
     }

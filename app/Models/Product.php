@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,13 +12,13 @@ use Illuminate\Support\Collection;
 
 class Product extends Model
 {
-    use HasFactory, Tenantable, SoftDeletes;
+    use HasFactory, SoftDeletes, Tenantable;
 
     protected $fillable = [
         'name', 'sku', 'description', 'unit', 'category', 'brand',
         'min_stock_level', 'critical_stock_level',
         'yellow_alert_level', 'red_alert_level',
-        'is_active', 'has_expiration_date', 'company_id', 'clinic_id'
+        'is_active', 'has_expiration_date', 'company_id', 'clinic_id',
     ];
 
     protected $casts = [
@@ -65,42 +64,51 @@ class Product extends Model
             return (int) $this->attributes['total_stock'];
         }
 
-        if (!$this->relationLoaded('batches')) {
+        if (! $this->relationLoaded('batches')) {
             $this->load('batches');
         }
 
-        return $this->batches->sum(function($batch) {
-            if (!$batch->has_sub_unit) {
+        return $this->batches->sum(function ($batch) {
+            if (! $batch->has_sub_unit) {
                 return $batch->current_stock;
             }
+
             return ($batch->current_stock * ($batch->sub_unit_multiplier ?? 1)) + $batch->current_sub_stock;
         });
     }
 
     public function getStockStatusAttribute()
     {
-        if (!$this->is_active) return \App\Enums\StockStatus::INACTIVE->value;
-        
+        if (! $this->is_active) {
+            return \App\Enums\StockStatus::INACTIVE->value;
+        }
+
         $total = $this->total_stock;
         $redLevel = $this->red_alert_level ?? $this->critical_stock_level;
         $yellowLevel = $this->yellow_alert_level ?? $this->min_stock_level;
 
-        if ($total <= $redLevel) return 'critical';
-        if ($total <= $yellowLevel) return \App\Enums\StockStatus::LOW_STOCK->value;
+        if ($total <= $redLevel) {
+            return 'critical';
+        }
+        if ($total <= $yellowLevel) {
+            return \App\Enums\StockStatus::LOW_STOCK->value;
+        }
+
         return 'normal';
     }
 
     // 🏦 Finansal Hesaplamalar (Sadece ilişkiler yüklüyse hesapla)
     public function getTotalStockValueAttribute()
     {
-        if (!$this->relationLoaded('batches')) {
+        if (! $this->relationLoaded('batches')) {
             return 0;
         }
 
-        return $this->batches->sum(function($batch) {
-            $totalUnits = $batch->has_sub_unit 
+        return $this->batches->sum(function ($batch) {
+            $totalUnits = $batch->has_sub_unit
                 ? ($batch->current_stock * ($batch->sub_unit_multiplier ?? 1)) + $batch->current_sub_stock
                 : $batch->current_stock;
+
             return $totalUnits * ($batch->purchase_price ?? 0);
         });
     }
@@ -108,8 +116,10 @@ class Product extends Model
     public function getAverageCostAttribute()
     {
         $totalUnits = $this->total_stock;
-        if ($totalUnits <= 0) return 0;
-        
+        if ($totalUnits <= 0) {
+            return 0;
+        }
+
         return $this->total_stock_value / $totalUnits;
     }
 
@@ -122,15 +132,17 @@ class Product extends Model
     {
         $totalCost = $this->total_stock_value;
         $totalRevenue = $this->potential_revenue;
-        
+
         return $totalRevenue - $totalCost;
     }
 
     public function getProfitMarginAttribute()
     {
         $totalRevenue = $this->potential_revenue;
-        if ($totalRevenue <= 0) return 0;
-        
+        if ($totalRevenue <= 0) {
+            return 0;
+        }
+
         return ($this->potential_profit / $totalRevenue) * 100;
     }
 

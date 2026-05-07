@@ -1,4 +1,5 @@
 <?php
+
 // ==============================================
 // 1. StockRequestRepository.php - DÜZELTİLMİŞ
 // app/Modules/Stock/Repositories/StockRequestRepository.php
@@ -22,31 +23,31 @@ class StockRequestRepository implements StockRequestRepositoryInterface
     public function all(): Collection
     {
         return $this->model->with(['requesterClinic', 'requestedFromClinic', 'stock'])
-                          ->orderByDesc('requested_at')
-                          ->get();
+            ->orderByDesc('requested_at')
+            ->get();
     }
 
     public function getAllWithFilters(array $filters = [], int $perPage = 15)
     {
         $query = $this->model->with([
-            'requesterClinic:id,name,specialty_code', 
-            'requestedFromClinic:id,name,specialty_code', 
+            'requesterClinic:id,name,specialty_code',
+            'requestedFromClinic:id,name,specialty_code',
             'stock:id,product_id,batch_number,unit,category,brand',
-            'stock.product:id,name,sku'
+            'stock.product:id,name,sku',
         ]);
 
-        if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
             $query->where(function ($q) use ($search) {
                 $q->where('request_number', 'like', $search)
-                  ->orWhereHas('stock.product', function($sq) use ($search) {
-                      $sq->where('name', 'like', $search)
-                        ->orWhere('sku', 'like', $search);
-                  });
+                    ->orWhereHas('stock.product', function ($sq) use ($search) {
+                        $sq->where('name', 'like', $search)
+                            ->orWhere('sku', 'like', $search);
+                    });
             });
         }
 
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('status', $filters['status']);
         }
 
@@ -61,12 +62,12 @@ class StockRequestRepository implements StockRequestRepositoryInterface
             } else {
                 $query->where(function ($q) use ($clinicId) {
                     $q->where('requester_clinic_id', $clinicId)
-                      ->orWhere('requested_from_clinic_id', $clinicId);
+                        ->orWhere('requested_from_clinic_id', $clinicId);
                 });
             }
-        } elseif ($type === 'sent' && !empty($filters['requester_clinic_id'])) {
+        } elseif ($type === 'sent' && ! empty($filters['requester_clinic_id'])) {
             $query->where('requester_clinic_id', $filters['requester_clinic_id']);
-        } elseif ($type === 'received' && !empty($filters['requested_from_clinic_id'])) {
+        } elseif ($type === 'received' && ! empty($filters['requested_from_clinic_id'])) {
             $query->where('requested_from_clinic_id', $filters['requested_from_clinic_id']);
         }
 
@@ -88,18 +89,21 @@ class StockRequestRepository implements StockRequestRepositoryInterface
         $request = $this->find($id);
         if ($request) {
             $request->update($data);
+
             return $request->fresh(['requesterClinic', 'requestedFromClinic', 'stock']);
         }
+
         return null;
     }
 
     public function delete(int $id): bool
     {
         $request = $this->find($id);
+
         return $request ? $request->delete() : false;
     }
 
-    public function getPendingRequests(int $clinicId = null): Collection
+    public function getPendingRequests(?int $clinicId = null): Collection
     {
         $query = $this->model->pending()->with(['requesterClinic', 'requestedFromClinic', 'stock']);
 
@@ -124,7 +128,7 @@ class StockRequestRepository implements StockRequestRepositoryInterface
             default:
                 $query->where(function ($q) use ($clinicId) {
                     $q->where('requester_clinic_id', $clinicId)
-                      ->orWhere('requested_from_clinic_id', $clinicId);
+                        ->orWhere('requested_from_clinic_id', $clinicId);
                 });
         }
 
@@ -134,9 +138,9 @@ class StockRequestRepository implements StockRequestRepositoryInterface
     public function getRequestsByStatus(string $status): Collection
     {
         return $this->model->where('status', $status)
-                          ->with(['requesterClinic', 'requestedFromClinic', 'stock'])
-                          ->orderByDesc('requested_at')
-                          ->get();
+            ->with(['requesterClinic', 'requestedFromClinic', 'stock'])
+            ->orderByDesc('requested_at')
+            ->get();
     }
 
     public function getStats(): array

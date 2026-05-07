@@ -13,7 +13,6 @@ use Illuminate\Support\Facades\Log;
 
 class TwoFactorAuthController extends Controller
 {
-
     protected $twoFactorService;
 
     public function __construct(TwoFactorService $twoFactorService)
@@ -27,13 +26,13 @@ class TwoFactorAuthController extends Controller
     public function generate(Request $request): JsonResponse
     {
         $user = $request->user();
-        
+
         $secret = $this->twoFactorService->generateSecret($user);
         $qrCodeUrl = $this->twoFactorService->getQrCodeUrl($user);
 
         return $this->success([
             'secret' => $secret,
-            'qr_code_url' => $qrCodeUrl
+            'qr_code_url' => $qrCodeUrl,
         ], '2FA setup generated');
     }
 
@@ -46,13 +45,13 @@ class TwoFactorAuthController extends Controller
 
         if ($this->twoFactorService->confirm2FA($user, $request->code)) {
             return $this->success([
-                'recovery_codes' => $user->two_factor_recovery_codes
+                'recovery_codes' => $user->two_factor_recovery_codes,
             ], '2FA enabled successfully. Please save your recovery codes.');
         }
 
         Log::warning('Failed 2FA confirmation attempt', [
             'user_id' => $user->id,
-            'ip' => $request->ip()
+            'ip' => $request->ip(),
         ]);
 
         return $this->error('Invalid verification code', 422);
@@ -65,7 +64,7 @@ class TwoFactorAuthController extends Controller
     {
         $user = Auth::user();
 
-        if (!$user) {
+        if (! $user) {
             return $this->error('Unauthorized', 401);
         }
 
@@ -87,14 +86,14 @@ class TwoFactorAuthController extends Controller
                 'user' => $user,
                 'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
-                'company' => $user->company
+                'company' => $user->company,
             ], '2FA verification successful');
         }
 
         Log::warning('Failed 2FA verification attempt', [
             'user_id' => $user->id,
             'ip' => $request->ip(),
-            'code_type' => (strlen($code) === 6 && is_numeric($code)) ? 'totp' : 'recovery'
+            'code_type' => (strlen($code) === 6 && is_numeric($code)) ? 'totp' : 'recovery',
         ]);
 
         return $this->error('Invalid verification code', 422);
@@ -106,15 +105,15 @@ class TwoFactorAuthController extends Controller
     public function regenerateRecoveryCodes(Request $request): JsonResponse
     {
         $user = $request->user();
-        
-        if (!$user->two_factor_confirmed_at) {
+
+        if (! $user->two_factor_confirmed_at) {
             return $this->error('2FA must be enabled first', 400);
         }
 
         $codes = $this->twoFactorService->generateRecoveryCodes($user);
 
         return $this->success([
-            'recovery_codes' => $codes
+            'recovery_codes' => $codes,
         ], 'Recovery codes regenerated successfully');
     }
 }

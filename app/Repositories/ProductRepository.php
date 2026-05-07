@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Models\Product;
 use App\Models\Stock;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 
@@ -23,7 +22,7 @@ class ProductRepository
         $query = Product::query()
             ->with([
                 'clinic:id,name',
-                'batches' => fn($q) => $q->with(['supplier:id,name', 'clinic:id,name'])->latest('id')
+                'batches' => fn ($q) => $q->with(['supplier:id,name', 'clinic:id,name'])->latest('id'),
             ])
             ->leftJoinSub($stockSummary, 'stock_summary', function ($join) {
                 $join->on('stock_summary.product_id', '=', 'products.id');
@@ -36,37 +35,37 @@ class ProductRepository
         $now = now();
 
         // 1. Arama (İsim veya SKU)
-        if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
-            $query->where(function($q) use ($search) {
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
+            $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', $search)
-                  ->orWhere('sku', 'like', $search);
+                    ->orWhere('sku', 'like', $search);
             });
         }
 
         // 2. Kategori
-        if (!empty($filters['category'])) {
+        if (! empty($filters['category'])) {
             $query->where('category', $filters['category']);
         }
 
         // 3. Klinik Filtresi
-        if (!empty($filters['clinic_id'])) {
+        if (! empty($filters['clinic_id'])) {
             $clinicId = $filters['clinic_id'];
-            $query->where(function($q) use ($clinicId) {
+            $query->where(function ($q) use ($clinicId) {
                 $q->where('clinic_id', $clinicId)
-                  ->orWhereHas('batches', function($batchQuery) use ($clinicId) {
-                      $batchQuery->where('clinic_id', $clinicId);
-                  });
+                    ->orWhereHas('batches', function ($batchQuery) use ($clinicId) {
+                        $batchQuery->where('clinic_id', $clinicId);
+                    });
             });
         }
 
         // 4. Durum (Aktif/Pasif)
-        if (!empty($filters['status'])) {
+        if (! empty($filters['status'])) {
             $query->where('is_active', $filters['status'] === 'active');
         }
 
         // 5. Seviye (Stok ve SKT Uyarıları)
-        if (!empty($filters['level'])) {
+        if (! empty($filters['level'])) {
             $level = $filters['level'];
             $levelAliases = [
                 'low_stock' => 'low',
@@ -74,42 +73,42 @@ class ProductRepository
                 'low_expiry' => 'near_expiry',
             ];
             $level = $levelAliases[$level] ?? $level;
-            
+
             // Stok Miktarı Bazlı Filtreler (Total Stock)
             if (in_array($level, ['low', 'critical'], true)) {
                 if ($level === 'critical') {
-                    $query->whereHas('batches', function($q) {
+                    $query->whereHas('batches', function ($q) {
                         $q->where('is_active', 1);
                     })->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.red_alert_level, products.critical_stock_level)');
                 } else {
                     $query->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
-                          ->whereRaw('COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level)');
+                        ->whereRaw('COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level)');
                 }
             }
-            
+
             // SKT (Miyat) Bazlı Filtreler
             if (in_array($level, ['near_expiry', 'critical_expiry', 'expired'], true)) {
-                $query->whereHas('batches', function($q) use ($level, $isSqlite, $now) {
+                $query->whereHas('batches', function ($q) use ($level, $isSqlite, $now) {
                     $q->where('is_active', 1)->where('track_expiry', 1);
-                    
+
                     if ($level === 'expired') {
                         $q->whereDate('expiry_date', '<', $now->toDateString());
                     } elseif ($level === 'critical_expiry') {
-                        $redDaysSql = $isSqlite 
+                        $redDaysSql = $isSqlite
                             ? "date(?, '+' || COALESCE(expiry_red_days, 15) || ' days')"
-                            : "DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)";
+                            : 'DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)';
                         $q->whereDate('expiry_date', '>=', $now->toDateString())
-                          ->whereRaw("expiry_date <= {$redDaysSql}", [$now->toDateTimeString()]);
+                            ->whereRaw("expiry_date <= {$redDaysSql}", [$now->toDateTimeString()]);
                     } else { // near_expiry
                         $yellowDaysSql = $isSqlite
                             ? "date(?, '+' || COALESCE(expiry_yellow_days, 30) || ' days')"
-                            : "DATE_ADD(?, INTERVAL COALESCE(expiry_yellow_days, 30) DAY)";
-                        $redDaysSql = $isSqlite 
+                            : 'DATE_ADD(?, INTERVAL COALESCE(expiry_yellow_days, 30) DAY)';
+                        $redDaysSql = $isSqlite
                             ? "date(?, '+' || COALESCE(expiry_red_days, 15) || ' days')"
-                            : "DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)";
+                            : 'DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)';
                         $q->whereDate('expiry_date', '>=', $now->toDateString())
-                          ->whereRaw("expiry_date <= {$yellowDaysSql}", [$now->toDateTimeString()])
-                          ->whereRaw("expiry_date > {$redDaysSql}", [$now->toDateTimeString()]);
+                            ->whereRaw("expiry_date <= {$yellowDaysSql}", [$now->toDateTimeString()])
+                            ->whereRaw("expiry_date > {$redDaysSql}", [$now->toDateTimeString()]);
                     }
                 });
             }
@@ -122,10 +121,10 @@ class ProductRepository
     {
         return Product::with(['batches.supplier', 'batches.clinic', 'clinic'])
             ->withCount('batches')
-            ->withSum(['stockTransactions as total_in' => function($q) {
+            ->withSum(['stockTransactions as total_in' => function ($q) {
                 $q->whereIn('type', Product::incomingTransactionTypes());
             }], 'quantity')
-            ->withSum(['stockTransactions as total_out' => function($q) {
+            ->withSum(['stockTransactions as total_out' => function ($q) {
                 $q->whereIn('type', Product::outgoingTransactionTypes());
             }], 'quantity')
             ->find($id);
@@ -141,8 +140,10 @@ class ProductRepository
         $product = Product::find($id);
         if ($product) {
             $product->update($data);
+
             return $product;
         }
+
         return null;
     }
 
@@ -152,15 +153,16 @@ class ProductRepository
         if ($product) {
             return $product->delete();
         }
+
         return false;
     }
 
     public function getTransactions(int $id): Collection
     {
         $stockIds = \App\Models\Stock::where('product_id', $id)->pluck('id')->toArray();
-        
+
         if (empty($stockIds)) {
-            return new Collection();
+            return new Collection;
         }
 
         return \App\Models\StockTransaction::with(['user', 'stock.product'])

@@ -5,17 +5,18 @@ namespace Tests\Unit\Models;
 use App\Models\Product;
 use App\Models\Stock;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_total_stock_correctly_with_base_units()
     {
         $product = Product::factory()->create();
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 10,
@@ -25,11 +26,11 @@ class ProductTest extends TestCase
         $this->assertEquals(10, $product->fresh()->total_stock);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_total_stock_with_sub_units()
     {
         $product = Product::factory()->create();
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 5,
@@ -42,7 +43,7 @@ class ProductTest extends TestCase
         $this->assertEquals(53, $product->fresh()->total_stock);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_normal_status_when_stock_is_above_thresholds()
     {
         $product = Product::factory()->create([
@@ -51,7 +52,7 @@ class ProductTest extends TestCase
             'yellow_alert_level' => 10,
             'red_alert_level' => 5,
         ]);
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 20,
@@ -61,7 +62,7 @@ class ProductTest extends TestCase
         $this->assertEquals('normal', $product->fresh()->stock_status);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_low_status_when_stock_is_below_min_level()
     {
         $product = Product::factory()->create([
@@ -70,7 +71,7 @@ class ProductTest extends TestCase
             'yellow_alert_level' => 10,
             'red_alert_level' => 5,
         ]);
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 8,
@@ -80,7 +81,7 @@ class ProductTest extends TestCase
         $this->assertEquals('low_stock', $product->fresh()->stock_status);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_critical_status_when_stock_is_below_critical_level()
     {
         $product = Product::factory()->create([
@@ -89,7 +90,7 @@ class ProductTest extends TestCase
             'yellow_alert_level' => 10,
             'red_alert_level' => 5,
         ]);
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 3,
@@ -99,13 +100,13 @@ class ProductTest extends TestCase
         $this->assertEquals('critical', $product->fresh()->stock_status);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_inactive_status_when_product_is_not_active()
     {
         $product = Product::factory()->create([
             'is_active' => false,
         ]);
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 100,
@@ -114,11 +115,11 @@ class ProductTest extends TestCase
         $this->assertEquals('inactive', $product->fresh()->stock_status);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_last_purchase_price_from_batches()
     {
         $product = Product::factory()->create();
-        
+
         $batch = Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 10,
@@ -129,11 +130,11 @@ class ProductTest extends TestCase
         $this->assertEquals(150.50, $product->fresh()->last_purchase_price);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_zero_when_no_active_batches()
     {
         $product = Product::factory()->create();
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 0,
@@ -143,16 +144,16 @@ class ProductTest extends TestCase
         $this->assertEquals(0, $product->fresh()->last_purchase_price);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_total_in_from_transactions()
     {
         $product = Product::factory()->create();
-        
+
         $stock = Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 10,
         ]);
-        
+
         // IN transaction
         \App\Models\StockTransaction::factory()->create([
             'stock_id' => $stock->id,
@@ -174,13 +175,13 @@ class ProductTest extends TestCase
         $this->assertEquals(15, $product->fresh()->total_in);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_total_out_from_transactions()
     {
         $product = Product::factory()->create();
-        
+
         $stock = Stock::factory()->create(['product_id' => $product->id]);
-        
+
         // OUT transaction
         \App\Models\StockTransaction::factory()->create([
             'stock_id' => $stock->id,
@@ -202,11 +203,11 @@ class ProductTest extends TestCase
         $this->assertEquals(8, $product->fresh()->total_out);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_handles_missing_sub_unit_multiplier_safely()
     {
         $product = Product::factory()->create();
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 5,
@@ -220,15 +221,15 @@ class ProductTest extends TestCase
         // If multiplier is null, (5 * 0) + 3 = 3 or (5 * 1) + 3 = 8.
         // Actually the model might cast it to int (0). So 5 * 0 + 3 = 3.
         $total = $product->fresh()->total_stock;
-        
+
         $this->assertIsNumeric($total);
     }
 
-    /** @test */
+    #[\PHPUnit\Framework\Attributes\Test]
     public function it_calculates_total_stock_with_multiple_stock_records()
     {
         $product = Product::factory()->create();
-        
+
         Stock::factory()->create([
             'product_id' => $product->id,
             'current_stock' => 10,

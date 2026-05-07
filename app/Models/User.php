@@ -13,9 +13,10 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasApiTokens, HasFactory, Notifiable, HasRoles, Tenantable;
+    use HasApiTokens, HasFactory, HasRoles, Notifiable, Tenantable;
 
     const ROLE_SUPER_ADMIN = 'Super Admin';
+
     /** Veritabanı / seeder ile aynı isim (eski 'Owner' sabiti hatalıydı) */
     const ROLE_OWNER = 'Company Owner';
 
@@ -41,7 +42,7 @@ class User extends Authenticatable
      */
     public function hasTwoFactorEnabled(): bool
     {
-        return !empty($this->two_factor_secret) && !is_null($this->two_factor_confirmed_at);
+        return ! empty($this->two_factor_secret) && ! is_null($this->two_factor_confirmed_at);
     }
 
     /**
@@ -94,7 +95,9 @@ class User extends Authenticatable
     public function isSuperAdmin(): bool
     {
         static $requestCache = [];
-        if (isset($requestCache[$this->id])) return $requestCache[$this->id];
+        if (isset($requestCache[$this->id])) {
+            return $requestCache[$this->id];
+        }
 
         return $requestCache[$this->id] = \Illuminate\Support\Facades\Cache::remember("user_is_super_admin_{$this->id}", 3600, function () {
             // 🛡️ TenantScope döngüsünü kırmak için rollerini scope olmadan kontrol et

@@ -15,7 +15,9 @@ class ExpiryAlert extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public Stock $stock;
+
     public int $daysToExpiry;
+
     public string $alertType;
 
     public function __construct(Stock $stock, string $alertType = 'near')
@@ -27,7 +29,7 @@ class ExpiryAlert extends Mailable implements ShouldQueue
 
     public function envelope(): Envelope
     {
-        $subject = match($this->alertType) {
+        $subject = match ($this->alertType) {
             'expired' => "🚨 SON KULLANMA TARİHİ GEÇTİ: {$this->stock->product->name}",
             'critical' => "⏰ ACİL - Son kullanma yaklaşıyor: {$this->stock->product->name}",
             default => "⚠️ Son kullanma tarihi yaklaşıyor: {$this->stock->product->name}",

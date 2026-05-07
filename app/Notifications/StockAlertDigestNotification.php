@@ -14,9 +14,7 @@ class StockAlertDigestNotification extends Notification implements ShouldQueue
     /**
      * Create a new notification instance.
      */
-    public function __construct(protected array $items)
-    {
-    }
+    public function __construct(protected array $items) {}
 
     /**
      * Get the notification's delivery channels.
@@ -35,7 +33,7 @@ class StockAlertDigestNotification extends Notification implements ShouldQueue
     {
         $message = (new MailMessage)
             ->subject('Günlük Stok Özeti: Kritik Seviyedeki Ürünler')
-            ->greeting('Merhaba ' . $notifiable->name . ',')
+            ->greeting('Merhaba '.$notifiable->name.',')
             ->line('Aşağıdaki ürünler kritik stok seviyesinin altına düşmüştür:')
             ->divider();
 
@@ -46,9 +44,9 @@ class StockAlertDigestNotification extends Notification implements ShouldQueue
         foreach ($itemsToShow as $item) {
             $stock = $item['stock'];
             $alerts = $item['alerts'];
-            
+
             foreach ($alerts as $alert) {
-                $message->line("**{$stock->product->name}**: " . $alert['message']);
+                $message->line("**{$stock->product->name}**: ".$alert['message']);
             }
         }
 
@@ -71,9 +69,9 @@ class StockAlertDigestNotification extends Notification implements ShouldQueue
     {
         return [
             'title' => 'Toplu Stok Uyarısı',
-            'message' => count($this->items) . ' ürün için kritik stok uyarısı mevcut.',
+            'message' => count($this->items).' ürün için kritik stok uyarısı mevcut.',
             'items_count' => count($this->items),
-            'type' => 'stock_digest'
+            'type' => 'stock_digest',
         ];
     }
 }

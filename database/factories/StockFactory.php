@@ -22,7 +22,7 @@ class StockFactory extends Factory
             'product_id' => \App\Models\Product::factory(),
             'clinic_id' => \App\Models\Clinic::factory(),
             'supplier_id' => \App\Models\Supplier::factory()->nullable(),
-            'batch_code' => 'BATCH-' . $this->faker->randomNumber(6),
+            'batch_code' => 'BATCH-'.$this->faker->randomNumber(6),
             'current_stock' => $currentStock,
             'current_sub_stock' => $currentSubStock,
             'has_sub_unit' => $hasSubUnit,
@@ -32,8 +32,8 @@ class StockFactory extends Factory
             'purchase_price' => $this->faker->randomFloat(2, 10, 1000),
             'currency' => 'TRY',
             'purchase_date' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'expiry_date' => $this->faker->boolean(70) 
-                ? $this->faker->dateTimeBetween('now', '+2 years') 
+            'expiry_date' => $this->faker->boolean(70)
+                ? $this->faker->dateTimeBetween('now', '+2 years')
                 : null,
             'expiry_yellow_days' => 30,
             'expiry_red_days' => 15,

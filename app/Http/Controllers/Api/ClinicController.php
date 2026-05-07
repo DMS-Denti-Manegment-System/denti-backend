@@ -8,9 +8,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreClinicRequest;
+use App\Http\Requests\UpdateClinicRequest;
+use App\Models\Clinic;
 use App\Services\ClinicService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
@@ -27,21 +28,23 @@ class ClinicController extends Controller
     {
         try {
             $clinics = $this->clinicService->getAllClinics();
+
             return $this->success($clinics);
         } catch (\Exception $e) {
-            Log::error('Klinikler listelenirken hata oluştu: ' . $e->getMessage());
+            Log::error('Klinikler listelenirken hata oluştu: '.$e->getMessage());
+
             return $this->error('Klinikler listelenirken bir hata oluştu.', 500);
         }
     }
 
-    public function store(\App\Http\Requests\StoreClinicRequest $request): JsonResponse
+    public function store(StoreClinicRequest $request): JsonResponse
     {
         $this->authorize('create', Clinic::class);
 
         try {
             $validatedData = $request->validated();
-            
-            if (!auth()->user()->isSuperAdmin()) {
+
+            if (! auth()->user()->isSuperAdmin()) {
                 $validatedData['company_id'] = auth()->user()->company_id;
             }
 
@@ -50,25 +53,27 @@ class ClinicController extends Controller
             }
 
             $clinic = $this->clinicService->createClinic($validatedData);
-            
+
             return $this->success($clinic, 'Klinik başarıyla oluşturuldu', 201);
         } catch (\Exception $e) {
-            return $this->error('Klinik oluşturulamadı: ' . $e->getMessage(), 400);
+            return $this->error('Klinik oluşturulamadı: '.$e->getMessage(), 400);
         }
     }
 
     public function show(Clinic $clinic): JsonResponse
     {
         $this->authorize('view', $clinic);
+
         return $this->success($clinic);
     }
 
-    public function update(\App\Http\Requests\UpdateClinicRequest $request, Clinic $clinic): JsonResponse
+    public function update(UpdateClinicRequest $request, Clinic $clinic): JsonResponse
     {
         $this->authorize('update', $clinic);
 
         try {
             $clinic = $this->clinicService->updateClinic($clinic->id, $request->validated());
+
             return $this->success($clinic, 'Klinik başarıyla güncellendi');
         } catch (\Exception $e) {
             return $this->error($e->getMessage(), 400);
@@ -82,13 +87,13 @@ class ClinicController extends Controller
         try {
             $deleted = $this->clinicService->deleteClinic($clinic->id);
 
-            if (!$deleted) {
+            if (! $deleted) {
                 return $this->error('Klinik silme işlemi başarısız.', 400);
             }
 
             return $this->success(null, 'Klinik başarıyla silindi');
         } catch (\Exception $e) {
-            return $this->error('Silme hatası: ' . $e->getMessage(), 400);
+            return $this->error('Silme hatası: '.$e->getMessage(), 400);
         }
     }
 
@@ -96,9 +101,11 @@ class ClinicController extends Controller
     {
         try {
             $clinics = $this->clinicService->getActiveClinics();
+
             return $this->success($clinics);
         } catch (\Exception $e) {
-            Log::error('Aktif klinikler getirilirken hata: ' . $e->getMessage());
+            Log::error('Aktif klinikler getirilirken hata: '.$e->getMessage());
+
             return $this->error('Aktif klinikler getirilirken hata oluştu.', 500);
         }
     }
@@ -107,9 +114,11 @@ class ClinicController extends Controller
     {
         try {
             $stats = $this->clinicService->getClinicStats();
+
             return $this->success($stats);
         } catch (\Exception $e) {
-            Log::error('Klinik istatistikleri getirilirken hata: ' . $e->getMessage());
+            Log::error('Klinik istatistikleri getirilirken hata: '.$e->getMessage());
+
             return $this->error('İstatistikler getirilirken hata oluştu.', 500);
         }
     }
@@ -119,7 +128,7 @@ class ClinicController extends Controller
         try {
             $clinic = $this->clinicService->getClinicById($id);
 
-            if (!$clinic) {
+            if (! $clinic) {
                 return $this->error('Klinik bulunamadı', 404);
             }
 
@@ -127,7 +136,8 @@ class ClinicController extends Controller
 
             return $this->success($clinic->stocks);
         } catch (\Exception $e) {
-            Log::error('Klinik stokları getirilirken hata: ' . $e->getMessage());
+            Log::error('Klinik stokları getirilirken hata: '.$e->getMessage());
+
             return $this->error('Klinik stokları getirilirken hata oluştu.', 500);
         }
     }
@@ -136,9 +146,11 @@ class ClinicController extends Controller
     {
         try {
             $summary = $this->clinicService->getClinicStockSummary($id);
+
             return $this->success($summary);
         } catch (\Exception $e) {
-            Log::error('Klinik özeti getirilirken hata: ' . $e->getMessage());
+            Log::error('Klinik özeti getirilirken hata: '.$e->getMessage());
+
             return $this->error('Klinik özeti getirilirken hata oluştu.', 500);
         }
     }

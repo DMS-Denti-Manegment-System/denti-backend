@@ -2,9 +2,9 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Foundation\Http\FormRequest;
 use App\Traits\JsonResponseTrait;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 class UpdateTodoRequest extends FormRequest
@@ -22,7 +22,7 @@ class UpdateTodoRequest extends FormRequest
             'title' => 'sometimes|required|string|min:3|max:255',
             'description' => 'nullable|string|max:1000',
             'completed' => 'sometimes|boolean',
-            'category_id' => 'nullable|exists:categories,id'
+            'category_id' => 'nullable|exists:categories,id',
         ];
     }
 

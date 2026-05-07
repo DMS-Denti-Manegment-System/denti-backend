@@ -7,7 +7,6 @@
 
 namespace App\Models;
 
-use App\Models\Company;
 use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,7 +15,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockTransaction extends Model
 {
-    use HasFactory, Tenantable, SoftDeletes;
+    use HasFactory, SoftDeletes, Tenantable;
 
     protected $fillable = [
         'transaction_number', 'stock_id', 'user_id', 'clinic_id', 'type',
@@ -24,14 +23,14 @@ class StockTransaction extends Model
         'unit_price', 'total_price', 'stock_request_id',
         'reference_number', 'batch_number', 'description',
         'notes', 'performed_by', 'transaction_date', 'company_id',
-        'is_sub_unit'
+        'is_sub_unit',
     ];
 
     protected $casts = [
         'unit_price' => 'decimal:2',
         'total_price' => 'decimal:2',
         'transaction_date' => 'datetime',
-        'is_sub_unit' => 'boolean'
+        'is_sub_unit' => 'boolean',
     ];
 
     public function company(): BelongsTo
@@ -71,7 +70,7 @@ class StockTransaction extends Model
 
     public function getTypeTextAttribute()
     {
-        return match($this->type) {
+        return match ($this->type) {
             'purchase' => 'Satın Alma',
             'usage' => 'Kullanım',
             'transfer_in' => 'Transfer Giriş',
