@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Health;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Queue;
 
 class HealthController extends Controller
 {
@@ -13,6 +14,7 @@ class HealthController extends Controller
         $checks = [
             'db' => $this->checkDb(),
             'cache' => $this->checkCache(),
+            'queue' => $this->checkQueue(),
         ];
 
         $ok = collect($checks)->every(fn ($status) => $status === 'ok');
@@ -43,6 +45,18 @@ class HealthController extends Controller
             Cache::put('health_check_probe', '1', 10);
 
             return Cache::get('health_check_probe') === '1' ? 'ok' : 'fail';
+        } catch (\Throwable) {
+            return 'fail';
+        }
+    }
+
+    private function checkQueue(): string
+    {
+        try {
+            // Lightweight probe: validates queue connection is reachable.
+            Queue::size();
+
+            return 'ok';
         } catch (\Throwable) {
             return 'fail';
         }

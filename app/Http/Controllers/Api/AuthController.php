@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
@@ -67,11 +68,22 @@ class AuthController extends Controller
             $user->load(['company', 'roles', 'clinic']);
 
             if ($user->hasTwoFactorEnabled()) {
+                Log::info('auth.login.2fa_required', [
+                    'user_id' => $user->id,
+                    'company_id' => $user->company_id,
+                    'ip' => $request->ip(),
+                ]);
                 return $this->success([
                     'requires_2fa' => true,
                     'user' => ['id' => $user->id, 'username' => $user->username],
                 ], 'Two-factor authentication required');
             }
+
+            Log::info('auth.login.success', [
+                'user_id' => $user->id,
+                'company_id' => $user->company_id,
+                'ip' => $request->ip(),
+            ]);
 
             return $this->success([
                 'user' => $user,
@@ -83,6 +95,11 @@ class AuthController extends Controller
         }
 
         RateLimiter::hit($throttleKey, 60);
+        Log::warning('auth.login.failed', [
+            'username' => $request->input('username'),
+            'company_code' => $clinicCode,
+            'ip' => $request->ip(),
+        ]);
 
         return $this->error('Geçersiz şirket kodu, kullanıcı adı veya şifre', 422);
     }
@@ -116,6 +133,10 @@ class AuthController extends Controller
             }
 
             $user->load(['company', 'roles']);
+            Log::info('auth.admin_login.success', [
+                'user_id' => $user->id,
+                'ip' => $request->ip(),
+            ]);
 
             return $this->success([
                 'user' => $user,
@@ -126,6 +147,10 @@ class AuthController extends Controller
         }
 
         RateLimiter::hit($throttleKey, 60);
+        Log::warning('auth.admin_login.failed', [
+            'username' => $request->input('username'),
+            'ip' => $request->ip(),
+        ]);
 
         return $this->error('Geçersiz kullanıcı adı veya şifre', 422);
     }

@@ -23,6 +23,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
@@ -50,8 +51,9 @@ class OperationsPageController extends Controller
             ->where('company_id', auth()->user()->company_id)
             ->findOrFail($id);
 
-        // Fetch transactions for the product (across all batches)
-        $transactions = \App\Models\StockTransaction::whereIn('stock_id', $product->batches->pluck('id'))
+        $batchIds = $product->batches->pluck('id');
+
+        $transactions = \App\Models\StockTransaction::whereIn('stock_id', $batchIds)
             ->with(['user', 'clinic', 'stock'])
             ->orderByDesc('transaction_date')
             ->paginate(10, ['*'], 'page', $request->integer('page', 1))
@@ -61,12 +63,23 @@ class OperationsPageController extends Controller
         $defaultUsageBatch = $product->batches
             ->first(fn ($batch) => $batch->is_active && $batch->current_stock > 0);
 
-        // Generate chart data (last 15 days)
+        // Generate chart data (last 15 days) using aggregated query output.
         $chartData = [];
         $currentTotal = $product->total_stock;
-        $allTxns = \App\Models\StockTransaction::whereIn('stock_id', $product->batches->pluck('id'))
-            ->orderByDesc('transaction_date')
+        $dailyTransactionTotals = \App\Models\StockTransaction::whereIn('stock_id', $batchIds)
+            ->selectRaw('DATE(transaction_date) as tx_date')
+            ->selectRaw("
+                SUM(
+                    CASE
+                        WHEN type IN ('purchase', 'adjustment_increase', 'transfer_in', 'return_in')
+                        THEN quantity
+                        ELSE -quantity
+                    END
+                ) as net_change
+            ")
+            ->groupBy(DB::raw('DATE(transaction_date)'))
             ->get();
+        $dailyNetByDate = $dailyTransactionTotals->pluck('net_change', 'tx_date');
 
         for ($i = 0; $i < 15; $i++) {
             $date = now()->subDays($i)->format('Y-m-d');
@@ -75,17 +88,8 @@ class OperationsPageController extends Controller
                 'value' => $currentTotal,
             ];
 
-            // Reconstruct previous day's stock by reversing transactions of the current date
-            $dayTxns = $allTxns->filter(fn ($t) => $t->transaction_date->format('Y-m-d') === $date);
-            foreach ($dayTxns as $txn) {
-                // To go back in time: subtract if it was an increase, add if it was a decrease
-                $isPositive = in_array($txn->type, ['purchase', 'adjustment_increase', 'transfer_in', 'return_in'], true);
-                if ($isPositive) {
-                    $currentTotal -= $txn->quantity;
-                } else {
-                    $currentTotal += $txn->quantity;
-                }
-            }
+            // Move one day backwards by subtracting that day's net change.
+            $currentTotal -= (int) ($dailyNetByDate[$date] ?? 0);
         }
         $chartData = array_reverse($chartData);
 
