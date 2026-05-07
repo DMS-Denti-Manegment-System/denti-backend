@@ -23,10 +23,10 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 
@@ -438,6 +438,7 @@ class OperationsPageController extends Controller
             return $this->actionErrorResponse($request, 'suppliers.index', 'supplier', 'Bu tedarikciye bagli stoklar oldugu icin silinemez.', 422);
         }
         $supplier->forceDelete();
+
         return $this->actionResponse($request, 'suppliers.index', 'Tedarikci kalici olarak silindi.');
     }
 
@@ -573,6 +574,7 @@ class OperationsPageController extends Controller
             return $this->actionErrorResponse($request, 'clinics.index', 'clinic', 'Bu klinik bagli kayitlar nedeniyle silinemez.', 422);
         }
         $clinic->forceDelete();
+
         return $this->actionResponse($request, 'clinics.index', 'Klinik kalici olarak silindi.');
     }
 
@@ -958,8 +960,10 @@ class OperationsPageController extends Controller
     {
         if ($request->ajax()) {
             $request->merge(['modal' => 'create']);
+
             return $this->stocks($request);
         }
+
         return redirect()->route('stocks.index', ['modal' => 'create']);
     }
 
@@ -1043,8 +1047,10 @@ class OperationsPageController extends Controller
     {
         if ($request->ajax()) {
             $request->merge(['modal' => 'edit', 'edit' => $product->id]);
+
             return $this->stocks($request);
         }
+
         return redirect()->route('stocks.index', ['modal' => 'edit', 'edit' => $product->id]);
     }
 

@@ -73,6 +73,7 @@ class AuthController extends Controller
                     'company_id' => $user->company_id,
                     'ip' => $request->ip(),
                 ]);
+
                 return $this->success([
                     'requires_2fa' => true,
                     'user' => ['id' => $user->id, 'username' => $user->username],

@@ -133,14 +133,14 @@ class StockAlertService
                     $alerts[] = [
                         'type' => 'critical_expiry',
                         'title' => 'Kritik Son Kullanma Tarihi',
-                        'message' => "{$product->name} ürününün son kullanma tarihine çok az kaldı! Kalan: " . (int) $mostUrgentDays . " gün (Parti: #{$mostUrgentBatch->id})",
+                        'message' => "{$product->name} ürününün son kullanma tarihine çok az kaldı! Kalan: ".(int) $mostUrgentDays." gün (Parti: #{$mostUrgentBatch->id})",
                         'expiry_date' => $mostUrgentBatch->expiry_date,
                     ];
                 } elseif ($mostUrgentDays <= $yellowDays) {
                     $alerts[] = [
                         'type' => 'near_expiry',
                         'title' => 'Son Kullanma Tarihi Yaklaşıyor',
-                        'message' => "{$product->name} ürününün son kullanma tarihi yaklaşıyor. Kalan: " . (int) $mostUrgentDays . " gün (Parti: #{$mostUrgentBatch->id})",
+                        'message' => "{$product->name} ürününün son kullanma tarihi yaklaşıyor. Kalan: ".(int) $mostUrgentDays." gün (Parti: #{$mostUrgentBatch->id})",
                         'expiry_date' => $mostUrgentBatch->expiry_date,
                     ];
                 }
