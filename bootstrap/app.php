@@ -19,6 +19,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->statefulApi();
+        $middleware->append(\App\Http\Middleware\ForceLocalhostMiddleware::class);
         $middleware->append(\App\Http\Middleware\RequestContextMiddleware::class);
 
         /* $middleware->api(append: [
@@ -46,7 +47,11 @@ return Application::configure(basePath: dirname(__DIR__))
             ], 422);
         });
 
-        $exceptions->render(function (AuthenticationException $e) {
+        $exceptions->render(function (AuthenticationException $e, \Illuminate\Http\Request $request) {
+            if (! $request->expectsJson() && ! $request->is('api/*')) {
+                return redirect()->guest(route('login'));
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Unauthenticated.',

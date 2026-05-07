@@ -8,11 +8,7 @@
     <div id="stockModule" data-url="{{ url()->full() }}">
         <!-- Stats Container -->
         <div id="stockStatsContainer" class="mb-8">
-            <div class="d-flex justify-content-center py-10">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-            </div>
+            @include('operations.stocks.components.stats')
         </div>
 
         <!-- Filters -->
@@ -20,7 +16,7 @@
 
         <!-- Table Container -->
         <div id="stockTableContainer">
-             <!-- AJAX content -->
+            @include('operations.stocks.table.index')
         </div>
     </div>
 @endsection
@@ -32,6 +28,10 @@
             <!-- AJAX content -->
         </div>
     </div>
+    <template id="stockCreateModalTemplate">
+        @php($modalMode = 'create')
+        @include('operations.stocks.modal.form')
+    </template>
 @endpush
 
 @push('scripts')
@@ -44,6 +44,8 @@
             tableContainer: '#stockTableContainer',
             filterForm: '#stockFilterForm',
             modalHost: '#stockModalContent',
+            createSelector: '[data-module-create-remote]',
+            initialLoad: false,
             onAfterLoad: function(response) {
                 if (response.statsHtml) {
                     $('#stockStatsContainer').html(response.statsHtml);
@@ -68,6 +70,14 @@
                     }
                 });
             }
+        });
+
+        $('#stockQuickCreate').on('click', function () {
+            const tpl = document.getElementById('stockCreateModalTemplate');
+            if (!tpl) return;
+            $('#stockModalContent').html(tpl.innerHTML);
+            window.DentiUI?.init(document.getElementById('stockModalContent'));
+            bootstrap.Modal.getOrCreateInstance(document.getElementById('stockModal')).show();
         });
 
         // Ürün detay sayfasındaki manuel tetikleyiciler için (Gerekirse)

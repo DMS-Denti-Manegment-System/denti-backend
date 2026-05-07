@@ -201,6 +201,7 @@
                     cleanUrl: null,
                     onAfterLoad: null,
                     onModalLoaded: null,
+                    initialLoad: true,
                 }, config || {});
 
                 const $root = $(settings.root);
@@ -215,6 +216,8 @@
                 let currentUrl = settings.indexUrl;
                 let modalInstance = null;
                 let searchTimer = null;
+                let currentTableRequest = null;
+                let currentModalRequest = null;
 
                 const api = {
                     reload(resetUrl) {
@@ -250,7 +253,10 @@
 
                     $tableContainer.css('opacity', '0.5');
 
-                    $.ajax({
+                    if (currentTableRequest && currentTableRequest.readyState !== 4) {
+                        currentTableRequest.abort();
+                    }
+                    currentTableRequest = $.ajax({
                         url: targetUrl,
                         type: 'GET',
                         dataType: 'json',
@@ -318,7 +324,10 @@
                 }
 
                 function openRemote(url) {
-                    $.ajax({
+                    if (currentModalRequest && currentModalRequest.readyState !== 4) {
+                        currentModalRequest.abort();
+                    }
+                    currentModalRequest = $.ajax({
                         url: url,
                         type: 'GET',
                         dataType: 'json',
@@ -437,7 +446,9 @@
                     showModalMarkup($modalHost.html());
                 }
 
-                loadData(true);
+                if (settings.initialLoad !== false) {
+                    loadData(true);
+                }
 
                 return api;
             },

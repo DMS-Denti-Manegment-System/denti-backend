@@ -42,9 +42,9 @@
             Temizle
         </button>
 
-        <a href="{{ route('stocks.create') }}" class="btn btn-primary" data-module-create>
+        <button type="button" id="stockQuickCreate" class="btn btn-primary">
             <i class="ki-duotone ki-plus fs-2"><span class="path1"></span><span class="path2"></span></i>
             Yeni Stok
-        </a>
+        </button>
     </div>
 </x-page-toolbar>

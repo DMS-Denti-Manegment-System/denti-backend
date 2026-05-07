@@ -26,15 +26,22 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 
 class OperationsPageController extends Controller
 {
+    private function perPage(Request $request, int $default = 20, int $max = 100): int
+    {
+        return min(max(1, $request->integer('per_page', $default)), $max);
+    }
+
     public function stocks(Request $request): View|JsonResponse
     {
         try {
-            $viewData = $this->getStocksViewData($request);
+            $cacheKey = 'web.stocks.'.auth()->id().'.'.md5((string) $request->fullUrl());
+            $viewData = Cache::remember($cacheKey, 45, fn () => $this->getStocksViewData($request));
 
             if ($request->ajax()) {
                 return response()->json([
@@ -223,7 +230,7 @@ class OperationsPageController extends Controller
             ->withCount('todos')
             ->when($request->filled('search'), fn (Builder $query) => $query->where('name', 'like', '%'.$request->string('search').'%'))
             ->orderBy('name')
-            ->paginate($request->integer('per_page', 20))
+            ->paginate($this->perPage($request))
             ->withQueryString();
 
         $editingCategory = null;
@@ -307,7 +314,7 @@ class OperationsPageController extends Controller
             })
             ->when($request->filled('status'), fn (Builder $query) => $query->where('is_active', $request->string('status') === 'active'))
             ->latest()
-            ->paginate($request->integer('per_page', 20))
+            ->paginate($this->perPage($request))
             ->withQueryString();
 
         $editingSupplier = null;
@@ -426,7 +433,7 @@ class OperationsPageController extends Controller
             })
             ->when($request->filled('status'), fn (Builder $query) => $query->where('is_active', $request->string('status') === 'active'))
             ->latest()
-            ->paginate($request->integer('per_page', 20))
+            ->paginate($this->perPage($request))
             ->withQueryString();
 
         $editingClinic = null;
@@ -1240,7 +1247,7 @@ class OperationsPageController extends Controller
     private function getStocksViewData(Request $request): array
     {
         $filters = $request->only(['search', 'clinic_id', 'category', 'status', 'level', 'per_page']);
-        $products = app(ProductService::class)->getAllProducts($filters, $request->integer('per_page', 20));
+        $products = app(ProductService::class)->getAllProducts($filters, $this->perPage($request));
 
         $companyId = auth()->user()->company_id;
         $selectedClinicId = $request->filled('clinic_id') ? $request->integer('clinic_id') : null;
