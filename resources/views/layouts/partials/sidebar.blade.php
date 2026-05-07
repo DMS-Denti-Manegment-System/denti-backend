@@ -80,6 +80,7 @@
                 </a>
             </div>
 
+
             <div class="menu-item">
                 <a class="menu-link {{ request()->routeIs('alerts.*') ? 'active' : '' }}" href="{{ route('alerts.index') }}">
                     <span class="menu-icon">
@@ -88,6 +89,17 @@
                         </i>
                     </span>
                     <span class="menu-title">Uyarılar</span>
+                </a>
+            </div>
+
+            <div class="menu-item">
+                <a class="menu-link {{ request()->routeIs('todos.*') ? 'active' : '' }}" href="{{ route('todos.index') }}">
+                    <span class="menu-icon">
+                        <i class="ki-duotone ki-check-square fs-2">
+                            <span class="path1"></span><span class="path2"></span>
+                        </i>
+                    </span>
+                    <span class="menu-title">Yapılacaklar</span>
                 </a>
             </div>
 

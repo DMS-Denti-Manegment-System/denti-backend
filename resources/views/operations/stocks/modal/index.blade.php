@@ -180,9 +180,9 @@
                     <input type="number" min="1" name="quantity" class="form-control form-control-solid" required />
                 </div>
                 <div class="mb-6">
-                    <label class="form-label required">Sebep</label>
+                    <label class="form-label required">Çıkış Sebebi</label>
                     <select name="reason" class="form-select form-select-solid" data-control="select2" required>
-                        <option value="">Sebep seçin</option>
+                        <option value="">Çıkış Sebebi seçin</option>
                         <option value="Ilk stok girisi">İlk stok girişi</option>
                         <option value="Sayim duzeltmesi">Sayım düzeltmesi</option>
                         <option value="Kullanim dusumu">Kullanım düşümü</option>

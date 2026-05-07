@@ -34,147 +34,60 @@ class ClinicController extends Controller
         }
     }
 
-    public function store(Request $request): JsonResponse
+    public function store(\App\Http\Requests\StoreClinicRequest $request): JsonResponse
     {
-        $data = $request->all();
-
-        $validator = Validator::make($data, [
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'responsible_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:50',
-            'location' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'website' => 'nullable|string|max:255',
-            'opening_hours' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
-            'company_id' => 'nullable|exists:companies,id'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error('Validasyon hatası', 422, $validator->errors()->toArray());
-        }
+        $this->authorize('create', Clinic::class);
 
         try {
-            $validatedData = $validator->validated();
+            $validatedData = $request->validated();
             
-            // 🛡️ Yetki ve Şirket Kontrolü
-            $currentUser = auth()->user();
-            
-            if (!$currentUser->isSuperAdmin()) {
-                $validatedData['company_id'] = $currentUser->company_id;
+            if (!auth()->user()->isSuperAdmin()) {
+                $validatedData['company_id'] = auth()->user()->company_id;
             }
 
             if (empty($validatedData['company_id'])) {
-                Log::error('Klinik oluşturma hatası: Kullanıcının şirket bilgisi (company_id) eksik.', ['user_id' => $currentUser->id]);
                 return $this->error('Klinik oluşturmak için bir şirkete bağlı olmalısınız.', 400);
             }
 
             $clinic = $this->clinicService->createClinic($validatedData);
             
-            $cacheCompanyId = $currentUser->isSuperAdmin()
-                ? ($validatedData['company_id'] ?? 'global')
-                : ($currentUser->company_id ?? 'global');
-            \Illuminate\Support\Facades\Cache::forget("all_clinics_{$cacheCompanyId}");
-            
             return $this->success($clinic, 'Klinik başarıyla oluşturuldu', 201);
         } catch (\Exception $e) {
-            Log::error('Klinik oluşturulurken teknik hata: ' . $e->getMessage(), [
-                'data' => $data,
-                'trace' => $e->getTraceAsString()
-            ]);
             return $this->error('Klinik oluşturulamadı: ' . $e->getMessage(), 400);
         }
     }
 
-    public function show($id): JsonResponse
+    public function show(Clinic $clinic): JsonResponse
     {
-        try {
-            $clinic = $this->clinicService->getClinicById($id);
-
-            if (!$clinic) {
-                return $this->error('Klinik bulunamadı', 404);
-            }
-
-            return $this->success($clinic);
-        } catch (\Exception $e) {
-            Log::error('Klinik getirilirken hata: ' . $e->getMessage());
-            return $this->error('Klinik getirilirken bir hata oluştu.', 500);
-        }
+        $this->authorize('view', $clinic);
+        return $this->success($clinic);
     }
 
-    public function update(Request $request, $id): JsonResponse
+    public function update(\App\Http\Requests\UpdateClinicRequest $request, Clinic $clinic): JsonResponse
     {
-        $data = $request->all();
-
-        $validator = Validator::make($data, [
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'responsible_person' => 'nullable|string|max:255',
-            'phone' => 'nullable|string|max:50',
-            'location' => 'nullable|string|max:255',
-            'email' => 'nullable|email|max:255',
-            'address' => 'nullable|string',
-            'city' => 'nullable|string|max:100',
-            'district' => 'nullable|string|max:100',
-            'postal_code' => 'nullable|string|max:20',
-            'website' => 'nullable|string|max:255',
-            'opening_hours' => 'nullable|string|max:255',
-            'is_active' => 'boolean',
-            'company_id' => 'nullable|exists:companies,id'
-        ]);
-
-        if ($validator->fails()) {
-            return $this->error('Validasyon hatası', 422, $validator->errors()->toArray());
-        }
+        $this->authorize('update', $clinic);
 
         try {
-            $clinic = $this->clinicService->updateClinic($id, $validator->validated());
-
-            if (!$clinic) {
-                return $this->error('Klinik bulunamadı', 404);
-            }
-
-            $u = auth()->user();
-            $cid = $u->isSuperAdmin() ? ($clinic->company_id ?? 'global') : ($u->company_id ?? 'global');
-            \Illuminate\Support\Facades\Cache::forget("all_clinics_{$cid}");
-
+            $clinic = $this->clinicService->updateClinic($clinic->id, $request->validated());
             return $this->success($clinic, 'Klinik başarıyla güncellendi');
         } catch (\Exception $e) {
-            Log::error('Klinik güncellenirken hata: ' . $e->getMessage());
             return $this->error($e->getMessage(), 400);
         }
     }
 
-    public function destroy($id): JsonResponse
+    public function destroy(Clinic $clinic): JsonResponse
     {
+        $this->authorize('delete', $clinic);
+
         try {
-            $clinic = $this->clinicService->getClinicById($id);
-            if (!$clinic) {
-                return $this->error('Klinik bulunamadı', 404);
-            }
-
-            // Super Admin değilse kendi şirketinin kliniği mi kontrol et
-            if (!auth()->user()->hasRole('Super Admin') && $clinic->company_id !== auth()->user()->company_id) {
-                return $this->error('Bu işlem için yetkiniz yok.', 403);
-            }
-
-            $companyIdForCache = $clinic->company_id ?? 'global';
-            $deleted = $this->clinicService->deleteClinic($id);
+            $deleted = $this->clinicService->deleteClinic($clinic->id);
 
             if (!$deleted) {
                 return $this->error('Klinik silme işlemi başarısız.', 400);
             }
 
-            \Illuminate\Support\Facades\Cache::forget("all_clinics_{$companyIdForCache}");
-
             return $this->success(null, 'Klinik başarıyla silindi');
         } catch (\Exception $e) {
-            Log::error('Klinik silinirken hata: ' . $e->getMessage());
             return $this->error('Silme hatası: ' . $e->getMessage(), 400);
         }
     }

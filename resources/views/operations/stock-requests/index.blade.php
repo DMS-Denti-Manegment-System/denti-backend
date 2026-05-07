@@ -4,6 +4,7 @@
 @section('page-subtitle', 'Klinikler arasi talep akisi')
 @section('content')
     <div id="stockRequestsModule" class="app-module-shell" data-index-url="{{ route('stock-requests.index') }}">
+        @include('operations.stock-requests.components.stats')
         @include('operations.stock-requests.components.filters')
         <div id="stockRequestsTableContainer" data-module-table>
             @include('operations.stock-requests.table.index')

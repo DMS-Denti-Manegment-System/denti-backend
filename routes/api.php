@@ -52,10 +52,10 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
     Route::prefix('categories')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
         Route::post('/', [\App\Http\Controllers\Api\CategoryController::class, 'store']);
-        Route::get('/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'show']);
-        Route::get('/{id}/stats', [\App\Http\Controllers\Api\CategoryController::class, 'stats']);
-        Route::put('/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'update']);
-        Route::delete('/{id}', [\App\Http\Controllers\Api\CategoryController::class, 'destroy']);
+        Route::get('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'show']);
+        Route::get('/{category}/stats', [\App\Http\Controllers\Api\CategoryController::class, 'stats']);
+        Route::put('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'update']);
+        Route::delete('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'destroy']);
     });
 
     // Todo
@@ -64,20 +64,20 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
         Route::post('/', [\App\Http\Controllers\Api\TodoController::class, 'store'])->middleware('permission:manage-todos');
         Route::get('/stats', [\App\Http\Controllers\Api\TodoController::class, 'stats'])->middleware('permission:view-todos');
         Route::get('/category/{categoryId}', [\App\Http\Controllers\Api\TodoController::class, 'byCategory'])->middleware('permission:view-todos');
-        Route::get('/{id}', [\App\Http\Controllers\Api\TodoController::class, 'show'])->middleware('permission:view-todos');
-        Route::put('/{id}', [\App\Http\Controllers\Api\TodoController::class, 'update'])->middleware('permission:manage-todos');
-        Route::patch('/{id}/toggle', [\App\Http\Controllers\Api\TodoController::class, 'toggle'])->middleware('permission:manage-todos');
-        Route::delete('/{id}', [\App\Http\Controllers\Api\TodoController::class, 'destroy'])->middleware('permission:manage-todos');
+        Route::get('/{todo}', [\App\Http\Controllers\Api\TodoController::class, 'show'])->middleware('permission:view-todos');
+        Route::put('/{todo}', [\App\Http\Controllers\Api\TodoController::class, 'update'])->middleware('permission:manage-todos');
+        Route::patch('/{todo}/toggle', [\App\Http\Controllers\Api\TodoController::class, 'toggle'])->middleware('permission:manage-todos');
+        Route::delete('/{todo}', [\App\Http\Controllers\Api\TodoController::class, 'destroy'])->middleware('permission:manage-todos');
     });
 
     // Products
     Route::prefix('products')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\ProductController::class, 'index'])->middleware('permission:view-stocks');
         Route::post('/', [\App\Http\Controllers\Api\ProductController::class, 'store'])->middleware('permission:create-stocks');
-        Route::get('/{id}', [\App\Http\Controllers\Api\ProductController::class, 'show'])->middleware('permission:view-stocks');
-        Route::put('/{id}', [\App\Http\Controllers\Api\ProductController::class, 'update'])->middleware('permission:update-stocks');
-        Route::delete('/{id}', [\App\Http\Controllers\Api\ProductController::class, 'destroy'])->middleware('permission:delete-stocks');
-        Route::get('/{id}/transactions', [\App\Http\Controllers\Api\ProductController::class, 'transactions'])->middleware('permission:view-audit-logs');
+        Route::get('/{product}', [\App\Http\Controllers\Api\ProductController::class, 'show'])->middleware('permission:view-stocks');
+        Route::put('/{product}', [\App\Http\Controllers\Api\ProductController::class, 'update'])->middleware('permission:update-stocks');
+        Route::delete('/{product}', [\App\Http\Controllers\Api\ProductController::class, 'destroy'])->middleware('permission:delete-stocks');
+        Route::get('/{product}/transactions', [\App\Http\Controllers\Api\ProductController::class, 'transactions'])->middleware('permission:view-audit-logs');
     });
 
     // Stocks
@@ -88,15 +88,15 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
         Route::get('/low-level', [\App\Http\Controllers\Api\StockController::class, 'getLowLevel'])->middleware('permission:view-stocks');
         Route::get('/critical-level', [\App\Http\Controllers\Api\StockController::class, 'getCriticalLevel'])->middleware('permission:view-stocks');
         Route::get('/expiring', [\App\Http\Controllers\Api\StockController::class, 'getExpiring'])->middleware('permission:view-stocks');
-        Route::put('/{id}/deactivate', [\App\Http\Controllers\Api\StockController::class, 'deactivate'])->middleware('permission:update-stocks');
-        Route::delete('/{id}/force', [\App\Http\Controllers\Api\StockController::class, 'forceDelete'])->middleware('permission:delete-stocks');
-        Route::put('/{id}/reactivate', [\App\Http\Controllers\Api\StockController::class, 'reactivate'])->middleware('permission:update-stocks');
-        Route::get('/{id}', [\App\Http\Controllers\Api\StockController::class, 'show'])->middleware('permission:view-stocks');
-        Route::put('/{id}', [\App\Http\Controllers\Api\StockController::class, 'update'])->middleware('permission:update-stocks');
-        Route::delete('/{id}', [\App\Http\Controllers\Api\StockController::class, 'destroy'])->middleware('permission:delete-stocks');
-        Route::post('/{id}/adjust', [\App\Http\Controllers\Api\StockController::class, 'adjustStock'])->middleware('permission:adjust-stocks');
-        Route::post('/{id}/use', [\App\Http\Controllers\Api\StockController::class, 'useStock'])->middleware('permission:use-stocks');
-        Route::get('/{id}/transactions', [\App\Http\Controllers\Api\StockController::class, 'transactions'])->middleware('permission:view-audit-logs');
+        Route::put('/{stock}/deactivate', [\App\Http\Controllers\Api\StockController::class, 'deactivate'])->middleware('permission:update-stocks');
+        Route::delete('/{stock}/force', [\App\Http\Controllers\Api\StockController::class, 'forceDelete'])->middleware('permission:delete-stocks');
+        Route::put('/{stock}/reactivate', [\App\Http\Controllers\Api\StockController::class, 'reactivate'])->middleware('permission:update-stocks');
+        Route::get('/{stock}', [\App\Http\Controllers\Api\StockController::class, 'show'])->middleware('permission:view-stocks');
+        Route::put('/{stock}', [\App\Http\Controllers\Api\StockController::class, 'update'])->middleware('permission:update-stocks');
+        Route::delete('/{stock}', [\App\Http\Controllers\Api\StockController::class, 'destroy'])->middleware('permission:delete-stocks');
+        Route::post('/{stock}/adjust', [\App\Http\Controllers\Api\StockController::class, 'adjustStock'])->middleware('permission:adjust-stocks');
+        Route::post('/{stock}/use', [\App\Http\Controllers\Api\StockController::class, 'useStock'])->middleware('permission:use-stocks');
+        Route::get('/{stock}/transactions', [\App\Http\Controllers\Api\StockController::class, 'transactions'])->middleware('permission:view-audit-logs');
     });
 
     // Suppliers
@@ -104,9 +104,9 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\SupplierController::class, 'index'])->middleware('permission:view-stocks');
         Route::post('/', [\App\Http\Controllers\Api\SupplierController::class, 'store'])->middleware('permission:create-stocks');
         Route::get('/active/list', [\App\Http\Controllers\Api\SupplierController::class, 'getActive'])->middleware('permission:view-stocks');
-        Route::get('/{id}', [\App\Http\Controllers\Api\SupplierController::class, 'show'])->middleware('permission:view-stocks');
-        Route::put('/{id}', [\App\Http\Controllers\Api\SupplierController::class, 'update'])->middleware('permission:update-stocks');
-        Route::delete('/{id}', [\App\Http\Controllers\Api\SupplierController::class, 'destroy'])->middleware('permission:delete-stocks');
+        Route::get('/{supplier}', [\App\Http\Controllers\Api\SupplierController::class, 'show'])->middleware('permission:view-stocks');
+        Route::put('/{supplier}', [\App\Http\Controllers\Api\SupplierController::class, 'update'])->middleware('permission:update-stocks');
+        Route::delete('/{supplier}', [\App\Http\Controllers\Api\SupplierController::class, 'destroy'])->middleware('permission:delete-stocks');
     });
 
     // Clinics
@@ -115,9 +115,9 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
         Route::post('/', [\App\Http\Controllers\Api\ClinicController::class, 'store'])->middleware('permission:create-clinics');
         Route::get('/active/list', [\App\Http\Controllers\Api\ClinicController::class, 'getActive'])->middleware('permission:view-stocks');
         Route::get('/stats', [\App\Http\Controllers\Api\ClinicController::class, 'getStats'])->middleware('permission:view-reports');
-        Route::get('/{id}', [\App\Http\Controllers\Api\ClinicController::class, 'show'])->middleware('permission:view-clinics');
-        Route::put('/{id}', [\App\Http\Controllers\Api\ClinicController::class, 'update'])->middleware('permission:update-clinics');
-        Route::delete('/{id}', [\App\Http\Controllers\Api\ClinicController::class, 'destroy'])->middleware('permission:delete-clinics');
+        Route::get('/{clinic}', [\App\Http\Controllers\Api\ClinicController::class, 'show'])->middleware('permission:view-clinics');
+        Route::put('/{clinic}', [\App\Http\Controllers\Api\ClinicController::class, 'update'])->middleware('permission:update-clinics');
+        Route::delete('/{clinic}', [\App\Http\Controllers\Api\ClinicController::class, 'destroy'])->middleware('permission:delete-clinics');
         Route::get('/{id}/stocks', [\App\Http\Controllers\Api\ClinicController::class, 'getStocks'])->middleware('permission:view-stocks');
         Route::get('/{id}/summary', [\App\Http\Controllers\Api\ClinicController::class, 'getSummary'])->middleware('permission:view-reports');
     });

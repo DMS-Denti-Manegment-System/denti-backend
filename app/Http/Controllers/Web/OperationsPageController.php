@@ -16,6 +16,9 @@ use App\Services\StockAlertService;
 use App\Services\StockRequestService;
 use App\Services\StockService;
 use App\Services\ProductService;
+use App\Models\StockTransfer;
+use App\Models\StockTransaction;
+use App\Services\TwoFactorService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
@@ -61,6 +64,34 @@ class OperationsPageController extends Controller
         $defaultUsageBatch = $product->batches
             ->first(fn ($batch) => $batch->is_active && $batch->current_stock > 0);
 
+        // Generate chart data (last 15 days)
+        $chartData = [];
+        $currentTotal = $product->total_stock;
+        $allTxns = \App\Models\StockTransaction::whereIn('stock_id', $product->batches->pluck('id'))
+            ->orderByDesc('transaction_date')
+            ->get();
+
+        for ($i = 0; $i < 15; $i++) {
+            $date = now()->subDays($i)->format('Y-m-d');
+            $chartData[] = [
+                'date' => $date,
+                'value' => $currentTotal
+            ];
+
+            // Reconstruct previous day's stock by reversing transactions of the current date
+            $dayTxns = $allTxns->filter(fn($t) => $t->transaction_date->format('Y-m-d') === $date);
+            foreach ($dayTxns as $txn) {
+                // To go back in time: subtract if it was an increase, add if it was a decrease
+                $isPositive = in_array($txn->type, ['purchase', 'adjustment_increase', 'transfer_in', 'return_in'], true);
+                if ($isPositive) {
+                    $currentTotal -= $txn->quantity;
+                } else {
+                    $currentTotal += $txn->quantity;
+                }
+            }
+        }
+        $chartData = array_reverse($chartData);
+
         return view('operations.stocks.show', [
             'product' => $product,
             'transactions' => $transactions,
@@ -70,6 +101,7 @@ class OperationsPageController extends Controller
             'clinics' => Clinic::query()->active()->where('company_id', auth()->user()->company_id)->orderBy('name')->get(['id', 'name']),
             'units' => ['Adet', 'Kutu', 'Paket', 'Sise', 'Ml', 'Lt', 'Kg', 'Gr', 'Set'],
             'currencies' => ['TRY' => '₺ (TL)', 'USD' => '$ (USD)', 'EUR' => '€ (EUR)'],
+            'chartData' => $chartData,
             'stockStats' => [
                 'total_usage' => $product->batches->sum('internal_usage_count'),
                 'total_value' => $product->batches->sum(fn($b) => $b->current_stock * $b->purchase_price),
@@ -440,11 +472,19 @@ class OperationsPageController extends Controller
             ->paginate($request->integer('per_page', 20))
             ->withQueryString();
 
+        $stats = [
+            'pending' => StockRequest::where('status', 'pending')->count(),
+            'approved' => StockRequest::where('status', 'approved')->count(),
+            'rejected' => StockRequest::where('status', 'rejected')->count(),
+            'completed' => StockRequest::where('status', 'completed')->count(),
+        ];
+
         $viewData = [
             'requests' => $requests,
             'stocks' => Stock::query()->with(['product', 'clinic'])->active()->orderBy('id', 'desc')->get(),
             'clinics' => Clinic::query()->active()->orderBy('name')->get(['id', 'name']),
             'modalMode' => $request->query('modal'),
+            'stats' => $stats,
         ];
 
         return $this->moduleResponse(
@@ -1196,5 +1236,80 @@ class OperationsPageController extends Controller
         }
 
         return redirect()->route($route)->withErrors([$key => $message]);
+    }
+
+
+    public function profile2faGenerate(Request $request): JsonResponse
+    {
+        $service = app(TwoFactorService::class);
+        $secret = $service->generateSecret(auth()->user());
+        $qrUrl = $service->getQrCodeUrl(auth()->user());
+
+        return response()->json([
+            'secret' => $secret,
+            'qrUrl' => $qrUrl,
+        ]);
+    }
+
+    public function profile2faConfirm(Request $request): JsonResponse
+    {
+        $request->validate(['code' => 'required|string']);
+        
+        $success = app(TwoFactorService::class)->confirm2FA(auth()->user(), $request->code);
+
+        return response()->json([
+            'success' => $success,
+            'message' => $success ? '2FA dogrulandi ve aktif edildi.' : 'Gecersiz kod.',
+            'recoveryCodes' => $success ? auth()->user()->two_factor_recovery_codes : [],
+        ]);
+    }
+
+    public function profile2faDisable(Request $request): RedirectResponse|JsonResponse
+    {
+        auth()->user()->update([
+            'two_factor_secret' => null,
+            'two_factor_confirmed_at' => null,
+            'two_factor_recovery_codes' => null,
+        ]);
+
+        return $this->actionResponse($request, 'profile.index', '2FA devre disi birakildi.');
+    }
+
+    public function profile2faRecoveryCodes(Request $request): JsonResponse
+    {
+        $codes = app(TwoFactorService::class)->generateRecoveryCodes(auth()->user());
+        return response()->json(['recoveryCodes' => $codes]);
+    }
+
+    public function alertBulkResolve(Request $request): RedirectResponse|JsonResponse
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
+        app(StockAlertService::class)->bulkResolve($request->ids, auth()->user()->name);
+        return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar cozuldu.');
+    }
+
+    public function alertBulkDismiss(Request $request): RedirectResponse|JsonResponse
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
+        app(StockAlertService::class)->bulkDismiss($request->ids);
+        return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar yoksayildi.');
+    }
+
+    public function alertBulkDelete(Request $request): RedirectResponse|JsonResponse
+    {
+        $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
+        app(StockAlertService::class)->bulkDelete($request->ids);
+        return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar silindi.');
+    }
+
+    public function alertSettings(Request $request): View
+    {
+        return view('operations.alerts.settings');
+    }
+
+    public function alertUpdateSettings(Request $request): RedirectResponse
+    {
+        // For now, settings are mocked as per report's mention of hardcoded settings
+        return redirect()->route('alerts.index')->with('status', 'Ayarlar guncellendi (simule edildi).');
     }
 }

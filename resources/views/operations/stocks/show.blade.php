@@ -125,6 +125,17 @@
             <div class="card card-flush app-stock-detail-card mb-7">
                 <div class="card-header">
                     <div class="card-title">
+                        <h2 class="mb-0">Stok Değişim Grafiği (Son 15 Gün)</h2>
+                    </div>
+                </div>
+                <div class="card-body pt-0">
+                    <div id="stock_movement_chart" style="height: 250px;"></div>
+                </div>
+            </div>
+
+            <div class="card card-flush app-stock-detail-card mb-7">
+                <div class="card-header">
+                    <div class="card-title">
                         <h2 class="mb-0">Stok Özeti</h2>
                     </div>
                 </div>
@@ -335,7 +346,7 @@
                                 <input type="number" min="1" name="quantity" id="stockUseQuantity" class="form-control form-control-solid" required>
                             </div>
                             <div class="col-md-7">
-                                <label class="form-label">Sebep</label>
+                                <label class="form-label">Çıkış Sebebi</label>
                                 <input type="text" name="reason" id="stockUseReason" class="form-control form-control-solid">
                             </div>
                             <div class="col-12">
@@ -486,6 +497,79 @@
         window.DentiUI?.init(document);
         var $modalElement = $('#stockModal');
         var $modalContent = $('#stockModalContent');
+        
+        // Chart Initialization
+        var chartData = @json($chartData);
+        var chartElement = document.getElementById('stock_movement_chart');
+        if (chartElement && chartData.length > 0) {
+            var options = {
+                series: [{
+                    name: 'Stok Miktarı',
+                    data: chartData.map(item => item.value)
+                }],
+                chart: {
+                    fontFamily: 'inherit',
+                    type: 'area',
+                    height: 250,
+                    toolbar: { show: false }
+                },
+                colors: ['#009ef7'],
+                fill: {
+                    type: 'gradient',
+                    gradient: {
+                        shadeIntensity: 1,
+                        opacityFrom: 0.3,
+                        opacityTo: 0.1,
+                        stops: [0, 90, 100]
+                    }
+                },
+                stroke: {
+                    curve: 'smooth',
+                    show: true,
+                    width: 3,
+                    colors: ['#009ef7']
+                },
+                xaxis: {
+                    categories: chartData.map(item => {
+                        const date = new Date(item.date);
+                        return date.toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit' });
+                    }),
+                    axisBorder: { show: false },
+                    axisTicks: { show: false },
+                    labels: {
+                        style: { colors: '#a1a5b7', fontSize: '12px' }
+                    }
+                },
+                yaxis: {
+                    labels: {
+                        style: { colors: '#a1a5b7', fontSize: '12px' }
+                    }
+                },
+                grid: {
+                    borderColor: '#f1f1f1',
+                    strokeDashArray: 4,
+                    yaxis: { lines: { show: true } }
+                },
+                markers: {
+                    size: 4,
+                    colors: ['#009ef7'],
+                    strokeColors: '#fff',
+                    strokeWidth: 2
+                },
+                tooltip: {
+                    style: { fontSize: '12px' },
+                    y: {
+                        formatter: function (val) {
+                            return val + ' {{ $product->unit }}'
+                        }
+                    }
+                }
+            };
+
+            var chart = new ApexCharts(chartElement, options);
+            chart.render();
+        }
+
         var modalInstance = new bootstrap.Modal(document.getElementById('stockModal'));
         var stockUseModalElement = document.getElementById('stockUseModal');
         var stockUseModal = stockUseModalElement ? new bootstrap.Modal(stockUseModalElement) : null;

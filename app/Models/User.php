@@ -34,9 +34,6 @@ class User extends Authenticatable
         'company_id',
         'clinic_id',
         'is_active',
-        'two_factor_secret',
-        'two_factor_recovery_codes',
-        'two_factor_confirmed_at',
     ];
 
     /**

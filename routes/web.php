@@ -56,9 +56,15 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/stock-requests/{stockRequest}/reject', [OperationsPageController::class, 'stockRequestReject'])->name('stock-requests.reject');
     Route::post('/stock-requests/{stockRequest}/ship', [OperationsPageController::class, 'stockRequestShip'])->name('stock-requests.ship');
     Route::post('/stock-requests/{stockRequest}/complete', [OperationsPageController::class, 'stockRequestComplete'])->name('stock-requests.complete');
+
     Route::get('/alerts', [OperationsPageController::class, 'alerts'])->name('alerts.index');
     Route::post('/alerts/{stockAlert}/resolve', [OperationsPageController::class, 'alertResolve'])->name('alerts.resolve');
     Route::post('/alerts/{stockAlert}/dismiss', [OperationsPageController::class, 'alertDismiss'])->name('alerts.dismiss');
+    Route::post('/alerts/bulk/resolve', [OperationsPageController::class, 'alertBulkResolve'])->name('alerts.bulk-resolve');
+    Route::post('/alerts/bulk/dismiss', [OperationsPageController::class, 'alertBulkDismiss'])->name('alerts.bulk-dismiss');
+    Route::post('/alerts/bulk/delete', [OperationsPageController::class, 'alertBulkDelete'])->name('alerts.bulk-delete');
+    Route::get('/alerts/settings', [OperationsPageController::class, 'alertSettings'])->name('alerts.settings');
+    Route::put('/alerts/settings', [OperationsPageController::class, 'alertUpdateSettings'])->name('alerts.update-settings');
     Route::get('/todos', [OperationsPageController::class, 'todos'])->name('todos.index');
     Route::get('/todos/create', [OperationsPageController::class, 'todoCreate'])->name('todos.create');
     Route::post('/todos', [OperationsPageController::class, 'todoStore'])->name('todos.store');
@@ -81,4 +87,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/profile', [OperationsPageController::class, 'profile'])->name('profile.index');
     Route::put('/profile/info', [OperationsPageController::class, 'profileUpdateInfo'])->name('profile.update.info');
     Route::put('/profile/password', [OperationsPageController::class, 'profileUpdatePassword'])->name('profile.update.password');
+    Route::post('/profile/2fa/generate', [OperationsPageController::class, 'profile2faGenerate'])->name('profile.2fa.generate');
+    Route::post('/profile/2fa/confirm', [OperationsPageController::class, 'profile2faConfirm'])->name('profile.2fa.confirm');
+    Route::post('/profile/2fa/disable', [OperationsPageController::class, 'profile2faDisable'])->name('profile.2fa.disable');
+    Route::post('/profile/2fa/recovery-codes', [OperationsPageController::class, 'profile2faRecoveryCodes'])->name('profile.2fa.recovery-codes');
 });
