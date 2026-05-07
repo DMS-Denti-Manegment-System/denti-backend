@@ -18,14 +18,16 @@ Route::get('/accept-invitation/{token}', [AuthPageController::class, 'invitation
 Route::post('/accept-invitation', [AuthPageController::class, 'acceptInvitation'])->name('invitation.accept.store');
 Route::get('/up', HealthController::class)->name('health.up');
 
-Route::middleware(['auth'])->group(function () {
-    Route::get('/', DashboardPageController::class)->name('dashboard');
-
+Route::middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::get('/admin/companies', AdminCompanyPageController::class)->name('admin.companies');
     Route::get('/admin/companies/create', [AdminCompanyPageController::class, 'create'])->name('admin.companies.create');
     Route::post('/admin/companies', [AdminCompanyPageController::class, 'store'])->name('admin.companies.store');
     Route::get('/admin/companies/{company}/edit', [AdminCompanyPageController::class, 'edit'])->name('admin.companies.edit');
     Route::put('/admin/companies/{company}', [AdminCompanyPageController::class, 'update'])->name('admin.companies.update');
+});
+
+Route::middleware(['auth', 'not_super_admin'])->group(function () {
+    Route::get('/', DashboardPageController::class)->name('dashboard');
 
     Route::get('/stocks', [OperationsPageController::class, 'stocks'])->name('stocks.index');
     Route::get('/stocks/create', [OperationsPageController::class, 'stockCreate'])->name('stocks.create');

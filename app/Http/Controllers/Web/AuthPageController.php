@@ -53,7 +53,7 @@ class AuthPageController extends Controller
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
 
-        return redirect()->route('dashboard');
+        return redirect()->route('admin.companies');
     }
 
     public function invitationForm(string $token): View

@@ -76,6 +76,10 @@ class AuthenticatedSessionController extends Controller
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
 
+        if ($user->hasRole('Super Admin')) {
+            return redirect()->route('admin.companies');
+        }
+
         return redirect()->intended('/');
     }
 
