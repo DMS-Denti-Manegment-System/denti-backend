@@ -7,3 +7,4 @@ parameters:
     - app
   tmpDir: storage/phpstan
   treatPhpDocTypesAsCertain: false
+  reportUnmatchedIgnoredErrors: false

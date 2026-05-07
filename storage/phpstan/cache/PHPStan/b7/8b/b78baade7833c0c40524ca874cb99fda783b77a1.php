@@ -2,6 +2,6 @@
 
 // variadic-method-App\Services\StockAlertService-getAlertStatistics-/Users/emircanuysal/Desktop/denti-backend/app/Services/StockAlertService.php
 return \PHPStan\Cache\CacheItem::__set_state(array(
-   'variableKey' => '1778151123-v4',
+   'variableKey' => '1778159662-v4',
    'data' => false,
 ));

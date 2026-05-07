@@ -1,7 +1,7 @@
 <?php declare(strict_types = 1);
 
 return [
-	'lastFullAnalysisTime' => 1778152037,
+	'lastFullAnalysisTime' => 1778162035,
 	'meta' => array (
   'cacheVersion' => 'v12-linesToIgnore',
   'phpstanVersion' => '1.12.33',
@@ -16,7 +16,7 @@ return [
   ),
   'composerLocks' => 
   array (
-    '/Users/emircanuysal/Desktop/denti-backend/composer.lock' => '2e6d648a20467ec93817e6305c1a815fa4da93e1',
+    '/Users/emircanuysal/Desktop/denti-backend/composer.lock' => 'ec55fc05b9860f599786afc9a813055329734dd6',
   ),
   'composerInstalled' => 
   array (
@@ -1403,9 +1403,9 @@ return [
         ),
         'spatie/laravel-permission' => 
         array (
-          'pretty_version' => '7.3.0',
-          'version' => '7.3.0.0',
-          'reference' => '5272955119759cd217e84e8bbac19443c305ebc3',
+          'pretty_version' => '7.4.1',
+          'version' => '7.4.1.0',
+          'reference' => 'ef42ecb781e5534d368a3853fa161e420ad51397',
           'type' => 'library',
           'install_path' => '/Users/emircanuysal/Desktop/denti-backend/vendor/composer/../spatie/laravel-permission',
           'aliases' => 
@@ -2127,12 +2127,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined static method App\\Models\\Company::whereRaw().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 43,
+       'line' => 44,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 43,
+       'nodeLine' => 44,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
@@ -2143,12 +2143,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Http\\Requests\\Auth\\LoginRequest::$username.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 53,
+       'line' => 54,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 53,
+       'nodeLine' => 54,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2159,12 +2159,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Http\\Requests\\Auth\\LoginRequest::$password.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 54,
+       'line' => 55,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 54,
+       'nodeLine' => 55,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2189,14 +2189,14 @@ return [
     )),
     4 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\User::$username.',
+       'message' => 'Access to an undefined property App\\Models\\User::$company_id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 72,
+       'line' => 73,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 72,
+       'nodeLine' => 73,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2205,14 +2205,14 @@ return [
     )),
     5 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\User::$company.',
+       'message' => 'Access to an undefined property App\\Models\\User::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 80,
+       'line' => 78,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 80,
+       'nodeLine' => 78,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2221,14 +2221,14 @@ return [
     )),
     6 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\User::$clinic.',
+       'message' => 'Access to an undefined property App\\Models\\User::$username.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 81,
+       'line' => 78,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 81,
+       'nodeLine' => 78,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2237,14 +2237,14 @@ return [
     )),
     7 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property Illuminate\\Http\\Request::$username.',
+       'message' => 'Access to an undefined property App\\Models\\User::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 97,
+       'line' => 83,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 97,
+       'nodeLine' => 83,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2253,14 +2253,14 @@ return [
     )),
     8 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property Illuminate\\Http\\Request::$username.',
+       'message' => 'Access to an undefined property App\\Models\\User::$company_id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 105,
+       'line' => 84,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 105,
+       'nodeLine' => 84,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2269,30 +2269,30 @@ return [
     )),
     9 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\User::where().',
+       'message' => 'Access to an undefined property App\\Models\\User::$company.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 105,
+       'line' => 92,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 105,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 92,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     10 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\User::$company.',
+       'message' => 'Access to an undefined property App\\Models\\User::$clinic.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 143,
+       'line' => 93,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 143,
+       'nodeLine' => 93,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -2301,14 +2301,78 @@ return [
     )),
     11 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Guard::logout().',
+       'message' => 'Access to an undefined property Illuminate\\Http\\Request::$username.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
-       'line' => 149,
+       'line' => 114,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 114,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    12 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property Illuminate\\Http\\Request::$username.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'line' => 122,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 122,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    13 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\User::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'line' => 122,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 149,
+       'nodeLine' => 122,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    14 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\User::$company.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'line' => 168,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 168,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    15 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Guard::logout().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'line' => 174,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 174,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3143,12 +3207,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Parameter #2 $default of method Illuminate\\Http\\Request::query() expects array|string|null, int given.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 41,
+       'line' => 42,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 41,
+       'nodeLine' => 42,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'argument.type',
        'metadata' => 
@@ -3159,12 +3223,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 49,
+       'line' => 50,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 49,
+       'nodeLine' => 50,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3175,12 +3239,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 68,
+       'line' => 69,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 68,
+       'nodeLine' => 69,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3191,12 +3255,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 88,
+       'line' => 89,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 88,
+       'nodeLine' => 89,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3207,12 +3271,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 112,
+       'line' => 113,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 112,
+       'nodeLine' => 113,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3223,12 +3287,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 140,
+       'line' => 141,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 140,
+       'nodeLine' => 141,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3239,12 +3303,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 160,
+       'line' => 161,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 160,
+       'nodeLine' => 161,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3255,12 +3319,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 187,
+       'line' => 188,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 187,
+       'nodeLine' => 188,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3271,12 +3335,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 207,
+       'line' => 208,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 207,
+       'nodeLine' => 208,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3287,12 +3351,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 225,
+       'line' => 226,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 225,
+       'nodeLine' => 226,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3303,12 +3367,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 238,
+       'line' => 239,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 238,
+       'nodeLine' => 239,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3319,12 +3383,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 249,
+       'line' => 250,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 249,
+       'nodeLine' => 250,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3333,14 +3397,14 @@ return [
     )),
     12 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 264,
+       'line' => 261,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 264,
+       'nodeLine' => 261,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3351,12 +3415,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 279,
+       'line' => 267,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 279,
+       'nodeLine' => 267,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3365,16 +3429,16 @@ return [
     )),
     14 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Parameter #2 $default of method Illuminate\\Http\\Request::query() expects array|string|null, int given.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 289,
+       'line' => 278,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 289,
+       'nodeLine' => 278,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'argument.type',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
@@ -3383,12 +3447,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 295,
+       'line' => 284,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 295,
+       'nodeLine' => 284,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3397,30 +3461,30 @@ return [
     )),
     16 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Parameter #2 $default of method Illuminate\\Http\\Request::query() expects array|string|null, int given.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 305,
+       'line' => 294,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 305,
+       'nodeLine' => 294,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'identifier' => 'argument.type',
        'metadata' => 
       array (
       ),
     )),
     17 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 328,
+       'line' => 296,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 328,
+       'nodeLine' => 296,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3431,12 +3495,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 345,
+       'line' => 302,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 345,
+       'nodeLine' => 302,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3445,14 +3509,14 @@ return [
     )),
     19 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 368,
+       'line' => 312,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 368,
+       'nodeLine' => 312,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3463,12 +3527,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 391,
+       'line' => 335,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 391,
+       'nodeLine' => 335,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -3479,12 +3543,60 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
-       'line' => 415,
+       'line' => 352,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 415,
+       'nodeLine' => 352,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    22 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
+       'line' => 375,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 375,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    23 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
+       'line' => 398,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 398,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    24 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
+       'line' => 422,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 422,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -5561,14 +5673,14 @@ return [
   array (
     0 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 50,
+       'line' => 43,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 50,
+       'nodeLine' => 43,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -5577,62 +5689,62 @@ return [
     )),
     1 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 54,
+       'line' => 57,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 54,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 57,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     2 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\StockTransaction::whereIn().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 54,
+       'line' => 58,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 54,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
+       'nodeLine' => 58,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     3 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 60,
+       'line' => 103,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 60,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 103,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     4 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$has_expiration_date.',
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 60,
+       'line' => 106,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 60,
+       'nodeLine' => 106,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -5641,30 +5753,30 @@ return [
     )),
     5 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined static method App\\Models\\StockTransaction::whereIn().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 61,
+       'line' => 108,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 61,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 108,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     6 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$total_stock.',
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 66,
+       'line' => 114,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 66,
+       'nodeLine' => 114,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -5673,14 +5785,14 @@ return [
     )),
     7 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Access to an undefined property App\\Models\\Product::$has_expiration_date.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 67,
+       'line' => 114,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 67,
+       'nodeLine' => 114,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -5689,62 +5801,62 @@ return [
     )),
     8 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\StockTransaction::whereIn().',
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 67,
+       'line' => 115,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 67,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 115,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     9 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Supplier>::active().',
+       'message' => 'Access to an undefined property App\\Models\\Product::$total_stock.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 97,
+       'line' => 120,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 97,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 120,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     10 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Call to an undefined static method App\\Models\\StockTransaction::whereIn().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 98,
+       'line' => 121,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 98,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'nodeLine' => 121,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     11 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Supplier>::active().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 98,
+       'line' => 153,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 98,
+       'nodeLine' => 153,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -5753,32 +5865,32 @@ return [
     )),
     12 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 103,
+       'line' => 154,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 103,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 154,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     13 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 104,
+       'line' => 154,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 104,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 154,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
@@ -5787,12 +5899,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 105,
+       'line' => 159,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 105,
+       'nodeLine' => 159,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -5801,14 +5913,14 @@ return [
     )),
     15 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$company_id.',
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 112,
+       'line' => 160,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 112,
+       'nodeLine' => 160,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -5817,55 +5929,7 @@ return [
     )),
     16 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 112,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 112,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    17 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 114,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 114,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    18 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 143,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 143,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    19 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'line' => 161,
        'canBeIgnored' => true,
@@ -5879,16 +5943,64 @@ return [
       array (
       ),
     )),
-    20 => 
+    17 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Stock::$company_id.',
+       'message' => 'Access to an undefined property App\\Models\\Product::$company_id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 166,
+       'line' => 168,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 166,
+       'nodeLine' => 168,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    18 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 168,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 168,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    19 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 170,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 170,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    20 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 199,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 199,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -5897,30 +6009,30 @@ return [
     )),
     21 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 166,
+       'line' => 217,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 166,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 217,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     22 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Stock::$product_id.',
+       'message' => 'Access to an undefined property App\\Models\\Stock::$company_id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 174,
+       'line' => 222,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 174,
+       'nodeLine' => 222,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -5929,71 +6041,55 @@ return [
     )),
     23 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Stock::$id.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 178,
+       'line' => 222,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 178,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 222,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     24 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Access to an undefined property App\\Models\\Stock::$product_id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 180,
+       'line' => 230,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 180,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 230,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     25 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'message' => 'Access to an undefined property App\\Models\\Stock::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 181,
+       'line' => 234,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 181,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 234,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     26 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Category::findOrFail().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 204,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 204,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    27 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Category::create().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'line' => 236,
        'canBeIgnored' => true,
@@ -6001,72 +6097,88 @@ return [
        'traitFilePath' => NULL,
        'tip' => NULL,
        'nodeLine' => 236,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    28 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 240,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 240,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    29 => 
+    27 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Category::$id.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 248,
+       'line' => 237,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 248,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 237,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    28 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\Category::findOrFail().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 260,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 260,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    29 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\Category::create().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 292,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 292,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     30 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Supplier::findOrFail().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 287,
+       'line' => 296,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 287,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
+       'nodeLine' => 296,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     31 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Supplier::create().',
+       'message' => 'Access to an undefined property App\\Models\\Category::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 322,
+       'line' => 304,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 322,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 304,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
@@ -6075,12 +6187,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 325,
+       'line' => 327,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 325,
+       'nodeLine' => 327,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -6089,46 +6201,46 @@ return [
     )),
     33 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Supplier::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\Supplier::findOrFail().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 333,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 333,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    34 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Clinic::findOrFail().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 374,
+       'line' => 345,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 374,
+       'nodeLine' => 345,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
-    35 => 
+    34 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Clinic::create().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 415,
+       'line' => 348,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 415,
+       'nodeLine' => 348,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    35 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\Supplier::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 348,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 348,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
@@ -6137,46 +6249,46 @@ return [
     )),
     36 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Call to an undefined static method App\\Models\\Stock::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 418,
+       'line' => 363,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 418,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'nodeLine' => 363,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     37 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Clinic::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\Stock::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 426,
+       'line' => 364,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 426,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 364,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     38 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'message' => 'Call to an undefined static method App\\Models\\Stock::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 473,
+       'line' => 365,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 473,
+       'nodeLine' => 365,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
@@ -6185,14 +6297,14 @@ return [
     )),
     39 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'message' => 'Call to an undefined static method App\\Models\\Stock::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 474,
+       'line' => 366,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 474,
+       'nodeLine' => 366,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
@@ -6201,14 +6313,14 @@ return [
     )),
     40 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'message' => 'Call to an undefined static method App\\Models\\StockTransaction::whereIn().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 475,
+       'line' => 366,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 475,
+       'nodeLine' => 366,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
@@ -6217,14 +6329,14 @@ return [
     )),
     41 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'message' => 'Call to an undefined static method App\\Models\\Supplier::create().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 476,
+       'line' => 397,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 476,
+       'nodeLine' => 397,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
@@ -6233,48 +6345,48 @@ return [
     )),
     42 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 477,
+       'line' => 400,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 477,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
+       'nodeLine' => 400,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     43 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Stock>::active().',
+       'message' => 'Access to an undefined property App\\Models\\Supplier::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 482,
+       'line' => 408,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 482,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 408,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     44 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
+       'message' => 'Access to an undefined property App\\Models\\Supplier::$company_id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 483,
+       'line' => 433,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 483,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 433,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
@@ -6283,12 +6395,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 514,
+       'line' => 433,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 514,
+       'nodeLine' => 433,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -6297,32 +6409,32 @@ return [
     )),
     46 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Access to an undefined property App\\Models\\Supplier::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 515,
+       'line' => 436,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 515,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 436,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     47 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\Stock::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 529,
+       'line' => 436,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 529,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 436,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
@@ -6331,12 +6443,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 531,
+       'line' => 446,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 531,
+       'nodeLine' => 446,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -6345,16 +6457,16 @@ return [
     )),
     49 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\Clinic::findOrFail().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 545,
+       'line' => 464,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 545,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 464,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
@@ -6363,12 +6475,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 547,
+       'line' => 467,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 547,
+       'nodeLine' => 467,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -6377,149 +6489,485 @@ return [
     )),
     51 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\Clinic::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 555,
+       'line' => 467,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 555,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 467,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     52 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Call to an undefined static method App\\Models\\Stock::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 555,
+       'line' => 482,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 555,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'nodeLine' => 482,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     53 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\Product::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 562,
+       'line' => 483,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 562,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 483,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     54 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 562,
+       'line' => 484,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 562,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'nodeLine' => 484,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     55 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\StockAlert::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\StockAlert::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 596,
+       'line' => 485,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 596,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 485,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     56 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Call to an undefined static method App\\Models\\StockTransaction::where().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 596,
+       'line' => 486,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 596,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'nodeLine' => 486,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     57 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\StockAlert::$id.',
+       'message' => 'Call to an undefined static method App\\Models\\Clinic::create().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 603,
+       'line' => 523,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 603,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 523,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     58 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Todo::findOrFail().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 620,
+       'line' => 526,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 620,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
+       'nodeLine' => 526,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     59 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\Todo::create().',
+       'message' => 'Access to an undefined property App\\Models\\Clinic::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 652,
+       'line' => 534,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 534,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    60 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Clinic::$company_id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 565,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 565,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    61 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 565,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 652,
+       'nodeLine' => 565,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    62 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Clinic::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 568,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 568,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    63 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\Stock::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 568,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 568,
        'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
        'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
-    60 => 
+    64 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Clinic::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 569,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 569,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    65 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Clinic::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 569,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 569,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    66 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 569,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 569,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    67 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Clinic::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 570,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 570,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    68 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\User::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 570,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 570,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    69 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Clinic::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 571,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 571,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    70 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\StockTransaction::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 571,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 571,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    71 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 597,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 597,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    72 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 598,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 598,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    73 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 599,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 599,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    74 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 600,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 600,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    75 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined static method App\\Models\\StockRequest::where().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 601,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 601,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    76 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Stock>::active().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 606,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 606,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    77 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 607,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 607,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    78 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 638,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 638,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    79 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 639,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 639,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    80 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 653,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 653,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    81 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
@@ -6535,352 +6983,16 @@ return [
       array (
       ),
     )),
-    61 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Todo::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 663,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 663,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    62 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Todo::$completed.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 688,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 688,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    63 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Todo::$completed.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 699,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 699,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    64 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 732,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 732,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    65 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 753,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 753,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    66 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined static method App\\Models\\User::create().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 765,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 765,
-       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
-       'identifier' => 'staticMethod.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    67 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\User::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 784,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 784,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    68 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 789,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 789,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    69 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\User::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 793,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 793,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    70 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\User::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 820,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 820,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    71 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 820,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 820,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    72 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 840,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 840,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    73 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 899,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 899,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    74 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 919,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 919,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    75 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property Illuminate\\Database\\Eloquent\\Model::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 929,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 929,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    76 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 932,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 932,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    77 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 945,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 945,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    78 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 951,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 951,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    79 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 955,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 955,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    80 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property Illuminate\\Database\\Eloquent\\Model::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1019,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1019,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    81 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1022,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1022,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
     82 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1041,
+       'line' => 669,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1041,
+       'nodeLine' => 669,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -6889,46 +7001,46 @@ return [
     )),
     83 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable::$company_id.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1051,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1051,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    84 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\StockAlert>::active().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1060,
+       'line' => 671,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1060,
+       'nodeLine' => 671,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
+    84 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 679,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 679,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
     85 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1075,
+       'line' => 679,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1075,
+       'nodeLine' => 679,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -6937,30 +7049,30 @@ return [
     )),
     86 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable::load().',
+       'message' => 'Access to an undefined property App\\Models\\StockRequest::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1082,
+       'line' => 686,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 1082,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 686,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     87 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1091,
+       'line' => 686,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1091,
+       'nodeLine' => 686,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -6969,16 +7081,16 @@ return [
     )),
     88 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Access to an undefined property App\\Models\\StockAlert::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1094,
+       'line' => 720,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 1094,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 720,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
@@ -6987,12 +7099,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1106,
+       'line' => 720,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1106,
+       'nodeLine' => 720,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -7001,94 +7113,94 @@ return [
     )),
     90 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Access to an undefined property App\\Models\\StockAlert::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1110,
+       'line' => 727,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 1110,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 727,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
     91 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'message' => 'Call to an undefined static method App\\Models\\Todo::findOrFail().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1122,
+       'line' => 744,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1122,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'nodeLine' => 744,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     92 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined static method App\\Models\\Todo::create().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1131,
+       'line' => 776,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1131,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 776,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     93 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1143,
-       'canBeIgnored' => true,
-       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1143,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
-       'metadata' => 
-      array (
-      ),
-    )),
-    94 => 
-    \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Support\\Optional::format().',
-       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1154,
+       'line' => 779,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1154,
+       'nodeLine' => 779,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    95 => 
+    94 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Access to an undefined property App\\Models\\Todo::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1158,
+       'line' => 787,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1158,
+       'nodeLine' => 787,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    95 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Todo::$completed.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 812,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 812,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -7097,14 +7209,14 @@ return [
     )),
     96 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$total_stock.',
+       'message' => 'Access to an undefined property App\\Models\\Todo::$completed.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1159,
+       'line' => 823,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1159,
+       'nodeLine' => 823,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -7113,64 +7225,64 @@ return [
     )),
     97 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1165,
+       'line' => 856,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1165,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 856,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     98 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Access to an undefined property App\\Models\\Product::$has_expiration_date.',
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1166,
+       'line' => 877,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1166,
-       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
-       'identifier' => 'property.notFound',
+       'tip' => NULL,
+       'nodeLine' => 877,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
     99 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
+       'message' => 'Call to an undefined static method App\\Models\\User::create().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1172,
+       'line' => 889,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1172,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'nodeLine' => 889,
+       'nodeType' => 'PhpParser\\Node\\Expr\\StaticCall',
+       'identifier' => 'staticMethod.notFound',
        'metadata' => 
       array (
       ),
     )),
     100 => 
     \PHPStan\Analyser\Error::__set_state(array(
-       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Supplier>::active().',
+       'message' => 'Access to an undefined property App\\Models\\User::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1173,
+       'line' => 908,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
-       'tip' => NULL,
-       'nodeLine' => 1173,
-       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
-       'identifier' => 'method.notFound',
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 908,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
@@ -7178,6 +7290,342 @@ return [
     101 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 913,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 913,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    102 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\User::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 917,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 917,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    103 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\User::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 944,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 944,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    104 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 944,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 944,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    105 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 968,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 968,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    106 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1017,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1017,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    107 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1045,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1045,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    108 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1048,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1048,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    109 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1068,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1068,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    110 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property Illuminate\\Database\\Eloquent\\Model::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1078,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1078,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    111 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1081,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1081,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    112 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1094,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1094,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    113 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1100,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1100,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    114 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1104,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1104,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    115 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property Illuminate\\Database\\Eloquent\\Model::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1171,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1171,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    116 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1174,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1174,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    117 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1193,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1193,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    118 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property Illuminate\\Contracts\\Auth\\Authenticatable::$company_id.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1203,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1203,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    119 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\StockAlert>::active().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1212,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1212,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    120 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1227,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1227,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    121 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Authenticatable::load().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1234,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1234,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    122 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::id().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'line' => 1243,
        'canBeIgnored' => true,
@@ -7191,160 +7639,384 @@ return [
       array (
       ),
     )),
-    102 => 
+    123 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1244,
+       'line' => 1246,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1244,
+       'nodeLine' => 1246,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    103 => 
+    124 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1258,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1258,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    125 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1262,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1262,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    126 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1274,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1274,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    127 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1283,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1283,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    128 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1295,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1295,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    129 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Support\\Optional::format().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1306,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1306,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    130 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1310,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1310,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    131 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$total_stock.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1311,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1311,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    132 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1317,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1317,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    133 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Access to an undefined property App\\Models\\Product::$has_expiration_date.',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1318,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
+       'nodeLine' => 1318,
+       'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
+       'identifier' => 'property.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    134 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Clinic>::active().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1324,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1324,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    135 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Database\\Eloquent\\Builder<App\\Models\\Supplier>::active().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1325,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1325,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    136 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1395,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1395,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    137 => 
+    \PHPStan\Analyser\Error::__set_state(array(
+       'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
+       'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'line' => 1396,
+       'canBeIgnored' => true,
+       'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
+       'traitFilePath' => NULL,
+       'tip' => NULL,
+       'nodeLine' => 1396,
+       'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
+       'identifier' => 'method.notFound',
+       'metadata' => 
+      array (
+      ),
+    )),
+    138 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property Illuminate\\Http\\Request::$code.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1256,
+       'line' => 1408,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1256,
+       'nodeLine' => 1408,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
-    104 => 
+    139 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1256,
+       'line' => 1408,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1256,
+       'nodeLine' => 1408,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    105 => 
+    140 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1261,
+       'line' => 1413,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1261,
+       'nodeLine' => 1413,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    106 => 
+    141 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1267,
+       'line' => 1419,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1267,
+       'nodeLine' => 1419,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    107 => 
+    142 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1278,
+       'line' => 1430,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1278,
+       'nodeLine' => 1430,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    108 => 
+    143 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property Illuminate\\Http\\Request::$ids.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1286,
+       'line' => 1438,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1286,
+       'nodeLine' => 1438,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
-    109 => 
+    144 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Contracts\\Auth\\Factory::user().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1286,
+       'line' => 1438,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 1286,
+       'nodeLine' => 1438,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
       array (
       ),
     )),
-    110 => 
+    145 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property Illuminate\\Http\\Request::$ids.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1294,
+       'line' => 1446,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1294,
+       'nodeLine' => 1446,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
       array (
       ),
     )),
-    111 => 
+    146 => 
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property Illuminate\\Http\\Request::$ids.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
-       'line' => 1302,
+       'line' => 1454,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 1302,
+       'nodeLine' => 1454,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10594,12 +11266,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 71,
+       'line' => 74,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 71,
+       'nodeLine' => 74,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10610,12 +11282,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$is_active.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 82,
+       'line' => 85,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 82,
+       'nodeLine' => 85,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10626,12 +11298,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$total_stock.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 86,
+       'line' => 89,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 86,
+       'nodeLine' => 89,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10642,12 +11314,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$critical_stock_level.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 87,
+       'line' => 90,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 87,
+       'nodeLine' => 90,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10658,12 +11330,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$min_stock_level.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 88,
+       'line' => 91,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 88,
+       'nodeLine' => 91,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10674,12 +11346,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 107,
+       'line' => 110,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 107,
+       'nodeLine' => 110,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10690,12 +11362,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$total_stock.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 118,
+       'line' => 121,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 118,
+       'nodeLine' => 121,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10706,12 +11378,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$total_stock_value.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 123,
+       'line' => 126,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 123,
+       'nodeLine' => 126,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10722,12 +11394,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$total_stock.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 128,
+       'line' => 131,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 128,
+       'nodeLine' => 131,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10738,12 +11410,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$total_stock_value.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 133,
+       'line' => 136,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 133,
+       'nodeLine' => 136,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10754,12 +11426,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$potential_revenue.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 134,
+       'line' => 137,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 134,
+       'nodeLine' => 137,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10770,12 +11442,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$potential_revenue.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 141,
+       'line' => 144,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 141,
+       'nodeLine' => 144,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10786,12 +11458,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$potential_profit.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 146,
+       'line' => 149,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 146,
+       'nodeLine' => 149,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10802,12 +11474,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Stock::$purchase_date.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 156,
+       'line' => 159,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 156,
+       'nodeLine' => 159,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10818,12 +11490,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Call to an undefined method Illuminate\\Support\\Optional::format().',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 156,
+       'line' => 159,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => NULL,
-       'nodeLine' => 156,
+       'nodeLine' => 159,
        'nodeType' => 'PhpParser\\Node\\Expr\\MethodCall',
        'identifier' => 'method.notFound',
        'metadata' => 
@@ -10834,12 +11506,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Stock::$id.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 157,
+       'line' => 160,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 157,
+       'nodeLine' => 160,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -10850,12 +11522,12 @@ return [
     \PHPStan\Analyser\Error::__set_state(array(
        'message' => 'Access to an undefined property App\\Models\\Product::$batches.',
        'file' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
-       'line' => 204,
+       'line' => 207,
        'canBeIgnored' => true,
        'filePath' => '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php',
        'traitFilePath' => NULL,
        'tip' => 'Learn more: <fg=cyan>https://phpstan.org/blog/solving-phpstan-access-to-undefined-property</>',
-       'nodeLine' => 204,
+       'nodeLine' => 207,
        'nodeType' => 'PhpParser\\Node\\Expr\\PropertyFetch',
        'identifier' => 'property.notFound',
        'metadata' => 
@@ -14331,7 +15003,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php' => 
   array (
-    'fileHash' => 'd3bda091deffe1a753199cd037633a66cabbc2eb',
+    'fileHash' => 'e5f23624e068a4077537e4aa2e0277d1483441a9',
     'dependentFiles' => 
     array (
     ),
@@ -14387,7 +15059,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php' => 
   array (
-    'fileHash' => '2d571e3340ca53ba5c27868d057cffdc3b0b7360',
+    'fileHash' => 'c5ba3993ec8d436aabba5b56ff023cf2e39c0639',
     'dependentFiles' => 
     array (
     ),
@@ -14488,7 +15160,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Health/HealthController.php' => 
   array (
-    'fileHash' => 'ae93c03dea8d1b71c3d1a3b57478202efabc44fb',
+    'fileHash' => 'd6f18cd35d9404dfccb2ba4f8017717c4bcf2df6',
     'dependentFiles' => 
     array (
     ),
@@ -14516,7 +15188,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php' => 
   array (
-    'fileHash' => 'df5d0a76612e548d1f6440f0987042f586ec68aa',
+    'fileHash' => 'b26b9ad51210456700ddaa3f1e2ab1581575b56c',
     'dependentFiles' => 
     array (
     ),
@@ -14552,6 +15224,13 @@ return [
   '/Users/emircanuysal/Desktop/denti-backend/app/Http/Middleware/EnsureTwoFactorIsVerified.php' => 
   array (
     'fileHash' => '494fb858a5691c6d79eb075ed77c6b98027a7835',
+    'dependentFiles' => 
+    array (
+    ),
+  ),
+  '/Users/emircanuysal/Desktop/denti-backend/app/Http/Middleware/ForceLocalhostMiddleware.php' => 
+  array (
+    'fileHash' => 'd6325e1c5d2892e8ee0fb0fc351d2724162b36ae',
     'dependentFiles' => 
     array (
     ),
@@ -14949,7 +15628,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php' => 
   array (
-    'fileHash' => '0953f1d49df5ffbe5f74527ba58d5f10a25c88c4',
+    'fileHash' => 'f86b554295e3d3fe6e3bd68aad467370a324ca22',
     'dependentFiles' => 
     array (
       0 => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/DashboardController.php',
@@ -14994,7 +15673,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Models/Stock.php' => 
   array (
-    'fileHash' => '0588ab5718107f65a34f0f814b149cf3c1eb3572',
+    'fileHash' => '3e3aaf070f69e3b9a3d0f2d43b43ca50e5983578',
     'dependentFiles' => 
     array (
       0 => '/Users/emircanuysal/Desktop/denti-backend/app/Events/Stock/StockLevelChanged.php',
@@ -15419,7 +16098,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Services/ProductService.php' => 
   array (
-    'fileHash' => 'ace8c1c91a3358b84c4e659e66661a9fa6d7aa00',
+    'fileHash' => '937df14e7459446fc6a8c70d34ee65e7113de25d',
     'dependentFiles' => 
     array (
       0 => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/ProductController.php',
@@ -15428,7 +16107,7 @@ return [
   ),
   '/Users/emircanuysal/Desktop/denti-backend/app/Services/StockAlertService.php' => 
   array (
-    'fileHash' => 'd3997a7951575eb3412f18f44b2e7cfc5b24a464',
+    'fileHash' => '9473146cf8c0b3d788404e3ed251d890f6d7a7b7',
     'dependentFiles' => 
     array (
       0 => '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockAlertController.php',
@@ -18658,6 +19337,7 @@ return [
               'stockservice' => 'App\\Services\\StockService',
               'jsonresponse' => 'Illuminate\\Http\\JsonResponse',
               'request' => 'Illuminate\\Http\\Request',
+              'cache' => 'Illuminate\\Support\\Facades\\Cache',
               'log' => 'Illuminate\\Support\\Facades\\Log',
             ),
              'constUses' => 
@@ -21779,6 +22459,46 @@ return [
         )),
         14 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'supplierDestroy',
+           'phpDoc' => NULL,
+           'byRef' => false,
+           'public' => true,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => 'Illuminate\\Http\\RedirectResponse|Illuminate\\Http\\JsonResponse',
+           'parameters' => 
+          array (
+            0 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'request',
+               'type' => 'Illuminate\\Http\\Request',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+            1 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'supplier',
+               'type' => 'App\\Models\\Supplier',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+        15 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'clinics',
            'phpDoc' => NULL,
            'byRef' => false,
@@ -21806,7 +22526,7 @@ return [
           array (
           ),
         )),
-        15 => 
+        16 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'clinicCreate',
            'phpDoc' => NULL,
@@ -21824,7 +22544,7 @@ return [
           array (
           ),
         )),
-        16 => 
+        17 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'clinicStore',
            'phpDoc' => NULL,
@@ -21853,7 +22573,7 @@ return [
           array (
           ),
         )),
-        17 => 
+        18 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'clinicEdit',
            'phpDoc' => NULL,
@@ -21882,7 +22602,7 @@ return [
           array (
           ),
         )),
-        18 => 
+        19 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'clinicUpdate',
            'phpDoc' => NULL,
@@ -21922,7 +22642,47 @@ return [
           array (
           ),
         )),
-        19 => 
+        20 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'clinicDestroy',
+           'phpDoc' => NULL,
+           'byRef' => false,
+           'public' => true,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => 'Illuminate\\Http\\RedirectResponse|Illuminate\\Http\\JsonResponse',
+           'parameters' => 
+          array (
+            0 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'request',
+               'type' => 'Illuminate\\Http\\Request',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+            1 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'clinic',
+               'type' => 'App\\Models\\Clinic',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+        21 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockRequests',
            'phpDoc' => NULL,
@@ -21951,7 +22711,7 @@ return [
           array (
           ),
         )),
-        20 => 
+        22 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockRequestCreate',
            'phpDoc' => NULL,
@@ -21969,7 +22729,7 @@ return [
           array (
           ),
         )),
-        21 => 
+        23 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockRequestStore',
            'phpDoc' => NULL,
@@ -21998,7 +22758,7 @@ return [
           array (
           ),
         )),
-        22 => 
+        24 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockRequestApprove',
            'phpDoc' => NULL,
@@ -22038,7 +22798,7 @@ return [
           array (
           ),
         )),
-        23 => 
+        25 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockRequestReject',
            'phpDoc' => NULL,
@@ -22078,7 +22838,7 @@ return [
           array (
           ),
         )),
-        24 => 
+        26 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockRequestShip',
            'phpDoc' => NULL,
@@ -22118,7 +22878,7 @@ return [
           array (
           ),
         )),
-        25 => 
+        27 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockRequestComplete',
            'phpDoc' => NULL,
@@ -22158,7 +22918,7 @@ return [
           array (
           ),
         )),
-        26 => 
+        28 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alerts',
            'phpDoc' => NULL,
@@ -22187,7 +22947,7 @@ return [
           array (
           ),
         )),
-        27 => 
+        29 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertResolve',
            'phpDoc' => NULL,
@@ -22227,7 +22987,7 @@ return [
           array (
           ),
         )),
-        28 => 
+        30 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertDismiss',
            'phpDoc' => NULL,
@@ -22267,7 +23027,7 @@ return [
           array (
           ),
         )),
-        29 => 
+        31 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'todos',
            'phpDoc' => NULL,
@@ -22296,7 +23056,7 @@ return [
           array (
           ),
         )),
-        30 => 
+        32 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'todoCreate',
            'phpDoc' => NULL,
@@ -22314,7 +23074,7 @@ return [
           array (
           ),
         )),
-        31 => 
+        33 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'todoStore',
            'phpDoc' => NULL,
@@ -22343,7 +23103,7 @@ return [
           array (
           ),
         )),
-        32 => 
+        34 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'todoEdit',
            'phpDoc' => NULL,
@@ -22372,7 +23132,7 @@ return [
           array (
           ),
         )),
-        33 => 
+        35 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'todoUpdate',
            'phpDoc' => NULL,
@@ -22412,7 +23172,7 @@ return [
           array (
           ),
         )),
-        34 => 
+        36 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'todoToggle',
            'phpDoc' => NULL,
@@ -22452,7 +23212,7 @@ return [
           array (
           ),
         )),
-        35 => 
+        37 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'todoDestroy',
            'phpDoc' => NULL,
@@ -22492,7 +23252,7 @@ return [
           array (
           ),
         )),
-        36 => 
+        38 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'employees',
            'phpDoc' => NULL,
@@ -22521,7 +23281,7 @@ return [
           array (
           ),
         )),
-        37 => 
+        39 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'employeeCreate',
            'phpDoc' => NULL,
@@ -22539,7 +23299,7 @@ return [
           array (
           ),
         )),
-        38 => 
+        40 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'employeeStore',
            'phpDoc' => NULL,
@@ -22568,7 +23328,7 @@ return [
           array (
           ),
         )),
-        39 => 
+        41 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'employeeEdit',
            'phpDoc' => NULL,
@@ -22597,7 +23357,7 @@ return [
           array (
           ),
         )),
-        40 => 
+        42 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'employeeUpdate',
            'phpDoc' => NULL,
@@ -22637,7 +23397,7 @@ return [
           array (
           ),
         )),
-        41 => 
+        43 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'employeeDestroy',
            'phpDoc' => NULL,
@@ -22677,7 +23437,7 @@ return [
           array (
           ),
         )),
-        42 => 
+        44 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockCreate',
            'phpDoc' => NULL,
@@ -22687,15 +23447,26 @@ return [
            'abstract' => false,
            'final' => false,
            'static' => false,
-           'returnType' => 'Illuminate\\Http\\RedirectResponse',
+           'returnType' => 'Illuminate\\Http\\RedirectResponse|Illuminate\\Http\\JsonResponse',
            'parameters' => 
           array (
+            0 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'request',
+               'type' => 'Illuminate\\Http\\Request',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
           ),
            'attributes' => 
           array (
           ),
         )),
-        43 => 
+        45 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockStore',
            'phpDoc' => NULL,
@@ -22724,78 +23495,9 @@ return [
           array (
           ),
         )),
-        44 => 
-        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
-           'name' => 'stockEdit',
-           'phpDoc' => NULL,
-           'byRef' => false,
-           'public' => true,
-           'private' => false,
-           'abstract' => false,
-           'final' => false,
-           'static' => false,
-           'returnType' => 'Illuminate\\Http\\RedirectResponse',
-           'parameters' => 
-          array (
-            0 => 
-            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
-               'name' => 'product',
-               'type' => 'App\\Models\\Product',
-               'byRef' => false,
-               'variadic' => false,
-               'hasDefault' => false,
-               'attributes' => 
-              array (
-              ),
-            )),
-          ),
-           'attributes' => 
-          array (
-          ),
-        )),
-        45 => 
-        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
-           'name' => 'stockAdjust',
-           'phpDoc' => NULL,
-           'byRef' => false,
-           'public' => true,
-           'private' => false,
-           'abstract' => false,
-           'final' => false,
-           'static' => false,
-           'returnType' => 'Illuminate\\Http\\RedirectResponse|Illuminate\\Http\\JsonResponse',
-           'parameters' => 
-          array (
-            0 => 
-            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
-               'name' => 'request',
-               'type' => 'Illuminate\\Http\\Request',
-               'byRef' => false,
-               'variadic' => false,
-               'hasDefault' => false,
-               'attributes' => 
-              array (
-              ),
-            )),
-            1 => 
-            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
-               'name' => 'product',
-               'type' => 'App\\Models\\Product',
-               'byRef' => false,
-               'variadic' => false,
-               'hasDefault' => false,
-               'attributes' => 
-              array (
-              ),
-            )),
-          ),
-           'attributes' => 
-          array (
-          ),
-        )),
         46 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
-           'name' => 'stockUpdate',
+           'name' => 'stockEdit',
            'phpDoc' => NULL,
            'byRef' => false,
            'public' => true,
@@ -22835,6 +23537,86 @@ return [
         )),
         47 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'stockAdjust',
+           'phpDoc' => NULL,
+           'byRef' => false,
+           'public' => true,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => 'Illuminate\\Http\\RedirectResponse|Illuminate\\Http\\JsonResponse',
+           'parameters' => 
+          array (
+            0 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'request',
+               'type' => 'Illuminate\\Http\\Request',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+            1 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'product',
+               'type' => 'App\\Models\\Product',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+        48 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'stockUpdate',
+           'phpDoc' => NULL,
+           'byRef' => false,
+           'public' => true,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => 'Illuminate\\Http\\RedirectResponse|Illuminate\\Http\\JsonResponse',
+           'parameters' => 
+          array (
+            0 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'request',
+               'type' => 'Illuminate\\Http\\Request',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+            1 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'product',
+               'type' => 'App\\Models\\Product',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+        49 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'stockDestroy',
            'phpDoc' => NULL,
            'byRef' => false,
@@ -22862,7 +23644,7 @@ return [
           array (
           ),
         )),
-        48 => 
+        50 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'reports',
            'phpDoc' => NULL,
@@ -22891,7 +23673,7 @@ return [
           array (
           ),
         )),
-        49 => 
+        51 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'profile',
            'phpDoc' => NULL,
@@ -22909,7 +23691,7 @@ return [
           array (
           ),
         )),
-        50 => 
+        52 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'profileUpdateInfo',
            'phpDoc' => NULL,
@@ -22938,7 +23720,7 @@ return [
           array (
           ),
         )),
-        51 => 
+        53 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'profileUpdatePassword',
            'phpDoc' => NULL,
@@ -22967,7 +23749,7 @@ return [
           array (
           ),
         )),
-        52 => 
+        54 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'profile2faGenerate',
            'phpDoc' => NULL,
@@ -22996,7 +23778,7 @@ return [
           array (
           ),
         )),
-        53 => 
+        55 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'profile2faConfirm',
            'phpDoc' => NULL,
@@ -23025,7 +23807,7 @@ return [
           array (
           ),
         )),
-        54 => 
+        56 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'profile2faDisable',
            'phpDoc' => NULL,
@@ -23054,7 +23836,7 @@ return [
           array (
           ),
         )),
-        55 => 
+        57 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'profile2faRecoveryCodes',
            'phpDoc' => NULL,
@@ -23083,7 +23865,7 @@ return [
           array (
           ),
         )),
-        56 => 
+        58 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertBulkResolve',
            'phpDoc' => NULL,
@@ -23112,7 +23894,7 @@ return [
           array (
           ),
         )),
-        57 => 
+        59 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertBulkDismiss',
            'phpDoc' => NULL,
@@ -23141,7 +23923,7 @@ return [
           array (
           ),
         )),
-        58 => 
+        60 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertBulkDelete',
            'phpDoc' => NULL,
@@ -23170,7 +23952,7 @@ return [
           array (
           ),
         )),
-        59 => 
+        61 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertSync',
            'phpDoc' => NULL,
@@ -23199,7 +23981,7 @@ return [
           array (
           ),
         )),
-        60 => 
+        62 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertSettings',
            'phpDoc' => NULL,
@@ -23228,7 +24010,7 @@ return [
           array (
           ),
         )),
-        61 => 
+        63 => 
         \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
            'name' => 'alertUpdateSettings',
            'phpDoc' => NULL,
@@ -23726,6 +24508,72 @@ return [
             array (
             ),
           )),
+           'byRef' => false,
+           'public' => true,
+           'private' => false,
+           'abstract' => false,
+           'final' => false,
+           'static' => false,
+           'returnType' => 'Symfony\\Component\\HttpFoundation\\Response',
+           'parameters' => 
+          array (
+            0 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'request',
+               'type' => 'Illuminate\\Http\\Request',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+            1 => 
+            \PHPStan\Dependency\ExportedNode\ExportedParameterNode::__set_state(array(
+               'name' => 'next',
+               'type' => 'Closure',
+               'byRef' => false,
+               'variadic' => false,
+               'hasDefault' => false,
+               'attributes' => 
+              array (
+              ),
+            )),
+          ),
+           'attributes' => 
+          array (
+          ),
+        )),
+      ),
+       'attributes' => 
+      array (
+      ),
+    )),
+  ),
+  '/Users/emircanuysal/Desktop/denti-backend/app/Http/Middleware/ForceLocalhostMiddleware.php' => 
+  array (
+    0 => 
+    \PHPStan\Dependency\ExportedNode\ExportedClassNode::__set_state(array(
+       'name' => 'App\\Http\\Middleware\\ForceLocalhostMiddleware',
+       'phpDoc' => NULL,
+       'abstract' => false,
+       'final' => false,
+       'extends' => NULL,
+       'implements' => 
+      array (
+      ),
+       'usedTraits' => 
+      array (
+      ),
+       'traitUseAdaptations' => 
+      array (
+      ),
+       'statements' => 
+      array (
+        0 => 
+        \PHPStan\Dependency\ExportedNode\ExportedMethodNode::__set_state(array(
+           'name' => 'handle',
+           'phpDoc' => NULL,
            'byRef' => false,
            'public' => true,
            'private' => false,

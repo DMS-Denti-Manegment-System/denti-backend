@@ -69,8 +69,30 @@ class OperationsPageController extends Controller
                 ], 500);
             }
 
-            return redirect()->route('dashboard')->withErrors([
-                'stocks' => 'Stok yönetimi ekranı yüklenemedi. Lütfen tekrar deneyin.',
+            return view('operations.stocks.index', [
+                'products' => collect(),
+                'clinics' => collect(),
+                'suppliers' => collect(),
+                'categories' => collect(),
+                'units' => ['Adet', 'Kutu', 'Paket', 'Sise', 'Ml', 'Lt', 'Kg', 'Gr', 'Set'],
+                'currencies' => ['TRY' => '₺ (TL)', 'USD' => '$ (USD)', 'EUR' => '€ (EUR)'],
+                'stockStats' => [
+                    'total_items' => 0,
+                    'low_stock_items' => 0,
+                    'critical_stock_items' => 0,
+                    'low_expiring_items' => 0,
+                    'critical_expiring_items' => 0,
+                    'total_value' => 0,
+                ],
+                'modalMode' => null,
+                'editingProduct' => null,
+                'editingBatch' => null,
+                'selectedProduct' => null,
+                'selectedBatch' => null,
+                'selectedTransactions' => null,
+                'activeDetailTab' => 'history',
+                'chartSeries' => collect(),
+                'detailMeta' => null,
             ]);
         }
     }

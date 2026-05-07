@@ -2,6 +2,6 @@
 
 // variadic-method-App\Models\Product-outgoingTransactionTypes-/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php
 return \PHPStan\Cache\CacheItem::__set_state(array(
-   'variableKey' => '1778149948-v4',
+   'variableKey' => '1778155395-v4',
    'data' => false,
 ));

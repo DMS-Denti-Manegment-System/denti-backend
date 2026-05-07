@@ -2,6 +2,6 @@
 
 // variadic-method-Spatie\Permission\Traits\HasRoles-roles-/Users/emircanuysal/Desktop/denti-backend/vendor/composer/../spatie/laravel-permission/src/Traits/HasRoles.php
 return \PHPStan\Cache\CacheItem::__set_state(array(
-   'variableKey' => '1775575182-v4',
+   'variableKey' => '1777449585-v4',
    'data' => false,
 ));

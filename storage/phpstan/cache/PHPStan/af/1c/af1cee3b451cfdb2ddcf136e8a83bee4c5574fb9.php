@@ -595,7 +595,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Models/Product.php' => 
     array (
-      0 => '0953f1d49df5ffbe5f74527ba58d5f10a25c88c4',
+      0 => 'f86b554295e3d3fe6e3bd68aad467370a324ca22',
       1 => 
       array (
         0 => 'app\\models\\product',
@@ -627,7 +627,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Models/Stock.php' => 
     array (
-      0 => '0588ab5718107f65a34f0f814b149cf3c1eb3572',
+      0 => '3e3aaf070f69e3b9a3d0f2d43b43ca50e5983578',
       1 => 
       array (
         0 => 'app\\models\\stock',
@@ -1566,79 +1566,82 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php' => 
     array (
-      0 => 'df5d0a76612e548d1f6440f0987042f586ec68aa',
+      0 => 'b26b9ad51210456700ddaa3f1e2ab1581575b56c',
       1 => 
       array (
         0 => 'app\\http\\controllers\\web\\operationspagecontroller',
       ),
       2 => 
       array (
-        0 => 'app\\http\\controllers\\web\\stocks',
-        1 => 'app\\http\\controllers\\web\\stockshow',
-        2 => 'app\\http\\controllers\\web\\stockbatchstore',
-        3 => 'app\\http\\controllers\\web\\stockuse',
-        4 => 'app\\http\\controllers\\web\\categories',
-        5 => 'app\\http\\controllers\\web\\categorycreate',
-        6 => 'app\\http\\controllers\\web\\categorystore',
-        7 => 'app\\http\\controllers\\web\\categoryedit',
-        8 => 'app\\http\\controllers\\web\\categoryupdate',
-        9 => 'app\\http\\controllers\\web\\suppliers',
-        10 => 'app\\http\\controllers\\web\\suppliercreate',
-        11 => 'app\\http\\controllers\\web\\supplierstore',
-        12 => 'app\\http\\controllers\\web\\supplieredit',
-        13 => 'app\\http\\controllers\\web\\supplierupdate',
-        14 => 'app\\http\\controllers\\web\\clinics',
-        15 => 'app\\http\\controllers\\web\\cliniccreate',
-        16 => 'app\\http\\controllers\\web\\clinicstore',
-        17 => 'app\\http\\controllers\\web\\clinicedit',
-        18 => 'app\\http\\controllers\\web\\clinicupdate',
-        19 => 'app\\http\\controllers\\web\\stockrequests',
-        20 => 'app\\http\\controllers\\web\\stockrequestcreate',
-        21 => 'app\\http\\controllers\\web\\stockrequeststore',
-        22 => 'app\\http\\controllers\\web\\stockrequestapprove',
-        23 => 'app\\http\\controllers\\web\\stockrequestreject',
-        24 => 'app\\http\\controllers\\web\\stockrequestship',
-        25 => 'app\\http\\controllers\\web\\stockrequestcomplete',
-        26 => 'app\\http\\controllers\\web\\alerts',
-        27 => 'app\\http\\controllers\\web\\alertresolve',
-        28 => 'app\\http\\controllers\\web\\alertdismiss',
-        29 => 'app\\http\\controllers\\web\\todos',
-        30 => 'app\\http\\controllers\\web\\todocreate',
-        31 => 'app\\http\\controllers\\web\\todostore',
-        32 => 'app\\http\\controllers\\web\\todoedit',
-        33 => 'app\\http\\controllers\\web\\todoupdate',
-        34 => 'app\\http\\controllers\\web\\todotoggle',
-        35 => 'app\\http\\controllers\\web\\tododestroy',
-        36 => 'app\\http\\controllers\\web\\employees',
-        37 => 'app\\http\\controllers\\web\\employeecreate',
-        38 => 'app\\http\\controllers\\web\\employeestore',
-        39 => 'app\\http\\controllers\\web\\employeeedit',
-        40 => 'app\\http\\controllers\\web\\employeeupdate',
-        41 => 'app\\http\\controllers\\web\\employeedestroy',
-        42 => 'app\\http\\controllers\\web\\stockcreate',
-        43 => 'app\\http\\controllers\\web\\stockstore',
-        44 => 'app\\http\\controllers\\web\\stockedit',
-        45 => 'app\\http\\controllers\\web\\stockadjust',
-        46 => 'app\\http\\controllers\\web\\stockupdate',
-        47 => 'app\\http\\controllers\\web\\stockdestroy',
-        48 => 'app\\http\\controllers\\web\\reports',
-        49 => 'app\\http\\controllers\\web\\profile',
-        50 => 'app\\http\\controllers\\web\\profileupdateinfo',
-        51 => 'app\\http\\controllers\\web\\profileupdatepassword',
-        52 => 'app\\http\\controllers\\web\\getstocksviewdata',
-        53 => 'app\\http\\controllers\\web\\moduleresponse',
-        54 => 'app\\http\\controllers\\web\\actionresponse',
-        55 => 'app\\http\\controllers\\web\\actionerrorresponse',
-        56 => 'app\\http\\controllers\\web\\profile2fagenerate',
-        57 => 'app\\http\\controllers\\web\\profile2faconfirm',
-        58 => 'app\\http\\controllers\\web\\profile2fadisable',
-        59 => 'app\\http\\controllers\\web\\profile2farecoverycodes',
-        60 => 'app\\http\\controllers\\web\\alertbulkresolve',
-        61 => 'app\\http\\controllers\\web\\alertbulkdismiss',
-        62 => 'app\\http\\controllers\\web\\alertbulkdelete',
-        63 => 'app\\http\\controllers\\web\\alertsync',
-        64 => 'app\\http\\controllers\\web\\alertsettings',
-        65 => 'app\\http\\controllers\\web\\alertupdatesettings',
+        0 => 'app\\http\\controllers\\web\\perpage',
+        1 => 'app\\http\\controllers\\web\\stocks',
+        2 => 'app\\http\\controllers\\web\\stockshow',
+        3 => 'app\\http\\controllers\\web\\stockbatchstore',
+        4 => 'app\\http\\controllers\\web\\stockuse',
+        5 => 'app\\http\\controllers\\web\\categories',
+        6 => 'app\\http\\controllers\\web\\categorycreate',
+        7 => 'app\\http\\controllers\\web\\categorystore',
+        8 => 'app\\http\\controllers\\web\\categoryedit',
+        9 => 'app\\http\\controllers\\web\\categoryupdate',
+        10 => 'app\\http\\controllers\\web\\suppliers',
+        11 => 'app\\http\\controllers\\web\\suppliercreate',
+        12 => 'app\\http\\controllers\\web\\supplierstore',
+        13 => 'app\\http\\controllers\\web\\supplieredit',
+        14 => 'app\\http\\controllers\\web\\supplierupdate',
+        15 => 'app\\http\\controllers\\web\\supplierdestroy',
+        16 => 'app\\http\\controllers\\web\\clinics',
+        17 => 'app\\http\\controllers\\web\\cliniccreate',
+        18 => 'app\\http\\controllers\\web\\clinicstore',
+        19 => 'app\\http\\controllers\\web\\clinicedit',
+        20 => 'app\\http\\controllers\\web\\clinicupdate',
+        21 => 'app\\http\\controllers\\web\\clinicdestroy',
+        22 => 'app\\http\\controllers\\web\\stockrequests',
+        23 => 'app\\http\\controllers\\web\\stockrequestcreate',
+        24 => 'app\\http\\controllers\\web\\stockrequeststore',
+        25 => 'app\\http\\controllers\\web\\stockrequestapprove',
+        26 => 'app\\http\\controllers\\web\\stockrequestreject',
+        27 => 'app\\http\\controllers\\web\\stockrequestship',
+        28 => 'app\\http\\controllers\\web\\stockrequestcomplete',
+        29 => 'app\\http\\controllers\\web\\alerts',
+        30 => 'app\\http\\controllers\\web\\alertresolve',
+        31 => 'app\\http\\controllers\\web\\alertdismiss',
+        32 => 'app\\http\\controllers\\web\\todos',
+        33 => 'app\\http\\controllers\\web\\todocreate',
+        34 => 'app\\http\\controllers\\web\\todostore',
+        35 => 'app\\http\\controllers\\web\\todoedit',
+        36 => 'app\\http\\controllers\\web\\todoupdate',
+        37 => 'app\\http\\controllers\\web\\todotoggle',
+        38 => 'app\\http\\controllers\\web\\tododestroy',
+        39 => 'app\\http\\controllers\\web\\employees',
+        40 => 'app\\http\\controllers\\web\\employeecreate',
+        41 => 'app\\http\\controllers\\web\\employeestore',
+        42 => 'app\\http\\controllers\\web\\employeeedit',
+        43 => 'app\\http\\controllers\\web\\employeeupdate',
+        44 => 'app\\http\\controllers\\web\\employeedestroy',
+        45 => 'app\\http\\controllers\\web\\stockcreate',
+        46 => 'app\\http\\controllers\\web\\stockstore',
+        47 => 'app\\http\\controllers\\web\\stockedit',
+        48 => 'app\\http\\controllers\\web\\stockadjust',
+        49 => 'app\\http\\controllers\\web\\stockupdate',
+        50 => 'app\\http\\controllers\\web\\stockdestroy',
+        51 => 'app\\http\\controllers\\web\\reports',
+        52 => 'app\\http\\controllers\\web\\profile',
+        53 => 'app\\http\\controllers\\web\\profileupdateinfo',
+        54 => 'app\\http\\controllers\\web\\profileupdatepassword',
+        55 => 'app\\http\\controllers\\web\\getstocksviewdata',
+        56 => 'app\\http\\controllers\\web\\moduleresponse',
+        57 => 'app\\http\\controllers\\web\\actionresponse',
+        58 => 'app\\http\\controllers\\web\\actionerrorresponse',
+        59 => 'app\\http\\controllers\\web\\profile2fagenerate',
+        60 => 'app\\http\\controllers\\web\\profile2faconfirm',
+        61 => 'app\\http\\controllers\\web\\profile2fadisable',
+        62 => 'app\\http\\controllers\\web\\profile2farecoverycodes',
+        63 => 'app\\http\\controllers\\web\\alertbulkresolve',
+        64 => 'app\\http\\controllers\\web\\alertbulkdismiss',
+        65 => 'app\\http\\controllers\\web\\alertbulkdelete',
+        66 => 'app\\http\\controllers\\web\\alertsync',
+        67 => 'app\\http\\controllers\\web\\alertsettings',
+        68 => 'app\\http\\controllers\\web\\alertupdatesettings',
       ),
       3 => 
       array (
@@ -1844,7 +1847,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php' => 
     array (
-      0 => 'd3bda091deffe1a753199cd037633a66cabbc2eb',
+      0 => 'e5f23624e068a4077537e4aa2e0277d1483441a9',
       1 => 
       array (
         0 => 'app\\http\\controllers\\api\\authcontroller',
@@ -1898,7 +1901,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/StockController.php' => 
     array (
-      0 => '2d571e3340ca53ba5c27868d057cffdc3b0b7360',
+      0 => 'c5ba3993ec8d436aabba5b56ff023cf2e39c0639',
       1 => 
       array (
         0 => 'app\\http\\controllers\\api\\stockcontroller',
@@ -2298,7 +2301,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Services/StockAlertService.php' => 
     array (
-      0 => 'd3997a7951575eb3412f18f44b2e7cfc5b24a464',
+      0 => '9473146cf8c0b3d788404e3ed251d890f6d7a7b7',
       1 => 
       array (
         0 => 'app\\services\\stockalertservice',
@@ -2435,7 +2438,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Services/ProductService.php' => 
     array (
-      0 => 'ace8c1c91a3358b84c4e659e66661a9fa6d7aa00',
+      0 => '937df14e7459446fc6a8c70d34ee65e7113de25d',
       1 => 
       array (
         0 => 'app\\services\\productservice',
@@ -2585,7 +2588,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Health/HealthController.php' => 
     array (
-      0 => 'ae93c03dea8d1b71c3d1a3b57478202efabc44fb',
+      0 => 'd6f18cd35d9404dfccb2ba4f8017717c4bcf2df6',
       1 => 
       array (
         0 => 'app\\http\\controllers\\health\\healthcontroller',
@@ -2595,6 +2598,22 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
         0 => 'app\\http\\controllers\\health\\__invoke',
         1 => 'app\\http\\controllers\\health\\checkdb',
         2 => 'app\\http\\controllers\\health\\checkcache',
+        3 => 'app\\http\\controllers\\health\\checkqueue',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    '/Users/emircanuysal/Desktop/denti-backend/app/Http/Middleware/ForceLocalhostMiddleware.php' => 
+    array (
+      0 => 'd6325e1c5d2892e8ee0fb0fc351d2724162b36ae',
+      1 => 
+      array (
+        0 => 'app\\http\\middleware\\forcelocalhostmiddleware',
+      ),
+      2 => 
+      array (
+        0 => 'app\\http\\middleware\\handle',
       ),
       3 => 
       array (
