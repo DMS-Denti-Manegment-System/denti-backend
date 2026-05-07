@@ -1,95 +1,90 @@
 @extends('layouts.app')
 
-@section('title', 'Dashboard - Denti')
-@section('page-title', $stats['company_name'] ?? 'Dashboard')
-@section('page-subtitle', 'Operasyon ozet gorunumu')
+@section('title', 'Ana Sayfa - Denti')
+@section('page-title', auth()->user()->name)
+@section('page-subtitle', 'Yönetim Paneli')
 
 @section('content')
-    @php
-        $cards = [
-            ['label' => 'Toplam Calisan', 'value' => $stats['total_employees'] ?? 0, 'color' => 'primary'],
-            ['label' => 'Toplam Klinik', 'value' => $stats['total_clinics'] ?? 0, 'color' => 'success'],
-            ['label' => 'Stok Kalemi', 'value' => $stats['total_stock_items'] ?? 0, 'color' => 'warning'],
-            ['label' => 'Toplam Tedarikci', 'value' => $stats['total_suppliers'] ?? 0, 'color' => 'info'],
-        ];
-        if (!empty($stats['is_super_admin'])) {
-            $cards[] = ['label' => 'Sirket Sayisi', 'value' => $stats['total_companies'] ?? 0, 'color' => 'danger'];
-        }
+    <div class="card card-flush mb-8 app-panel-surface border-0 shadow-none bg-transparent">
+        <div class="card-body p-0">
+            <div class="d-flex flex-column">
+                <h1 class="text-gray-900 fw-bolder fs-2tx mb-2">Hoş Geldiniz, {{ $stats['company_name'] ?? 'Denti' }}</h1>
+                <p class="text-gray-500 fs-4 fw-semibold">Denti Klinik Yönetim Paneli ile her şey kontrolünüz altında.</p>
+            </div>
+        </div>
+    </div>
 
-        $insights = [
-            ['icon' => 'S', 'title' => 'Stok nabzi', 'body' => (($stats['total_stock_items'] ?? 0) > 0 ? $stats['total_stock_items'] : '0') . ' aktif kalem dogrudan merkezi sorgudan geliyor.'],
-            ['icon' => 'K', 'title' => 'Klinik yayilimi', 'body' => (($stats['total_clinics'] ?? 0) > 0 ? $stats['total_clinics'] : '0') . ' klinik icin tek shell ve ortak filtre dili aktif.'],
-            ['icon' => 'E', 'title' => 'Ekip yogunlugu', 'body' => (($stats['total_employees'] ?? 0) > 0 ? $stats['total_employees'] : '0') . ' kullanici yeni Blade panelden yonetilebilir gorunumde.'],
-        ];
-
-        $actions = [
-            ['href' => url('/stocks'), 'icon' => 'ST', 'title' => 'Stoklara git', 'body' => 'Kalemleri, detaylari ve mevcut seviyeleri hizli kontrol et.'],
-            ['href' => url('/stock-requests'), 'icon' => 'TR', 'title' => 'Talepleri ac', 'body' => 'Klinikler arasi akisi ve bekleyen hareketleri goru.'],
-            ['href' => url('/alerts'), 'icon' => 'AL', 'title' => 'Uyarilari izle', 'body' => 'Kritik stok, SKT ve operasyon sinyallerini tek yerden takip et.'],
-            ['href' => url('/suppliers'), 'icon' => 'TD', 'title' => 'Tedarik agi', 'body' => 'Tedarikci kartlarini ve temel iletisim bilgilerini yonet.'],
-        ];
-    @endphp
-
-    <div class="row g-5 g-xl-8 mb-8">
-        @foreach ($cards as $card)
+    <div class="mb-8">
+        <h3 class="fw-bold text-gray-800 mb-6">Genel İstatistikler</h3>
+        <div class="row g-5 g-xl-8">
+            <!-- Toplam Tedarikçi -->
             <div class="col-md-6 col-xl-3">
-                <div class="card card-flush h-md-100 app-summary-card app-kpi-card bg-{{ $card['color'] }} bg-opacity-10 app-panel-surface">
+                <div class="card card-flush h-md-100 bg-white shadow-sm border-0 rounded-4">
                     <div class="card-header pt-5">
                         <div class="card-title d-flex flex-column">
-                            <span class="fs-2hx fw-bold text-{{ $card['color'] }} me-2 lh-1 ls-n2">{{ $card['value'] }}</span>
-                            <span class="text-gray-500 pt-1 fw-semibold fs-6">{{ $card['label'] }}</span>
+                            <span class="fs-2hx fw-bold text-primary me-2 lh-1 ls-n2">{{ $stats['total_suppliers'] ?? 0 }}</span>
+                            <span class="text-gray-500 pt-1 fw-semibold fs-6">Toplam Tedarikçi</span>
                         </div>
                     </div>
                     <div class="card-body d-flex align-items-end pt-0">
-                        <span class="text-gray-600 fs-7">Canli backend verisi uzerinden olusan ozet.</span>
+                        <span class="text-gray-400 fs-7">Sistemdeki kayıtlı tedarikçiler</span>
                     </div>
                 </div>
             </div>
-        @endforeach
-    </div>
 
-    <div class="app-dashboard-grid">
-        <div class="card card-flush h-xl-100 app-panel-surface">
-            <div class="card-header pt-7">
-                <div class="d-flex flex-column">
-                    <span class="app-panel-heading">Gunluk Ozet</span>
-                    <h3 class="card-title fw-bold text-gray-900 mt-2">Operasyon icgorusleri</h3>
+            <!-- Toplam Çalışan -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card card-flush h-md-100 bg-white shadow-sm border-0 rounded-4">
+                    <div class="card-header pt-5">
+                        <div class="card-title d-flex flex-column">
+                            <span class="fs-2hx fw-bold text-success me-2 lh-1 ls-n2">{{ $stats['total_employees'] ?? 0 }}</span>
+                            <span class="text-gray-500 pt-1 fw-semibold fs-6">Toplam Çalışan</span>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex align-items-end pt-0">
+                        <span class="text-gray-400 fs-7">Aktif personel sayısı</span>
+                    </div>
                 </div>
             </div>
-            <div class="card-body pt-3">
-                <div class="app-insight-list">
-                    @foreach ($insights as $insight)
-                        <div class="app-insight-item">
-                            <span class="app-insight-icon">{{ $insight['icon'] }}</span>
-                            <div>
-                                <div class="fw-bold text-gray-900 mb-1">{{ $insight['title'] }}</div>
-                                <div class="text-gray-600 fs-7">{{ $insight['body'] }}</div>
-                            </div>
+
+            <!-- Toplam Klinik -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card card-flush h-md-100 bg-white shadow-sm border-0 rounded-4">
+                    <div class="card-header pt-5">
+                        <div class="card-title d-flex flex-column">
+                            <span class="fs-2hx fw-bold text-warning me-2 lh-1 ls-n2">{{ $stats['total_clinics'] ?? 0 }}</span>
+                            <span class="text-gray-500 pt-1 fw-semibold fs-6">Toplam Klinik</span>
                         </div>
-                    @endforeach
+                    </div>
+                    <div class="card-body d-flex align-items-end pt-0">
+                        <span class="text-gray-400 fs-7">Yönetilen klinik sayısı</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stok Kalemi -->
+            <div class="col-md-6 col-xl-3">
+                <div class="card card-flush h-md-100 bg-white shadow-sm border-0 rounded-4">
+                    <div class="card-header pt-5">
+                        <div class="card-title d-flex flex-column">
+                            <span class="fs-2hx fw-bold text-info me-2 lh-1 ls-n2">{{ $stats['total_stock_items'] ?? 0 }}</span>
+                            <span class="text-gray-500 pt-1 fw-semibold fs-6">Stok Kalemi</span>
+                        </div>
+                    </div>
+                    <div class="card-body d-flex align-items-end pt-0">
+                        <span class="text-gray-400 fs-7">Katalogdaki ürün çeşidi</span>
+                    </div>
                 </div>
             </div>
         </div>
-        <div class="card card-flush h-xl-100 app-panel-surface">
-            <div class="card-header pt-7">
-                <div class="d-flex flex-column">
-                    <span class="app-panel-heading">Hizli Erisim</span>
-                    <h3 class="card-title fw-bold text-gray-900 mt-2">Kritik moduller</h3>
-                </div>
-            </div>
-            <div class="card-body pt-3">
-                <div class="app-action-list">
-                    @foreach ($actions as $action)
-                        <a href="{{ $action['href'] }}" class="app-action-link">
-                            <span class="app-action-icon">{{ $action['icon'] }}</span>
-                            <div>
-                                <div class="fw-bold text-gray-900 mb-1">{{ $action['title'] }}</div>
-                                <div class="text-gray-600 fs-7">{{ $action['body'] }}</div>
-                            </div>
-                        </a>
-                    @endforeach
-                </div>
-            </div>
+    </div>
+
+    <div class="card card-flush app-panel-surface bg-primary bg-opacity-10 border-0 rounded-4">
+        <div class="card-body p-10 text-center">
+            <h2 class="text-primary fw-bold mb-4">Mutlu Gülüşler, Profesyonel Yönetim</h2>
+            <p class="text-gray-700 fs-5 max-w-800px mx-auto mb-0">
+                {{ $stats['company_name'] ?? 'Denti' }} bünyesindeki tüm süreçlerinizi dijitalleştirerek hastalarınıza en iyi hizmeti sunmaya odaklanın.
+            </p>
         </div>
     </div>
 @endsection

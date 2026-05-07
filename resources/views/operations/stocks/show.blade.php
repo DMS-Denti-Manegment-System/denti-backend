@@ -347,7 +347,13 @@
                             </div>
                             <div class="col-md-7">
                                 <label class="form-label">Çıkış Sebebi</label>
-                                <input type="text" name="reason" id="stockUseReason" class="form-control form-control-solid">
+                                <select name="reason" id="stockUseReason" class="form-select form-select-solid" data-control="select2" data-dropdown-parent="#stockUseModal" data-hide-search="true">
+                                    <option value="Kullanım">Kullanım</option>
+                                    <option value="Transfer">Transfer</option>
+                                    <option value="Değişim">Değişim</option>
+                                    <option value="İade">İade</option>
+                                    <option value="Süresi geçmiş">Süresi geçmiş</option>
+                                </select>
                             </div>
                             <div class="col-12">
                                 <label class="form-label">Not</label>
@@ -651,7 +657,18 @@
             $('#stockUseQuantity')
                 .attr('max', $trigger.attr('data-stock-use-max') || '')
                 .val('');
-            $('#stockUseReason').val($trigger.attr('data-stock-use-reason') || 'Web panel kullanımı');
+            
+            // Re-init select2 when modal opens to prevent width/parent bugs
+            var $reasonSelect = $('#stockUseReason');
+            $reasonSelect.val($trigger.attr('data-stock-use-reason') || 'Kullanım').trigger('change');
+            
+            if ($.fn.select2) {
+                $reasonSelect.select2({
+                    dropdownParent: $('#stockUseModal'),
+                    minimumResultsForSearch: Infinity
+                });
+            }
+
             $('#stockUseForm').find('textarea[name="notes"]').val('');
             stockUseModal.show();
         });

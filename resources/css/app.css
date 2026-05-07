@@ -290,8 +290,8 @@ body.app-body--sidebar-open {
 
 .app-stock-kpi-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(6, minmax(0, 1fr)); /* Updated to 6 columns */
+    gap: 10px;
     margin-bottom: 20px;
 }
 
@@ -299,8 +299,8 @@ body.app-body--sidebar-open {
     background: #fff;
     border: 1px solid #e9edf3;
     border-radius: 10px;
-    min-height: 96px;
-    padding: 14px 16px;
+    min-height: 80px; /* Reduced height */
+    padding: 10px 12px; /* Reduced padding */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -314,9 +314,9 @@ body.app-body--sidebar-open {
 
 .app-stock-kpi-card__label {
     color: #8c95a6;
-    font-size: 12px;
+    font-size: 11px; /* Reduced */
     font-weight: 500;
-    margin-bottom: 8px;
+    margin-bottom: 6px;
 }
 
 .app-stock-kpi-card__value {
@@ -324,7 +324,7 @@ body.app-body--sidebar-open {
     align-items: center;
     gap: 6px;
     color: #2c313a;
-    font-size: 17px;
+    font-size: 15px; /* Reduced */
     font-weight: 700;
 }
 
@@ -469,20 +469,28 @@ body.app-body--sidebar-open {
     background: linear-gradient(90deg, #3b82f6, #60a5fa);
 }
 
-@media (max-width: 1199.98px) {
+@media (max-width: 1399.98px) {
+    .app-stock-kpi-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 767.98px) {
     .app-stock-kpi-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+}
 
+@media (max-width: 1199.98px) {
     .app-stock-filter-bar__fields {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        flex-wrap: wrap; /* Only wrap if really needed on smaller screens */
     }
 }
 
 @media (max-width: 767.98px) {
     .app-stock-kpi-grid,
     .app-stock-filter-bar__fields {
-        grid-template-columns: 1fr;
+        flex-wrap: wrap;
     }
 
     .app-stock-filter-bar__actions,

@@ -63,6 +63,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/alerts/bulk/resolve', [OperationsPageController::class, 'alertBulkResolve'])->name('alerts.bulk-resolve');
     Route::post('/alerts/bulk/dismiss', [OperationsPageController::class, 'alertBulkDismiss'])->name('alerts.bulk-dismiss');
     Route::post('/alerts/bulk/delete', [OperationsPageController::class, 'alertBulkDelete'])->name('alerts.bulk-delete');
+    Route::get('/alerts/sync', [OperationsPageController::class, 'alertSync'])->name('alerts.sync');
     Route::get('/alerts/settings', [OperationsPageController::class, 'alertSettings'])->name('alerts.settings');
     Route::put('/alerts/settings', [OperationsPageController::class, 'alertUpdateSettings'])->name('alerts.update-settings');
     Route::get('/todos', [OperationsPageController::class, 'todos'])->name('todos.index');

@@ -30,23 +30,16 @@
     </script>
 
     <div class="d-flex flex-column flex-root">
-        <div class="page d-flex flex-row flex-column-fluid">
+        <!-- Navbar (Header) - Full Width -->
+        @include('layouts.partials.header')
+
+        <div class="page d-flex flex-row flex-column-fluid mt-20">
             
             <div id="kt_aside" class="aside aside-light" data-kt-drawer="true" data-kt-drawer-name="aside" data-kt-drawer-activate="{default: true, lg: false}" data-kt-drawer-overlay="true" data-kt-drawer-width="{default:'265px', '300px': '265px'}" data-kt-drawer-direction="start" data-kt-drawer-toggle="#kt_aside_mobile_toggle">
-                <!-- Sidebar Logo -->
-                <div class="aside-logo flex-column-auto" id="kt_aside_logo">
-                    <a href="{{ route('dashboard') }}">
-                        <img alt="Logo" src="{{ asset('ui-kit/media/logos/default-dark.svg') }}" class="h-25px logo" />
-                    </a>
-                </div>
-                
                 @include('layouts.partials.sidebar')
             </div>
 
-            <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper">
-                
-                @include('layouts.partials.header')
-
+            <div class="wrapper d-flex flex-column flex-row-fluid" id="kt_wrapper" style="padding: 20px 20px 20px 10px;">
                 <div id="kt_content" class="content d-flex flex-column flex-column-fluid">
                     
                     <div class="toolbar" id="kt_toolbar">

@@ -53,7 +53,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-10 text-muted">Uyari kaydi bulunamadi.</td>
+                            <td colspan="7" class="text-center py-10 text-muted">Uyari kaydi bulunamadi.</td>
                         </tr>
                     @endforelse
                 </tbody>

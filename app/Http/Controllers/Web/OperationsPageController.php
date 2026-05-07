@@ -475,6 +475,7 @@ class OperationsPageController extends Controller
         $stats = [
             'pending' => StockRequest::where('status', 'pending')->count(),
             'approved' => StockRequest::where('status', 'approved')->count(),
+            'in_transit' => StockRequest::where('status', 'in_transit')->count(),
             'rejected' => StockRequest::where('status', 'rejected')->count(),
             'completed' => StockRequest::where('status', 'completed')->count(),
         ];
@@ -1300,6 +1301,12 @@ class OperationsPageController extends Controller
         $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
         app(StockAlertService::class)->bulkDelete($request->ids);
         return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar silindi.');
+    }
+
+    public function alertSync(Request $request): RedirectResponse|JsonResponse
+    {
+        $count = app(StockAlertService::class)->syncAlerts();
+        return $this->actionResponse($request, 'alerts.index', "{$count} stok kaydi tarandi ve uyarilar guncellendi.");
     }
 
     public function alertSettings(Request $request): View
