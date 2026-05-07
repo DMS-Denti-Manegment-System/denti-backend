@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
     <link href="{{ asset('ui-kit/plugins/global/plugins.bundle.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('ui-kit/css/style.bundle.css') }}" rel="stylesheet" type="text/css" />
-    @vite(['resources/css/app.css'])
+    @php
+        $hasViteManifest = file_exists(public_path('build/manifest.json'));
+    @endphp
+    @if ($hasViteManifest && ! app()->runningUnitTests())
+        @vite(['resources/css/app.css'])
+    @endif
     @stack('styles')
 </head>
 <body id="kt_body" 
