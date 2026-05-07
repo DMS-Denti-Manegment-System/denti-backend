@@ -25,6 +25,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 
@@ -32,17 +33,39 @@ class OperationsPageController extends Controller
 {
     public function stocks(Request $request): View|JsonResponse
     {
-        $viewData = $this->getStocksViewData($request);
+        try {
+            $viewData = $this->getStocksViewData($request);
 
-        if ($request->ajax()) {
-            return response()->json([
-                'statsHtml' => view('operations.stocks.components.stats', $viewData)->render(),
-                'tableHtml' => view('operations.stocks.table.index', $viewData)->render(),
-                'modalHtml' => view('operations.stocks.modal.index', $viewData)->render(),
+            if ($request->ajax()) {
+                return response()->json([
+                    'statsHtml' => view('operations.stocks.components.stats', $viewData)->render(),
+                    'tableHtml' => view('operations.stocks.table.index', $viewData)->render(),
+                    'modalHtml' => view('operations.stocks.modal.index', $viewData)->render(),
+                ]);
+            }
+
+            return view('operations.stocks.index', $viewData);
+        } catch (\Throwable $e) {
+            Log::error('web.stocks.index_failed', [
+                'user_id' => auth()->id(),
+                'company_id' => auth()->user()?->company_id,
+                'error' => $e->getMessage(),
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Stok listesi yüklenirken bir hata oluştu.',
+                    'data' => null,
+                    'errors' => null,
+                    'meta' => null,
+                ], 500);
+            }
+
+            return redirect()->route('dashboard')->withErrors([
+                'stocks' => 'Stok yönetimi ekranı yüklenemedi. Lütfen tekrar deneyin.',
             ]);
         }
-
-        return view('operations.stocks.index', $viewData);
     }
 
     public function stockShow(Request $request, int $id): View
@@ -869,24 +892,41 @@ class OperationsPageController extends Controller
             'is_active' => 'nullable|boolean',
         ]);
 
-        app(\App\Services\ProductService::class)->createProduct([
-            ...$validated,
-            'initial_stock' => $validated['quantity'] ?? 0,
-            'company_id' => $companyId,
-            'is_active' => $request->boolean('is_active', true),
-            'has_expiration_date' => $request->boolean('has_expiration_date', false),
-            'expiry_yellow_days' => $validated['expiry_yellow_days'] ?? 30,
-            'expiry_red_days' => $validated['expiry_red_days'] ?? 15,
-            'has_sub_unit' => $request->boolean('has_sub_unit', false),
-            'sub_unit_name' => $request->boolean('has_sub_unit', false) ? ($validated['sub_unit_name'] ?? null) : null,
-            'sub_unit_multiplier' => $request->boolean('has_sub_unit', false) ? ($validated['sub_unit_multiplier'] ?? null) : null,
-            'yellow_alert_level' => $validated['yellow_alert_level'] ?? 10,
-            'red_alert_level' => $validated['red_alert_level'] ?? 5,
-            'min_stock_level' => $validated['yellow_alert_level'] ?? 10,
-            'critical_stock_level' => $validated['red_alert_level'] ?? 5,
-            'currency' => $validated['currency'] ?? 'TRY',
-            'expiry_date' => $request->boolean('has_expiration_date', false) ? ($validated['expiry_date'] ?? null) : null,
-        ]);
+        try {
+            app(\App\Services\ProductService::class)->createProduct([
+                ...$validated,
+                'initial_stock' => (int) ($validated['quantity'] ?? 0),
+                'company_id' => $companyId,
+                'is_active' => $request->boolean('is_active', true),
+                'has_expiration_date' => $request->boolean('has_expiration_date', false),
+                'expiry_yellow_days' => $validated['expiry_yellow_days'] ?? 30,
+                'expiry_red_days' => $validated['expiry_red_days'] ?? 15,
+                'has_sub_unit' => $request->boolean('has_sub_unit', false),
+                'sub_unit_name' => $request->boolean('has_sub_unit', false) ? ($validated['sub_unit_name'] ?? null) : null,
+                'sub_unit_multiplier' => $request->boolean('has_sub_unit', false) ? ($validated['sub_unit_multiplier'] ?? null) : null,
+                'yellow_alert_level' => $validated['yellow_alert_level'] ?? 10,
+                'red_alert_level' => $validated['red_alert_level'] ?? 5,
+                'min_stock_level' => $validated['yellow_alert_level'] ?? 10,
+                'critical_stock_level' => $validated['red_alert_level'] ?? 5,
+                'currency' => $validated['currency'] ?? 'TRY',
+                'expiry_date' => $request->boolean('has_expiration_date', false) ? ($validated['expiry_date'] ?? null) : null,
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('web.stocks.store_failed', [
+                'user_id' => auth()->id(),
+                'company_id' => $companyId,
+                'payload' => $request->except(['_token']),
+                'error' => $e->getMessage(),
+            ]);
+
+            return $this->actionErrorResponse(
+                $request,
+                'stocks.index',
+                'stock',
+                'Yeni stok eklenemedi. Lütfen bilgileri kontrol edip tekrar deneyin.',
+                500
+            );
+        }
 
         if ($request->ajax()) {
             return response()->json([

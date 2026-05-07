@@ -18,6 +18,7 @@ use App\Models\Stock;
 use App\Services\StockService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 
 class StockController extends Controller
@@ -257,7 +258,9 @@ class StockController extends Controller
         try {
             $this->authorize('viewAny', Stock::class);
             $clinicId = $request->query('clinic_id');
-            $items = $this->stockService->getLowStockItems($clinicId ? (int) $clinicId : null);
+            $user = auth()->user();
+            $cacheKey = sprintf('stocks.low_level.%d.%s', $user->company_id ?? 0, $clinicId ?? 'all');
+            $items = Cache::remember($cacheKey, 60, fn () => $this->stockService->getLowStockItems($clinicId ? (int) $clinicId : null));
 
             return $this->success(StockResource::collection($items));
         } catch (\Exception $e) {
@@ -272,7 +275,9 @@ class StockController extends Controller
         try {
             $this->authorize('viewAny', Stock::class);
             $clinicId = $request->query('clinic_id');
-            $items = $this->stockService->getCriticalStockItems($clinicId ? (int) $clinicId : null);
+            $user = auth()->user();
+            $cacheKey = sprintf('stocks.critical_level.%d.%s', $user->company_id ?? 0, $clinicId ?? 'all');
+            $items = Cache::remember($cacheKey, 60, fn () => $this->stockService->getCriticalStockItems($clinicId ? (int) $clinicId : null));
 
             return $this->success(StockResource::collection($items));
         } catch (\Exception $e) {
@@ -288,7 +293,9 @@ class StockController extends Controller
             $this->authorize('viewAny', Stock::class);
             $days = $request->query('days', 30);
             $clinicId = $request->query('clinic_id');
-            $items = $this->stockService->getExpiringItems((int) $days, $clinicId ? (int) $clinicId : null);
+            $user = auth()->user();
+            $cacheKey = sprintf('stocks.expiring.%d.%s.%d', $user->company_id ?? 0, $clinicId ?? 'all', (int) $days);
+            $items = Cache::remember($cacheKey, 60, fn () => $this->stockService->getExpiringItems((int) $days, $clinicId ? (int) $clinicId : null));
 
             return $this->success(StockResource::collection($items));
         } catch (\Exception $e) {

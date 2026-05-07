@@ -1,4 +1,4 @@
-<div class="app-stock-table-card">
+<div class="app-stock-table-card bg-white">
     <div class="app-stock-table-card__header">
         <div class="app-stock-table-card__title">Stok Listesi</div>
         <div class="app-stock-table-card__meta">Toplam {{ $products->total() }} kayıt</div>
@@ -60,9 +60,9 @@
                             </td>
                              <td class="text-end">
                                 <div class="d-flex justify-content-end gap-2">
-                                    <button type="button" class="btn btn-sm btn-icon btn-light-primary" data-stock-edit="{{ $product->id }}" title="Düzenle">
+                                    <a href="{{ route('stocks.edit', $product->id) }}" class="btn btn-sm btn-icon btn-light-primary" data-module-edit title="Düzenle">
                                         <i class="ki-duotone ki-pencil fs-3"><span class="path1"></span><span class="path2"></span></i>
-                                    </button>
+                                    </a>
                                     <button type="button" class="btn btn-sm btn-icon btn-light-danger" data-stock-delete="{{ $product->id }}" title="Sil">
                                         <i class="ki-duotone ki-trash fs-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span><span class="path4"></span><span class="path5"></span></i>
                                     </button>

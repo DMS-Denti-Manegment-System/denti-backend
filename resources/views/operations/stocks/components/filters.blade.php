@@ -41,14 +41,15 @@
                 <option value="active" @selected(request('status', 'active') === 'active')>Aktif</option>
                 <option value="inactive" @selected(request('status') === 'inactive')>Pasif</option>
             </select>
-            <button type="button" id="resetFilters" class="btn btn-light">Temizle</button>
+            
+            <div class="d-flex gap-2">
+                <button type="button" id="resetFilters" class="btn btn-light w-100">Temizle</button>
 
-            <button type="button" class="btn btn-primary" id="btnCreateStock">
-                <i class="ki-duotone ki-plus fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
-                Yeni Stok
-            </button>
+                <a href="{{ route('stocks.create') }}" class="btn btn-primary w-100 text-nowrap" data-module-create>
+                    <i class="ki-duotone ki-plus fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
+                    Yeni Stok
+                </a>
+            </div>
         </div>
-
-
     </form>
 </div>
