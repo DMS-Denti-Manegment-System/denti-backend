@@ -833,8 +833,11 @@ class OperationsPageController extends Controller
 
     public function employees(Request $request): View|JsonResponse
     {
+        $companyId = auth()->user()->company_id;
+
         $users = User::query()
             ->with(['clinic', 'roles'])
+            ->where('company_id', $companyId)
             ->when($request->filled('search'), function (Builder $query) use ($request) {
                 $search = $request->string('search');
                 $query->where(function (Builder $inner) use ($search) {
@@ -849,13 +852,19 @@ class OperationsPageController extends Controller
 
         $editingEmployee = null;
         if ($request->filled('edit')) {
-            $editingEmployee = User::with(['roles', 'permissions'])->findOrFail($request->integer('edit'));
+            $editingEmployee = User::with(['roles', 'permissions'])
+                ->where('company_id', $companyId)
+                ->findOrFail($request->integer('edit'));
         }
 
         $viewData = [
             'users' => $users,
             'permissions' => Permission::query()->orderBy('name')->get(),
-            'clinics' => Clinic::query()->active()->orderBy('name')->get(['id', 'name']),
+            'clinics' => Clinic::query()
+                ->active()
+                ->where('company_id', $companyId)
+                ->orderBy('name')
+                ->get(['id', 'name']),
             'modalMode' => $request->query('modal'),
             'editingEmployee' => $editingEmployee,
         ];
@@ -913,6 +922,7 @@ class OperationsPageController extends Controller
     public function employeeUpdate(Request $request, User $user): RedirectResponse|JsonResponse
     {
         $companyId = auth()->user()->company_id;
+        abort_if($user->company_id !== $companyId, 403);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -943,6 +953,8 @@ class OperationsPageController extends Controller
 
     public function employeeDestroy(Request $request, User $user): RedirectResponse|JsonResponse
     {
+        abort_if($user->company_id !== auth()->user()->company_id, 403);
+
         if ($user->id === auth()->id()) {
             return $this->actionErrorResponse($request, 'employees.index', 'employee', 'Kendi hesabinizi silemezsiniz.');
         }
