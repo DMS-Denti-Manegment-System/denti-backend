@@ -295,7 +295,8 @@ class OperationsPageController extends Controller
 
     public function suppliers(Request $request): View|JsonResponse
     {
-        $suppliers = Supplier::query()
+        $baseQuery = Supplier::query()->where('company_id', auth()->user()->company_id);
+        $suppliers = (clone $baseQuery)
             ->when($request->filled('search'), function (Builder $query) use ($request) {
                 $search = $request->string('search');
                 $query->where(function (Builder $inner) use ($search) {
@@ -310,14 +311,32 @@ class OperationsPageController extends Controller
             ->withQueryString();
 
         $editingSupplier = null;
+        $selectedSupplier = null;
         if ($request->filled('edit')) {
             $editingSupplier = Supplier::findOrFail($request->integer('edit'));
+        }
+        if ($request->query('modal') === 'detail' && $request->filled('detail')) {
+            $selectedSupplier = Supplier::where('company_id', auth()->user()->company_id)
+                ->findOrFail($request->integer('detail'));
         }
 
         $viewData = [
             'suppliers' => $suppliers,
             'modalMode' => $request->query('modal'),
             'editingSupplier' => $editingSupplier,
+            'selectedSupplier' => $selectedSupplier,
+            'supplierStats' => [
+                'total' => (clone $baseQuery)->count(),
+                'active' => (clone $baseQuery)->where('is_active', true)->count(),
+                'passive' => (clone $baseQuery)->where('is_active', false)->count(),
+            ],
+            'supplierDetailStats' => $selectedSupplier ? [
+                'total_stocks' => Stock::where('supplier_id', $selectedSupplier->id)->count(),
+                'active_stocks' => Stock::where('supplier_id', $selectedSupplier->id)->where('is_active', true)->count(),
+                'passive_stocks' => Stock::where('supplier_id', $selectedSupplier->id)->where('is_active', false)->count(),
+                'latest_transactions' => \App\Models\StockTransaction::whereIn('stock_id', Stock::where('supplier_id', $selectedSupplier->id)->select('id'))
+                    ->latest('transaction_date')->limit(5)->get(['id', 'type', 'quantity', 'transaction_date']),
+            ] : null,
         ];
 
         return $this->moduleResponse(
@@ -380,9 +399,23 @@ class OperationsPageController extends Controller
         return $this->actionResponse($request, 'suppliers.index', 'Tedarikci guncellendi.');
     }
 
+    public function supplierDestroy(Request $request, Supplier $supplier): RedirectResponse|JsonResponse
+    {
+        if ($supplier->company_id !== auth()->user()->company_id) {
+            abort(403);
+        }
+        $stockCount = Stock::where('supplier_id', $supplier->id)->count();
+        if ($stockCount > 0) {
+            return $this->actionErrorResponse($request, 'suppliers.index', 'supplier', 'Bu tedarikciye bagli stoklar oldugu icin silinemez.', 422);
+        }
+        $supplier->forceDelete();
+        return $this->actionResponse($request, 'suppliers.index', 'Tedarikci kalici olarak silindi.');
+    }
+
     public function clinics(Request $request): View|JsonResponse
     {
-        $clinics = Clinic::query()
+        $baseQuery = Clinic::query()->where('company_id', auth()->user()->company_id);
+        $clinics = (clone $baseQuery)
             ->when($request->filled('search'), function (Builder $query) use ($request) {
                 $search = $request->string('search');
                 $query->where(function (Builder $inner) use ($search) {
@@ -397,14 +430,33 @@ class OperationsPageController extends Controller
             ->withQueryString();
 
         $editingClinic = null;
+        $selectedClinic = null;
         if ($request->filled('edit')) {
             $editingClinic = Clinic::findOrFail($request->integer('edit'));
+        }
+        if ($request->query('modal') === 'detail' && $request->filled('detail')) {
+            $selectedClinic = Clinic::where('company_id', auth()->user()->company_id)
+                ->findOrFail($request->integer('detail'));
         }
 
         $viewData = [
             'clinics' => $clinics,
             'modalMode' => $request->query('modal'),
             'editingClinic' => $editingClinic,
+            'selectedClinic' => $selectedClinic,
+            'clinicStats' => [
+                'total' => (clone $baseQuery)->count(),
+                'active' => (clone $baseQuery)->where('is_active', true)->count(),
+                'passive' => (clone $baseQuery)->where('is_active', false)->count(),
+            ],
+            'clinicDetailStats' => $selectedClinic ? [
+                'total_stocks' => Stock::where('clinic_id', $selectedClinic->id)->count(),
+                'total_products' => Product::where('clinic_id', $selectedClinic->id)->count(),
+                'total_requests' => StockRequest::where('requester_clinic_id', $selectedClinic->id)->orWhere('requested_from_clinic_id', $selectedClinic->id)->count(),
+                'total_alerts' => StockAlert::where('clinic_id', $selectedClinic->id)->count(),
+                'latest_transactions' => \App\Models\StockTransaction::where('clinic_id', $selectedClinic->id)
+                    ->latest('transaction_date')->limit(5)->get(['id', 'type', 'quantity', 'transaction_date']),
+            ] : null,
         ];
 
         return $this->moduleResponse(
@@ -477,6 +529,22 @@ class OperationsPageController extends Controller
         ]);
 
         return $this->actionResponse($request, 'clinics.index', 'Klinik guncellendi.');
+    }
+
+    public function clinicDestroy(Request $request, Clinic $clinic): RedirectResponse|JsonResponse
+    {
+        if ($clinic->company_id !== auth()->user()->company_id) {
+            abort(403);
+        }
+        $hasRefs = Stock::where('clinic_id', $clinic->id)->exists()
+            || StockRequest::where('requester_clinic_id', $clinic->id)->orWhere('requested_from_clinic_id', $clinic->id)->exists()
+            || User::where('clinic_id', $clinic->id)->exists()
+            || \App\Models\StockTransaction::where('clinic_id', $clinic->id)->exists();
+        if ($hasRefs) {
+            return $this->actionErrorResponse($request, 'clinics.index', 'clinic', 'Bu klinik bagli kayitlar nedeniyle silinemez.', 422);
+        }
+        $clinic->forceDelete();
+        return $this->actionResponse($request, 'clinics.index', 'Klinik kalici olarak silindi.');
     }
 
     public function stockRequests(Request $request): View|JsonResponse
@@ -857,8 +925,12 @@ class OperationsPageController extends Controller
         return $this->actionResponse($request, 'employees.index', 'Personel silindi.');
     }
 
-    public function stockCreate(): RedirectResponse
+    public function stockCreate(Request $request): RedirectResponse|JsonResponse
     {
+        if ($request->ajax()) {
+            $request->merge(['modal' => 'create']);
+            return $this->stocks($request);
+        }
         return redirect()->route('stocks.index', ['modal' => 'create']);
     }
 
@@ -938,8 +1010,12 @@ class OperationsPageController extends Controller
         return redirect()->route('stocks.index')->with('status', 'Urun olusturuldu.');
     }
 
-    public function stockEdit(Product $product): RedirectResponse
+    public function stockEdit(Request $request, Product $product): RedirectResponse|JsonResponse
     {
+        if ($request->ajax()) {
+            $request->merge(['modal' => 'edit', 'edit' => $product->id]);
+            return $this->stocks($request);
+        }
         return redirect()->route('stocks.index', ['modal' => 'edit', 'edit' => $product->id]);
     }
 
@@ -1034,6 +1110,9 @@ class OperationsPageController extends Controller
             'critical_stock_level' => $validated['red_alert_level'] ?? 5,
             'is_active' => $request->boolean('is_active', false),
             'has_expiration_date' => $request->boolean('has_expiration_date', false),
+            'has_sub_unit' => $request->boolean('has_sub_unit', false),
+            'sub_unit_name' => $request->boolean('has_sub_unit', false) ? ($validated['sub_unit_name'] ?? null) : null,
+            'sub_unit_multiplier' => $request->boolean('has_sub_unit', false) ? ($validated['sub_unit_multiplier'] ?? null) : null,
         ]);
 
         $trackExpiry = $request->boolean('has_expiration_date', false);

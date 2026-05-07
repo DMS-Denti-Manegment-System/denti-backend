@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stocks', [OperationsPageController::class, 'stocks'])->name('stocks.index');
     Route::get('/stocks/create', [OperationsPageController::class, 'stockCreate'])->name('stocks.create');
     Route::post('/stocks', [OperationsPageController::class, 'stockStore'])->name('stocks.store');
+    Route::delete('/stocks/{product}', [OperationsPageController::class, 'stockDestroy'])->name('stocks.destroy');
     Route::get('/stocks/{product}/edit', [OperationsPageController::class, 'stockEdit'])->name('stocks.edit');
     Route::put('/stocks/{product}', [OperationsPageController::class, 'stockUpdate'])->name('stocks.update');
     Route::get('/stock/products/{id}', [OperationsPageController::class, 'stockShow'])->name('products.show');
@@ -46,11 +47,13 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/suppliers', [OperationsPageController::class, 'supplierStore'])->name('suppliers.store');
     Route::get('/suppliers/{supplier}/edit', [OperationsPageController::class, 'supplierEdit'])->name('suppliers.edit');
     Route::put('/suppliers/{supplier}', [OperationsPageController::class, 'supplierUpdate'])->name('suppliers.update');
+    Route::delete('/suppliers/{supplier}', [OperationsPageController::class, 'supplierDestroy'])->name('suppliers.destroy');
     Route::get('/clinics', [OperationsPageController::class, 'clinics'])->name('clinics.index');
     Route::get('/clinics/create', [OperationsPageController::class, 'clinicCreate'])->name('clinics.create');
     Route::post('/clinics', [OperationsPageController::class, 'clinicStore'])->name('clinics.store');
     Route::get('/clinics/{clinic}/edit', [OperationsPageController::class, 'clinicEdit'])->name('clinics.edit');
     Route::put('/clinics/{clinic}', [OperationsPageController::class, 'clinicUpdate'])->name('clinics.update');
+    Route::delete('/clinics/{clinic}', [OperationsPageController::class, 'clinicDestroy'])->name('clinics.destroy');
     Route::get('/stock-requests', [OperationsPageController::class, 'stockRequests'])->name('stock-requests.index');
     Route::get('/stock-requests/create', [OperationsPageController::class, 'stockRequestCreate'])->name('stock-requests.create');
     Route::post('/stock-requests', [OperationsPageController::class, 'stockRequestStore'])->name('stock-requests.store');

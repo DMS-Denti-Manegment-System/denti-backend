@@ -99,4 +99,24 @@
             </div>
         </div>
     </div>
+@elseif($modalMode === 'detail' && isset($selectedClinic) && $selectedClinic)
+    <div class="modal fade show" id="clinicModal" tabindex="-1" aria-modal="true" role="dialog" style="display:block;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"><h2>Klinik Detayi</h2><a href="{{ route('clinics.index') }}" class="btn btn-sm btn-icon"><i class="ki-duotone ki-cross fs-1"></i></a></div>
+                <div class="modal-body">
+                    <div><strong>Klinik:</strong> {{ $selectedClinic->name }}</div>
+                    <div><strong>Sorumlu:</strong> {{ $selectedClinic->responsible_person ?: '-' }}</div>
+                    <div><strong>Telefon:</strong> {{ $selectedClinic->phone ?: '-' }}</div>
+                    <div><strong>Sehir:</strong> {{ $selectedClinic->city ?: '-' }}</div>
+                    <div><strong>Adres:</strong> {{ $selectedClinic->address ?: '-' }}</div>
+                    <hr>
+                    <div><strong>Toplam Stok:</strong> {{ $clinicDetailStats['total_stocks'] ?? 0 }}</div>
+                    <div><strong>Toplam Urun:</strong> {{ $clinicDetailStats['total_products'] ?? 0 }}</div>
+                    <div><strong>Toplam Talep:</strong> {{ $clinicDetailStats['total_requests'] ?? 0 }}</div>
+                    <div><strong>Toplam Uyari:</strong> {{ $clinicDetailStats['total_alerts'] ?? 0 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endif

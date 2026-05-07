@@ -286,8 +286,16 @@
                     clearModal();
                     $modalHost.html(markup);
 
-                    const modalEl = $modalHost.find('.modal').first();
+                    // Try to find a modal inside the host (for full modal markups)
+                    let modalEl = $modalHost.find('.modal').first();
+                    
+                    // If not found, check if the host itself is inside a modal (for partial content markups)
                     if (!modalEl.length) {
+                        modalEl = $modalHost.closest('.modal');
+                    }
+
+                    if (!modalEl.length) {
+                        if (window.DentiUI.debug) console.warn('[DentiUI] Modal element not found for markup.');
                         return;
                     }
 
@@ -296,7 +304,7 @@
                         id: modalEl.attr('id') || null,
                     });
 
-                    modalInstance = new bootstrap.Modal(modalEl[0]);
+                    modalInstance = bootstrap.Modal.getOrCreateInstance(modalEl[0]);
                     modalInstance.show();
 
                     modalEl.on('hidden.bs.modal', function () {

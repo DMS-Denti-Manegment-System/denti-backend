@@ -402,25 +402,7 @@ body.app-body--sidebar-open {
     color: #8c95a6;
 }
 
-.app-stock-table thead th {
-    background: #fafbfd;
-    color: #6f7787;
-    font-size: 12px;
-    font-weight: 700;
-    border-bottom: 1px solid #eef2f7;
-    padding-top: 14px;
-    padding-bottom: 14px;
-}
-
-.app-stock-table tbody td {
-    padding-top: 14px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid #eef2f7;
-}
-
-.app-stock-table tbody tr:last-child td {
-    border-bottom: 0;
-}
+/* app-stock-table specific styles removed for standard consistency */
 
 .app-stock-level .progress {
     border-radius: 999px;

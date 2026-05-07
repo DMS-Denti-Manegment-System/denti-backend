@@ -42,7 +42,7 @@
                         </div>
                     </div>
                     <div class="row g-5 mt-2">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="required form-label">Birim</label>
                             <select name="unit" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
                                 @foreach($units as $u)
@@ -50,7 +50,7 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label">Kategori</label>
                             <select name="category" class="form-select form-select-solid" data-control="select2">
                                 <option value="">Kategori Seçin</option>
@@ -58,6 +58,10 @@
                                     <option value="{{ $cat->name }}" @selected(($editingProduct?->category ?? '') === $cat->name)>{{ $cat->name }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Marka</label>
+                            <input type="text" name="brand" class="form-control form-control-solid" value="{{ $editingProduct?->brand }}" placeholder="örn: 3M, Coltene" />
                         </div>
                     </div>
                 </div>

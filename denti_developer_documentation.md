@@ -167,7 +167,6 @@ Frontend "Feature-Sliced" veya "Domain-Driven" bir yapıya sahiptir. Tüm mantı
 
 ## 12. Dış Entegrasyonlar
 - Mevcut durumda `.env` dosyasında `AWS_ACCESS_KEY_ID` (S3 Storage) tanımları vardır. Resim veya belge yükleme işlemlerinde (AWS S3) kullanılmaktadır.
-- Raporlama veya Loglama için Laravel Telescope (`telescope_entries` tablosundan anlaşılacağı üzere) entegre edilmiştir. Sadece geliştirme ortamında kullanılması tavsiye edilir.
 
 ---
 

@@ -40,7 +40,12 @@
                             </span>
                         </div>
                         <div>
-                            <div class="fs-2 fw-bold text-gray-900">{{ $product->name }}</div>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="fs-2 fw-bold text-gray-900">{{ $product->name }}</div>
+                                @if($product->has_sub_unit)
+                                    <span class="badge badge-light-info fw-bold fs-9 px-2 py-1" title="Alt birim (iç içe stok) takibi aktif">Alt Birimli</span>
+                                @endif
+                            </div>
                             <div class="text-muted">{{ $product->category ?: 'Kategori Yok' }}</div>
                         </div>
                     </div>
@@ -75,6 +80,12 @@
                                 <div class="text-muted fs-7">Klinik</div>
                                 <div class="text-gray-800 fw-semibold">{{ $product->clinic?->name ?: 'Genel' }}</div>
                             </div>
+                            @if($product->has_sub_unit)
+                                <div>
+                                    <div class="text-muted fs-7">Alt Birim Yapılandırması</div>
+                                    <div class="text-gray-800 fw-semibold">1 {{ $product->unit }} = {{ $product->sub_unit_multiplier }} {{ $product->sub_unit_name }}</div>
+                                </div>
+                            @endif
                             <div>
                                 <div class="text-muted fs-7">Uyarı Seviyesi</div>
                                 <div class="d-flex gap-2">

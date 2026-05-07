@@ -14,13 +14,20 @@
                 </thead>
                 <tbody class="text-gray-600 fw-semibold">
                     @forelse($suppliers as $supplier)
-                        <tr>
+                        <tr class="cursor-pointer" onclick="window.location='{{ route('suppliers.index', ['modal' => 'detail', 'detail' => $supplier->id]) }}'">
                             <td>{{ $supplier->name }}</td>
                             <td>{{ $supplier->contact_person ?: '-' }}</td>
                             <td>{{ $supplier->phone ?: '-' }}</td>
                             <td>{{ $supplier->email ?: '-' }}</td>
                             <td><span class="badge {{ $supplier->is_active ? 'badge-light-success' : 'badge-light-danger' }}">{{ $supplier->is_active ? 'Aktif' : 'Pasif' }}</span></td>
-                            <td><a href="{{ route('suppliers.edit', $supplier) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a></td>
+                            <td>
+                                <a href="{{ route('suppliers.edit', $supplier) }}" class="btn btn-sm btn-light-primary" data-module-edit onclick="event.stopPropagation()">Duzenle</a>
+                                <form method="POST" action="{{ route('suppliers.destroy', $supplier) }}" class="d-inline" onclick="event.stopPropagation()" onsubmit="return confirm('Tedarikci kalici silinsin mi?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-sm btn-light-danger">Sil</button>
+                                </form>
+                            </td>
                         </tr>
                     @empty
                         <tr>

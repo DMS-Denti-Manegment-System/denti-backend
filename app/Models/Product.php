@@ -19,6 +19,7 @@ class Product extends Model
         'min_stock_level', 'critical_stock_level',
         'yellow_alert_level', 'red_alert_level',
         'is_active', 'has_expiration_date', 'company_id', 'clinic_id',
+        'has_sub_unit', 'sub_unit_name', 'sub_unit_multiplier',
     ];
 
     protected $casts = [
@@ -29,6 +30,8 @@ class Product extends Model
         'yellow_alert_level' => 'integer',
         'red_alert_level' => 'integer',
         'clinic_id' => 'integer',
+        'has_sub_unit' => 'boolean',
+        'sub_unit_multiplier' => 'integer',
     ];
 
     // Relationships

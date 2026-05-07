@@ -5,7 +5,7 @@
 @section('page-subtitle', 'Ürün ve miktar görünümü')
 
 @section('content')
-    <div id="stockModule" data-url="{{ route('stocks.index') }}">
+    <div id="stockModule" data-url="{{ url()->full() }}">
         <!-- Stats Container -->
         <div id="stockStatsContainer" class="mb-8">
             <div class="d-flex justify-content-center py-10">
@@ -40,7 +40,7 @@
         window.StockModule = window.DentiUI.createModule({
             name: 'stocks',
             root: '#stockModule',
-            indexUrl: @json(route('stocks.index')),
+            indexUrl: @json(url()->full()),
             tableContainer: '#stockTableContainer',
             filterForm: '#stockFilterForm',
             modalHost: '#stockModalContent',
@@ -48,6 +48,25 @@
                 if (response.statsHtml) {
                     $('#stockStatsContainer').html(response.statsHtml);
                 }
+            },
+            onModalLoaded: function($modal) {
+                // SKT Toggle
+                $modal.find('#expiry_toggle').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#expiry_date_container').removeClass('d-none');
+                    } else {
+                        $('#expiry_date_container').addClass('d-none');
+                    }
+                });
+
+                // Alt Birim Toggle
+                $modal.find('#sub_unit_toggle').on('change', function() {
+                    if ($(this).is(':checked')) {
+                        $('#sub_unit_container').removeClass('d-none');
+                    } else {
+                        $('#sub_unit_container').addClass('d-none');
+                    }
+                });
             }
         });
 

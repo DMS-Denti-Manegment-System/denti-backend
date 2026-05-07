@@ -32,4 +32,23 @@
             </div>
         </div>
     </div>
+@elseif($modalMode === 'detail' && isset($selectedSupplier) && $selectedSupplier)
+    <div class="modal fade show" id="supplierModal" tabindex="-1" aria-modal="true" role="dialog" style="display:block;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header"><h2>Tedarikci Detayi</h2><a href="{{ route('suppliers.index') }}" class="btn btn-sm btn-icon"><i class="ki-duotone ki-cross fs-1"></i></a></div>
+                <div class="modal-body">
+                    <div><strong>Firma:</strong> {{ $selectedSupplier->name }}</div>
+                    <div><strong>Iletisim:</strong> {{ $selectedSupplier->contact_person ?: '-' }}</div>
+                    <div><strong>Telefon:</strong> {{ $selectedSupplier->phone ?: '-' }}</div>
+                    <div><strong>E-posta:</strong> {{ $selectedSupplier->email ?: '-' }}</div>
+                    <div><strong>Adres:</strong> {{ $selectedSupplier->address ?: '-' }}</div>
+                    <hr>
+                    <div><strong>Toplam Stok:</strong> {{ $supplierDetailStats['total_stocks'] ?? 0 }}</div>
+                    <div><strong>Aktif Stok:</strong> {{ $supplierDetailStats['active_stocks'] ?? 0 }}</div>
+                    <div><strong>Pasif Stok:</strong> {{ $supplierDetailStats['passive_stocks'] ?? 0 }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
 @endif

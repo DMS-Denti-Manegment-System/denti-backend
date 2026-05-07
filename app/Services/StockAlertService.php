@@ -98,18 +98,18 @@ class StockAlertService
         });
 
         if ($allBatches->isNotEmpty()) {
-            $today = now();
+            $today = now()->startOfDay();
             $mostUrgentBatch = null;
             $mostUrgentDays = PHP_INT_MAX;
             $hasExpired = false;
 
             foreach ($allBatches as $batch) {
-                $daysToExpiry = $today->diffInDays($batch->expiry_date, false);
+                $daysToExpiry = (int) $today->diffInDays($batch->expiry_date, false);
 
                 if ($daysToExpiry < 0) {
                     $hasExpired = true;
                     $mostUrgentBatch = $batch;
-                    break; // En kritik durum, hemen çık
+                    break;
                 }
 
                 if ($daysToExpiry < $mostUrgentDays) {
@@ -133,14 +133,14 @@ class StockAlertService
                     $alerts[] = [
                         'type' => 'critical_expiry',
                         'title' => 'Kritik Son Kullanma Tarihi',
-                        'message' => "{$product->name} ürününün son kullanma tarihine çok az kaldı! Kalan: {$mostUrgentDays} gün (Parti: #{$mostUrgentBatch->id})",
+                        'message' => "{$product->name} ürününün son kullanma tarihine çok az kaldı! Kalan: " . (int) $mostUrgentDays . " gün (Parti: #{$mostUrgentBatch->id})",
                         'expiry_date' => $mostUrgentBatch->expiry_date,
                     ];
                 } elseif ($mostUrgentDays <= $yellowDays) {
                     $alerts[] = [
                         'type' => 'near_expiry',
                         'title' => 'Son Kullanma Tarihi Yaklaşıyor',
-                        'message' => "{$product->name} ürününün son kullanma tarihi yaklaşıyor. Kalan: {$mostUrgentDays} gün (Parti: #{$mostUrgentBatch->id})",
+                        'message' => "{$product->name} ürününün son kullanma tarihi yaklaşıyor. Kalan: " . (int) $mostUrgentDays . " gün (Parti: #{$mostUrgentBatch->id})",
                         'expiry_date' => $mostUrgentBatch->expiry_date,
                     ];
                 }

@@ -98,8 +98,8 @@ class Stock extends Model
     public static function totalBaseUnitsRaw(): string
     {
         return '(CASE 
-                    WHEN has_sub_unit = 1 THEN (current_stock * COALESCE(sub_unit_multiplier, 1)) + current_sub_stock 
-                    ELSE current_stock 
+                    WHEN stocks.has_sub_unit = 1 THEN (stocks.current_stock * COALESCE(stocks.sub_unit_multiplier, 1)) + stocks.current_sub_stock 
+                    ELSE stocks.current_stock 
                  END)';
     }
 
@@ -218,7 +218,7 @@ class Stock extends Model
             return null;
         }
 
-        return now()->diffInDays($this->expiry_date, false);
+        return (int) now()->startOfDay()->diffInDays($this->expiry_date, false);
     }
 
     public function getAvailableStockAttribute($value)

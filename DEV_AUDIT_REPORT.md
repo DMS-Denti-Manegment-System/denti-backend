@@ -40,7 +40,6 @@
 | **Charts** | Recharts | ^3.8.1 |
 | **Testing BE** | PHPUnit | ^11.5.3 |
 | **Testing FE** | Playwright | ^1.59.1 |
-| **Debugging** | Laravel Telescope | ^5.20 |
 
 ---
 
@@ -163,7 +162,7 @@
 
 | Dosya | Ne İşe Yarar |
 |-------|-------------|
-| `composer.json` | PHP bağımlılıkları (Laravel 12, Sanctum, spatie-permission, Telescope, Google2FA) |
+| `composer.json` | PHP bağımlılıkları (Laravel 12, Sanctum, spatie-permission, Google2FA) |
 | `package.json` | Node bağımlılıkları (React 19, Ant Design, Inertia, TanStack Query, Tailwind 4) |
 | `vite.config.js` | Vite build — laravel-vite-plugin, react, tailwindcss, `@` alias → `/resources/js` |
 | `playwright.config.ts` | E2E test konfigürasyonu |
@@ -693,7 +692,6 @@ Modules/{feature}/
 | **Database Notifications** | Laravel Notification (database channel) | Uygulama içi bildirimler | `StockLowLevelNotification`, `StockAlertDigestNotification`, `StockRequestNotification` |
 | **Queue (Database)** | Laravel Queue | Uyarı kontrol job'ları, bildirim job'ları | `CheckAllStockLevelsJob`, `CheckExpiringItemsJob`, `SendStockRequestNotificationJob` |
 | **Cache (Database)** | Laravel Cache | Stok istatistikleri cache | `StockService@getStockStats` |
-| **Laravel Telescope** | `laravel/telescope` ^5.20 | Debugging ve izleme | Provider register edilmiş |
 | **Spatie Permission** | `spatie/laravel-permission` ^7.3 | RBAC (rol ve izin yönetimi) | `User`, `Role`, Middleware, Policies |
 | **Laravel Sanctum** | `laravel/sanctum` ^4.3 | SPA API auth (cookie-based) | `api.php` middleware, `User` model `HasApiTokens` |
 

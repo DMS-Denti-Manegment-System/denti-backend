@@ -42,7 +42,7 @@ class ProductService
             ];
 
             // Product fields only
-            $productFields = ['name', 'sku', 'description', 'unit', 'category', 'brand', 'min_stock_level', 'critical_stock_level', 'yellow_alert_level', 'red_alert_level', 'is_active', 'has_expiration_date', 'clinic_id', 'company_id'];
+            $productFields = ['name', 'sku', 'description', 'unit', 'category', 'brand', 'min_stock_level', 'critical_stock_level', 'yellow_alert_level', 'red_alert_level', 'is_active', 'has_expiration_date', 'clinic_id', 'company_id', 'has_sub_unit', 'sub_unit_name', 'sub_unit_multiplier'];
             $productData = array_intersect_key($data, array_flip($productFields));
 
             $product = $this->productRepository->create($productData);
