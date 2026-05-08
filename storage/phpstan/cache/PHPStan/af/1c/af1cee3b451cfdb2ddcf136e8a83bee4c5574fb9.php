@@ -1534,7 +1534,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Auth/AuthenticatedSessionController.php' => 
     array (
-      0 => '9afd3a3c886d3253f7d54018b5b9af0842757578',
+      0 => 'e112296edc05a85681a5faa7779cb2bbcf7cc379',
       1 => 
       array (
         0 => 'app\\http\\controllers\\auth\\authenticatedsessioncontroller',
@@ -1566,7 +1566,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php' => 
     array (
-      0 => 'b26b9ad51210456700ddaa3f1e2ab1581575b56c',
+      0 => '61184d127b246b2ef963a21fb7de6386573f38a3',
       1 => 
       array (
         0 => 'app\\http\\controllers\\web\\operationspagecontroller',
@@ -1687,7 +1687,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/AuthPageController.php' => 
     array (
-      0 => '56e774c5d0a992e9ae3c6864c50945b60bd4b338',
+      0 => '52c1cdc70c55e725c656137485f0d5ad9c1de748',
       1 => 
       array (
         0 => 'app\\http\\controllers\\web\\authpagecontroller',
@@ -1847,7 +1847,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Api/AuthController.php' => 
     array (
-      0 => 'e5f23624e068a4077537e4aa2e0277d1483441a9',
+      0 => '5d5450a42b3749e9fff7e273f02f0fab3d9d4245',
       1 => 
       array (
         0 => 'app\\http\\controllers\\api\\authcontroller',
@@ -2301,7 +2301,7 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
     ),
     '/Users/emircanuysal/Desktop/denti-backend/app/Services/StockAlertService.php' => 
     array (
-      0 => '9473146cf8c0b3d788404e3ed251d890f6d7a7b7',
+      0 => '1d48bcf612cef567b939ee2a96a3571f0eea4ecb',
       1 => 
       array (
         0 => 'app\\services\\stockalertservice',
@@ -2610,6 +2610,21 @@ return \PHPStan\Cache\CacheItem::__set_state(array(
       1 => 
       array (
         0 => 'app\\http\\middleware\\forcelocalhostmiddleware',
+      ),
+      2 => 
+      array (
+        0 => 'app\\http\\middleware\\handle',
+      ),
+      3 => 
+      array (
+      ),
+    ),
+    '/Users/emircanuysal/Desktop/denti-backend/app/Http/Middleware/EnsureNotSuperAdmin.php' => 
+    array (
+      0 => '5657c8a347d45f5f94eb464a67e0901cf68bc57c',
+      1 => 
+      array (
+        0 => 'app\\http\\middleware\\ensurenotsuperadmin',
       ),
       2 => 
       array (

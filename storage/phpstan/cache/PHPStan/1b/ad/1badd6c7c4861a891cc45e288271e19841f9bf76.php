@@ -2,6 +2,6 @@
 
 // variadic-method-App\Http\Controllers\Web\OperationsPageController-actionResponse-/Users/emircanuysal/Desktop/denti-backend/app/Http/Controllers/Web/OperationsPageController.php
 return \PHPStan\Cache\CacheItem::__set_state(array(
-   'variableKey' => '1778162130-v4',
+   'variableKey' => '1778236089-v4',
    'data' => false,
 ));
