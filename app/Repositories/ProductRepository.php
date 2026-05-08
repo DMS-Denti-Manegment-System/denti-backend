@@ -79,10 +79,11 @@ class ProductRepository
                 if ($level === 'critical') {
                     $query->whereHas('batches', function ($q) {
                         $q->where('is_active', 1);
-                    })->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.red_alert_level, products.critical_stock_level)');
+                    })->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.red_alert_level, products.critical_stock_level)')
+                        ->whereRaw('NOT (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)');
                 } else {
                     $query->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
-                        ->whereRaw('COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level)');
+                        ->whereRaw('(COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level) OR (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))');
                 }
             }
 

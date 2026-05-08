@@ -227,6 +227,8 @@ class OperationsPageController extends Controller
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string|max:255',
             'reason' => 'nullable|string|max:255',
+            'is_sub_unit' => 'nullable|boolean',
+            'show_zero_stock_in_critical' => 'nullable|boolean',
         ]);
 
         $productId = $stock->product_id;
@@ -237,7 +239,10 @@ class OperationsPageController extends Controller
                 (int) $validated['quantity'],
                 auth()->user()->name,
                 auth()->id(),
-                trim(($validated['reason'] ?? 'Web panel kullanımı').(! empty($validated['notes']) ? ' - '.$validated['notes'] : ''))
+                trim(($validated['reason'] ?? 'Web panel kullanımı').(! empty($validated['notes']) ? ' - '.$validated['notes'] : '')),
+                false,
+                (bool) ($validated['is_sub_unit'] ?? false),
+                array_key_exists('show_zero_stock_in_critical', $validated) ? (bool) $validated['show_zero_stock_in_critical'] : null
             );
 
             return redirect()->route('products.show', $productId)->with('status', 'Stok kullanımı kaydedildi.');

@@ -55,6 +55,7 @@ class StoreProductRequest extends FormRequest
             'has_sub_unit' => 'boolean',
             'sub_unit_name' => 'nullable|string|max:50',
             'sub_unit_multiplier' => 'nullable|integer|min:1',
+            'show_zero_stock_in_critical' => 'nullable|boolean',
         ];
     }
 }

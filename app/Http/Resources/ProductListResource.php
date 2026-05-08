@@ -20,6 +20,7 @@ class ProductListResource extends JsonResource
             'total_stock' => $this->total_stock,
             'status' => $this->stock_status,
             'is_active' => $this->is_active,
+            'show_zero_stock_in_critical' => $this->show_zero_stock_in_critical,
             'clinic_name' => $this->clinic?->name,
             'clinics' => $this->clinic?->name ? [$this->clinic->name] : [],
             'batches_count' => $this->batches_count ?? 0,

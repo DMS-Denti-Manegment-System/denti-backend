@@ -118,6 +118,7 @@ class Stock extends Model
     {
         return $query->join('products', 'stocks.product_id', '=', 'products.id')
             ->whereRaw(self::totalBaseUnitsRaw().' <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
+            ->whereRaw('('.self::totalBaseUnitsRaw().' > COALESCE(products.red_alert_level, products.critical_stock_level) OR ('.self::totalBaseUnitsRaw().' = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))')
             ->where('stocks.is_active', true)
             ->select('stocks.*');
     }
@@ -126,6 +127,7 @@ class Stock extends Model
     {
         return $query->join('products', 'stocks.product_id', '=', 'products.id')
             ->whereRaw(self::totalBaseUnitsRaw().' <= COALESCE(products.red_alert_level, products.critical_stock_level)')
+            ->whereRaw('NOT ('.self::totalBaseUnitsRaw().' = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)')
             ->where('stocks.is_active', true)
             ->select('stocks.*');
     }
@@ -169,8 +171,9 @@ class Stock extends Model
         $total = $this->total_base_units;
         $redLevel = $product->red_alert_level ?? $product->critical_stock_level;
         $yellowLevel = $product->yellow_alert_level ?? $product->min_stock_level;
+        $hideZeroFromCritical = ! ($product->show_zero_stock_in_critical ?? true);
 
-        if ($total <= $redLevel) {
+        if ($total <= $redLevel && ! ($total === 0 && $hideZeroFromCritical)) {
             return 'critical';
         }
         if ($total <= $yellowLevel) {

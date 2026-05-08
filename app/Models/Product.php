@@ -20,6 +20,7 @@ class Product extends Model
         'yellow_alert_level', 'red_alert_level',
         'is_active', 'has_expiration_date', 'company_id', 'clinic_id',
         'has_sub_unit', 'sub_unit_name', 'sub_unit_multiplier',
+        'show_zero_stock_in_critical',
     ];
 
     protected $casts = [
@@ -32,6 +33,7 @@ class Product extends Model
         'clinic_id' => 'integer',
         'has_sub_unit' => 'boolean',
         'sub_unit_multiplier' => 'integer',
+        'show_zero_stock_in_critical' => 'boolean',
     ];
 
     // Relationships
@@ -89,8 +91,9 @@ class Product extends Model
         $total = $this->total_stock;
         $redLevel = $this->red_alert_level ?? $this->critical_stock_level;
         $yellowLevel = $this->yellow_alert_level ?? $this->min_stock_level;
+        $hideZeroFromCritical = ! ($this->show_zero_stock_in_critical ?? true);
 
-        if ($total <= $redLevel) {
+        if ($total <= $redLevel && ! ($total === 0 && $hideZeroFromCritical)) {
             return 'critical';
         }
         if ($total <= $yellowLevel) {

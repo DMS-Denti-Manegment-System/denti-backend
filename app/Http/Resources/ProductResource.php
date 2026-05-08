@@ -29,6 +29,7 @@ class ProductResource extends JsonResource
             'clinic_name' => $this->clinic?->name,
             'clinics' => $this->batches->pluck('clinic.name')->unique()->filter()->values(),
             'has_expiration_date' => $this->has_expiration_date,
+            'show_zero_stock_in_critical' => $this->show_zero_stock_in_critical,
 
             // Finansal Bilgiler
             'average_cost' => $this->averageCost,

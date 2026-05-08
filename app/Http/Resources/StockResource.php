@@ -50,6 +50,7 @@ class StockResource extends JsonResource
                 'category' => $this->product?->category,
                 'unit' => $this->product?->unit,
                 'has_expiration_date' => $this->product?->has_expiration_date,
+                'show_zero_stock_in_critical' => $this->product?->show_zero_stock_in_critical,
             ],
             'total_base_units' => $this->total_base_units,
             'stock_status' => $this->stock_status,

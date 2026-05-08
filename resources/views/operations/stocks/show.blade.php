@@ -111,7 +111,12 @@
                                         data-stock-use-trigger
                                         data-stock-use-action="{{ route('stocks.use', $defaultUsageBatch) }}"
                                         data-stock-use-batch="#{{ $defaultUsageBatch->id }} / {{ $product->name }}"
-                                        data-stock-use-max="{{ $defaultUsageBatch->current_stock }}"
+                                        data-stock-use-max-main="{{ $defaultUsageBatch->current_stock }}"
+                                        data-stock-use-max-sub="{{ $defaultUsageBatch->total_base_units }}"
+                                        data-stock-unit="{{ $product->unit }}"
+                                        data-stock-sub-unit="{{ $product->sub_unit_name }}"
+                                        data-stock-sub-multiplier="{{ $product->sub_unit_multiplier }}"
+                                        data-stock-has-sub-unit="{{ $product->has_sub_unit ? 1 : 0 }}"
                                         data-stock-use-reason="Ürün Detay Kullanımı"
                                     >
                                         Stok Kullan
@@ -238,7 +243,12 @@
                                                     data-stock-use-trigger
                                                     data-stock-use-action="{{ route('stocks.use', $batch) }}"
                                                     data-stock-use-batch="#{{ $batch->id }} / {{ $batch->batch_code ?: $product->name }}"
-                                                    data-stock-use-max="{{ $batch->current_stock }}"
+                                                    data-stock-use-max-main="{{ $batch->current_stock }}"
+                                                    data-stock-use-max-sub="{{ $batch->total_base_units }}"
+                                                    data-stock-unit="{{ $product->unit }}"
+                                                    data-stock-sub-unit="{{ $product->sub_unit_name }}"
+                                                    data-stock-sub-multiplier="{{ $product->sub_unit_multiplier }}"
+                                                    data-stock-has-sub-unit="{{ $product->has_sub_unit ? 1 : 0 }}"
                                                     data-stock-use-reason="Parti Bazlı Kullanım"
                                                 >
                                                     Stok Kullan
@@ -352,6 +362,13 @@
                             </div>
                         </div>
                         <div class="row g-5">
+                            <div class="col-md-12 d-none" id="stockUseUnitContainer">
+                                <label class="form-label required">Kullanım Birimi</label>
+                                <select name="is_sub_unit" id="stockUseUnitMode" class="form-select form-select-solid" data-control="select2" data-dropdown-parent="#stockUseModal" data-hide-search="true">
+                                    <option value="0">Ana Birim</option>
+                                    <option value="1">Alt Birim</option>
+                                </select>
+                            </div>
                             <div class="col-md-5">
                                 <label class="form-label required">Miktar</label>
                                 <input type="number" min="1" name="quantity" id="stockUseQuantity" class="form-control form-control-solid" required>
@@ -369,6 +386,23 @@
                             <div class="col-12">
                                 <label class="form-label">Not</label>
                                 <textarea name="notes" rows="3" class="form-control form-control-solid" placeholder="Opsiyonel not"></textarea>
+                            </div>
+                            <div class="col-12 d-none" id="stockUseCriticalChoiceContainer">
+                                <div class="notice d-flex rounded border border-warning border-dashed bg-light-warning p-4">
+                                    <div class="d-flex flex-column w-100">
+                                        <span class="fw-bold text-gray-800 mb-3">Stok bu işlemle sıfırlanacak. Kritikte görünsün mü?</span>
+                                        <div class="d-flex gap-6">
+                                            <label class="form-check form-check-custom form-check-solid">
+                                                <input class="form-check-input" type="radio" name="show_zero_stock_in_critical" value="1">
+                                                <span class="form-check-label">Kritikte Göster</span>
+                                            </label>
+                                            <label class="form-check form-check-custom form-check-solid">
+                                                <input class="form-check-input" type="radio" name="show_zero_stock_in_critical" value="0">
+                                                <span class="form-check-label">Kritikte Gösterme</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -656,31 +690,90 @@
             var isChecked = $(this).is(':checked');
             $('#sub_unit_container_batch').toggleClass('d-none', !isChecked);
         });
+
+        function updateStockUseAvailability() {
+            var $form = $('#stockUseForm');
+            var isSubUnit = $form.find('#stockUseUnitMode').val() === '1';
+            var maxMain = parseInt($form.data('max-main') || 0, 10);
+            var maxSub = parseInt($form.data('max-sub') || 0, 10);
+            var mainUnit = $form.data('main-unit') || '';
+            var subUnit = $form.data('sub-unit') || '';
+            var max = isSubUnit ? maxSub : maxMain;
+            var unitLabel = isSubUnit ? subUnit : mainUnit;
+
+            $form.find('#stockUseQuantity').attr('max', max > 0 ? max : '').val('');
+            $form.find('#stockUseModalMax').text(max + ' ' + unitLabel);
+
+            // Any quantity must be re-validated after unit switch.
+            toggleZeroCriticalChoice();
+        }
+
+        function toggleZeroCriticalChoice() {
+            var $form = $('#stockUseForm');
+            var isSubUnit = $form.find('#stockUseUnitMode').val() === '1';
+            var maxMain = parseInt($form.data('max-main') || 0, 10);
+            var maxSub = parseInt($form.data('max-sub') || 0, 10);
+            var max = isSubUnit ? maxSub : maxMain;
+            var quantity = parseInt($form.find('#stockUseQuantity').val() || 0, 10);
+            var shouldShow = max > 0 && quantity === max;
+            var $container = $('#stockUseCriticalChoiceContainer');
+            var $radios = $container.find('input[name="show_zero_stock_in_critical"]');
+
+            $container.toggleClass('d-none', !shouldShow);
+            $radios.prop('required', shouldShow);
+
+            if (!shouldShow) {
+                $radios.prop('checked', false);
+            }
+        }
+
+        $(document).on('change', '#stockUseUnitMode', updateStockUseAvailability);
+        $(document).on('input', '#stockUseQuantity', toggleZeroCriticalChoice);
+
         $(document).on('click', '[data-stock-use-trigger]', function() {
             if (!stockUseModal) {
                 return;
             }
 
             var $trigger = $(this);
-            $('#stockUseForm').attr('action', $trigger.attr('data-stock-use-action'));
+            var $form = $('#stockUseForm');
+            var hasSubUnit = parseInt($trigger.attr('data-stock-has-sub-unit') || '0', 10) === 1;
+            var maxMain = parseInt($trigger.attr('data-stock-use-max-main') || '0', 10);
+            var maxSub = parseInt($trigger.attr('data-stock-use-max-sub') || '0', 10);
+            var mainUnit = $trigger.attr('data-stock-unit') || '{{ $product->unit }}';
+            var subUnit = $trigger.attr('data-stock-sub-unit') || '';
+
+            $form.attr('action', $trigger.attr('data-stock-use-action'));
+            $form.data('max-main', maxMain);
+            $form.data('max-sub', maxSub);
+            $form.data('main-unit', mainUnit);
+            $form.data('sub-unit', subUnit);
+
             $('#stockUseModalBatch').text($trigger.attr('data-stock-use-batch') || 'Seçilen stok');
-            $('#stockUseModalMax').text(($trigger.attr('data-stock-use-max') || '0') + ' {{ $product->unit }}');
-            $('#stockUseQuantity')
-                .attr('max', $trigger.attr('data-stock-use-max') || '')
-                .val('');
+            $('#stockUseQuantity').val('');
+            $('#stockUseUnitContainer').toggleClass('d-none', !hasSubUnit);
+            $('#stockUseUnitMode').val('0').trigger('change');
+            updateStockUseAvailability();
             
             // Re-init select2 when modal opens to prevent width/parent bugs
             var $reasonSelect = $('#stockUseReason');
             $reasonSelect.val($trigger.attr('data-stock-use-reason') || 'Kullanım').trigger('change');
+            var $unitModeSelect = $('#stockUseUnitMode');
             
             if ($.fn.select2) {
                 $reasonSelect.select2({
                     dropdownParent: $('#stockUseModal'),
                     minimumResultsForSearch: Infinity
                 });
+                $unitModeSelect.select2({
+                    dropdownParent: $('#stockUseModal'),
+                    minimumResultsForSearch: Infinity
+                });
             }
 
-            $('#stockUseForm').find('textarea[name="notes"]').val('');
+            $form.find('textarea[name="notes"]').val('');
+            $('#stockUseCriticalChoiceContainer').addClass('d-none');
+            $('#stockUseCriticalChoiceContainer input[name="show_zero_stock_in_critical"]').prop('checked', false).prop('required', false);
             stockUseModal.show();
         });
 
@@ -715,6 +808,17 @@
             var $form = $(this);
             if ($form.data('submitting')) {
                 return false;
+            }
+
+            if ($form.is('#stockUseForm')) {
+                var $criticalContainer = $('#stockUseCriticalChoiceContainer');
+                var isVisible = !$criticalContainer.hasClass('d-none');
+                var hasChoice = $criticalContainer.find('input[name="show_zero_stock_in_critical"]:checked').length > 0;
+
+                if (isVisible && !hasChoice) {
+                    window.DentiUI?.notify('warning', 'Stok sıfırlanacağı için kritik görünürlük seçimi yapmalısınız.');
+                    return false;
+                }
             }
 
             $form.data('submitting', true);

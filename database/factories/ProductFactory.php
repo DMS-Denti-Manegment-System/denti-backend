@@ -42,6 +42,7 @@ class ProductFactory extends Factory
             'yellow_alert_level' => $this->faker->numberBetween(15, 40),
             'red_alert_level' => $this->faker->numberBetween(5, 15),
             'has_expiration_date' => $this->faker->boolean(70),
+            'show_zero_stock_in_critical' => true,
             'is_active' => true,
         ];
     }

@@ -62,13 +62,14 @@ class StockAlertService
         $alerts = [];
         // Toplam ürün stoğunu kontrol et
         $currentValue = $product->total_stock;
+        $hideZeroFromCritical = ! ($product->show_zero_stock_in_critical ?? true);
 
         // Seviye değerlerini üründen al
         $yellowLevel = $product->yellow_alert_level ?? $product->min_stock_level ?? 10;
         $redLevel = $product->red_alert_level ?? $product->critical_stock_level ?? 5;
 
         // 1. Kritik Stok Kontrolü
-        if ($currentValue <= $redLevel) {
+        if ($currentValue <= $redLevel && ! ($currentValue === 0 && $hideZeroFromCritical)) {
             $unitName = $product->unit;
             $alerts[] = [
                 'type' => 'critical_stock',

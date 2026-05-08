@@ -73,7 +73,7 @@ class StockRepository implements StockRepositoryInterface
     public function getAllWithFilters(array $filters, int $perPage = 50)
     {
         $query = $this->model->with([
-            'product:id,name,sku,unit,category,brand',
+            'product:id,name,sku,unit,category,brand,show_zero_stock_in_critical',
             'supplier:id,name',
             'clinic:id,name',
             'alerts',

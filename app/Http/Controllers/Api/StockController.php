@@ -238,7 +238,9 @@ class StockController extends Controller
                 $performedBy,
                 auth()->id(),
                 $notes,
-                $data['is_from_reserved'] ?? false
+                $data['is_from_reserved'] ?? false,
+                (bool) ($data['is_sub_unit'] ?? false),
+                array_key_exists('show_zero_stock_in_critical', $data) ? (bool) $data['show_zero_stock_in_critical'] : null
             );
 
             return $this->success(new StockResource($this->stockService->getStockById((int) $id)), 'Stok kullanımı kaydedildi');

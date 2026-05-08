@@ -85,6 +85,7 @@ class ProductController extends Controller
                 'brand' => 'nullable|string|max:50',
                 'min_stock_level' => 'nullable|integer',
                 'critical_stock_level' => 'nullable|integer',
+                'show_zero_stock_in_critical' => 'nullable|boolean',
             ]);
 
             $product = $this->productService->updateProduct((int) $id, $data);

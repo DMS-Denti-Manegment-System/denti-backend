@@ -8,6 +8,7 @@
 namespace App\Repositories;
 
 use App\Models\Clinic;
+use App\Models\Stock;
 use App\Repositories\Interfaces\ClinicRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
@@ -99,19 +100,27 @@ class ClinicRepository implements ClinicRepositoryInterface
     public function getStockSummary(int $clinicId): array
     {
         $companyId = auth()->user()->company_id;
+        $totalUnitsRaw = Stock::totalBaseUnitsRaw();
         $summary = DB::table('stocks')
             ->join('products', 'stocks.product_id', '=', 'products.id')
             ->where('stocks.clinic_id', $clinicId)
             ->where('stocks.company_id', $companyId)
             ->where('stocks.is_active', true)
             ->whereNull('stocks.deleted_at')
-            ->selectRaw('
+            ->selectRaw("
                 COUNT(*) as total_items,
-                SUM(stocks.current_stock) as total_quantity,
+                SUM({$totalUnitsRaw}) as total_quantity,
                 SUM(stocks.current_stock * stocks.purchase_price) as total_value,
-                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.yellow_alert_level, products.min_stock_level, 10) THEN 1 ELSE 0 END) as low_stock_items,
-                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.red_alert_level, products.critical_stock_level, 5) THEN 1 ELSE 0 END) as critical_stock_items
-            ')
+                SUM(CASE
+                    WHEN {$totalUnitsRaw} <= COALESCE(products.yellow_alert_level, products.min_stock_level, 10)
+                    AND ({$totalUnitsRaw} > COALESCE(products.red_alert_level, products.critical_stock_level, 5)
+                        OR ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))
+                    THEN 1 ELSE 0 END) as low_stock_items,
+                SUM(CASE
+                    WHEN {$totalUnitsRaw} <= COALESCE(products.red_alert_level, products.critical_stock_level, 5)
+                    AND NOT ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)
+                    THEN 1 ELSE 0 END) as critical_stock_items
+            ")
             ->first();
 
         return [
@@ -128,17 +137,25 @@ class ClinicRepository implements ClinicRepositoryInterface
         $companyId = auth()->user()->company_id;
         $totalClinics = $this->model->count();
         $activeClinics = $this->model->where('is_active', true)->count();
+        $totalUnitsRaw = Stock::totalBaseUnitsRaw();
 
         $stockStats = DB::table('stocks')
             ->join('products', 'stocks.product_id', '=', 'products.id')
             ->where('stocks.company_id', $companyId)
             ->where('stocks.is_active', true)
             ->whereNull('stocks.deleted_at')
-            ->selectRaw('
+            ->selectRaw("
                 COUNT(*) as total_items,
-                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.yellow_alert_level, products.min_stock_level, 10) THEN 1 ELSE 0 END) as low_stock_items,
-                SUM(CASE WHEN stocks.current_stock <= COALESCE(products.red_alert_level, products.critical_stock_level, 5) THEN 1 ELSE 0 END) as critical_stock_items
-            ')
+                SUM(CASE
+                    WHEN {$totalUnitsRaw} <= COALESCE(products.yellow_alert_level, products.min_stock_level, 10)
+                    AND ({$totalUnitsRaw} > COALESCE(products.red_alert_level, products.critical_stock_level, 5)
+                        OR ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))
+                    THEN 1 ELSE 0 END) as low_stock_items,
+                SUM(CASE
+                    WHEN {$totalUnitsRaw} <= COALESCE(products.red_alert_level, products.critical_stock_level, 5)
+                    AND NOT ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)
+                    THEN 1 ELSE 0 END) as critical_stock_items
+            ")
             ->first();
 
         return [

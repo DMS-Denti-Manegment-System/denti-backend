@@ -100,6 +100,46 @@ class ProductTest extends TestCase
         $this->assertEquals('critical', $product->fresh()->stock_status);
     }
 
+    #[Test]
+    public function it_keeps_zero_stock_in_critical_when_show_zero_stock_setting_is_true()
+    {
+        $product = Product::factory()->create([
+            'min_stock_level' => 10,
+            'critical_stock_level' => 5,
+            'yellow_alert_level' => 10,
+            'red_alert_level' => 5,
+            'show_zero_stock_in_critical' => true,
+        ]);
+
+        Stock::factory()->create([
+            'product_id' => $product->id,
+            'current_stock' => 0,
+            'has_sub_unit' => false,
+        ]);
+
+        $this->assertEquals('critical', $product->fresh()->stock_status);
+    }
+
+    #[Test]
+    public function it_downgrades_zero_stock_to_low_when_show_zero_stock_setting_is_false()
+    {
+        $product = Product::factory()->create([
+            'min_stock_level' => 10,
+            'critical_stock_level' => 5,
+            'yellow_alert_level' => 10,
+            'red_alert_level' => 5,
+            'show_zero_stock_in_critical' => false,
+        ]);
+
+        Stock::factory()->create([
+            'product_id' => $product->id,
+            'current_stock' => 0,
+            'has_sub_unit' => false,
+        ]);
+
+        $this->assertEquals('low_stock', $product->fresh()->stock_status);
+    }
+
     #[\PHPUnit\Framework\Attributes\Test]
     public function it_returns_inactive_status_when_product_is_not_active()
     {

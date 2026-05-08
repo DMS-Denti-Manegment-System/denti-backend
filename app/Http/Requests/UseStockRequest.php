@@ -24,6 +24,8 @@ class UseStockRequest extends FormRequest
             'reason' => 'nullable|string|max:500',
             'used_by' => 'nullable|string|max:255',
             'is_from_reserved' => 'nullable|boolean',
+            'is_sub_unit' => 'nullable|boolean',
+            'show_zero_stock_in_critical' => 'nullable|boolean',
         ];
     }
 

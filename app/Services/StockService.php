@@ -130,10 +130,19 @@ class StockService
      * @throws StockNotFoundException Stok bulunamazsa
      * @throws InsufficientStockException Yeterli stok yoksa
      */
-    public function useStock(int $stockId, int $quantity, string $performedBy, ?int $userId = null, ?string $notes = null, bool $isFromReserved = false): bool
+    public function useStock(
+        int $stockId,
+        int $quantity,
+        string $performedBy,
+        ?int $userId = null,
+        ?string $notes = null,
+        bool $isFromReserved = false,
+        bool $isSubUnit = false,
+        ?bool $showZeroStockInCritical = null
+    ): bool
     {
         try {
-            return DB::transaction(function () use ($stockId, $quantity, $performedBy, $userId, $notes, $isFromReserved) {
+            return DB::transaction(function () use ($stockId, $quantity, $performedBy, $userId, $notes, $isFromReserved, $isSubUnit, $showZeroStockInCritical) {
                 // 🔒 Pessimistic lock: eşzamanlı kullanımlarda veri bütünlüğünü korur
                 $stock = $this->stockRepository->findAndLock($stockId);
                 if (! $stock) {
@@ -150,8 +159,26 @@ class StockService
                     throw new InsufficientStockException($stock->reserved_stock, $quantity, 'Yeterli rezerve stok bulunmamaktadır.');
                 }
 
-                $isSubUnitUsage = $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
+                if ($isSubUnit && (! $stock->has_sub_unit || (int) ($stock->sub_unit_multiplier ?? 0) <= 0)) {
+                    throw new \Exception('Bu stok için alt birim kullanımı aktif değil.');
+                }
+
+                $isSubUnitUsage = $isSubUnit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
                 $previousTotal = $isSubUnitUsage ? $stock->total_base_units : $stock->current_stock;
+
+                if ($isSubUnitUsage) {
+                    if ($isFromReserved) {
+                        throw new \Exception('Alt birim kullanımı için rezerve stoktan düşüm yapılamaz. Lütfen ana birim üzerinden işlem yapın.');
+                    }
+
+                    if ($stock->total_base_units < $quantity) {
+                        throw new InsufficientStockException($stock->total_base_units, $quantity);
+                    }
+                } elseif ($isFromReserved && $stock->current_stock < $quantity) {
+                    throw new InsufficientStockException($stock->current_stock, $quantity);
+                } elseif (! $isFromReserved && $stock->available_stock < $quantity) {
+                    throw new InsufficientStockException($stock->available_stock, $quantity);
+                }
 
                 // 🛡️ Rezerve stok manuel yonetilir cunku TransactionObserver sadece current_stock'u etkiler.
                 // Rezerve stoktan dusum yapiliyorsa rezerve miktarini azalt.
@@ -174,6 +201,17 @@ class StockService
                     'transaction_date' => now(),
                     'is_sub_unit' => $isSubUnitUsage,
                 ]);
+
+                if ($showZeroStockInCritical !== null) {
+                    $updatedStock = Stock::with('product.batches')->find($stockId);
+                    $product = $updatedStock?->product;
+
+                    if ($product && (int) $product->total_stock === 0) {
+                        $product->update([
+                            'show_zero_stock_in_critical' => $showZeroStockInCritical,
+                        ]);
+                    }
+                }
 
                 return true;
             });
@@ -351,10 +389,12 @@ class StockService
                     -- Stok Seviyesi Uyarıları
                     COUNT(DISTINCT CASE WHEN stocks.is_active = 1
                         AND {$totalUnitsRaw} <= COALESCE(products.red_alert_level, products.critical_stock_level)
+                        AND NOT ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)
                         THEN stocks.product_id END) as critical_stock_items,
                     COUNT(DISTINCT CASE WHEN stocks.is_active = 1
                         AND {$totalUnitsRaw} <= COALESCE(products.yellow_alert_level, products.min_stock_level)
-                        AND {$totalUnitsRaw} > COALESCE(products.red_alert_level, products.critical_stock_level)
+                        AND ({$totalUnitsRaw} > COALESCE(products.red_alert_level, products.critical_stock_level)
+                            OR ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))
                         THEN stocks.product_id END) as low_stock_items,
                     
                     -- Miyat (SKT) Uyarıları
