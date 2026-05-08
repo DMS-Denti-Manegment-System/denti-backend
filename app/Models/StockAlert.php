@@ -43,7 +43,7 @@ class StockAlert extends Model
     public function getSeverityAttribute(): string
     {
         return match ($this->type) {
-            'critical_stock', 'expired' => 'critical',
+            'critical_stock', 'critical_expiry', 'expired' => 'critical',
             'low_stock', 'near_expiry' => 'high',
             default => 'medium'
         };
@@ -79,6 +79,7 @@ class StockAlert extends Model
         return match ($this->type) {
             'low_stock' => 'Düşük Stok',
             'critical_stock' => 'Kritik Stok',
+            'critical_expiry' => 'Kritik SKT',
             'expired' => 'Süresi Geçen',
             'near_expiry' => 'Süresi Yaklaşan',
             default => 'Bilinmeyen'
@@ -90,6 +91,7 @@ class StockAlert extends Model
         return match ($this->type) {
             'low_stock' => 'orange',
             'critical_stock' => 'red',
+            'critical_expiry' => 'red',
             'expired' => 'red',
             'near_expiry' => 'orange',
             default => 'gray'

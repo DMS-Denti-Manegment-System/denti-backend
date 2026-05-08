@@ -22,6 +22,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -699,20 +701,7 @@ class OperationsPageController extends Controller
 
     public function alerts(Request $request): View|JsonResponse
     {
-        $alerts = StockAlert::query()
-            ->with(['clinic', 'product'])
-            ->when($request->filled('search'), function (Builder $query) use ($request) {
-                $search = $request->string('search');
-                $query->where(function (Builder $inner) use ($search) {
-                    $inner->where('title', 'like', "%{$search}%")
-                        ->orWhere('message', 'like', "%{$search}%");
-                });
-            })
-            ->when($request->filled('type'), fn (Builder $query) => $query->where('type', $request->string('type')))
-            ->when($request->filled('resolved'), fn (Builder $query) => $query->where('is_resolved', $request->string('resolved') === '1'))
-            ->latest()
-            ->paginate($request->integer('per_page', 20))
-            ->withQueryString();
+        $alerts = $this->buildAlertsFeed($request);
 
         $viewData = compact('alerts');
 
@@ -722,6 +711,202 @@ class OperationsPageController extends Controller
             $viewData,
             'operations.alerts.table.index',
         );
+    }
+
+    private function buildAlertsFeed(Request $request): LengthAwarePaginator
+    {
+        $perPage = $request->integer('per_page', 20);
+        $page = max(1, $request->integer('page', 1));
+        $typeFilter = trim((string) $request->query('type', ''));
+        $search = trim((string) $request->query('search', ''));
+        $resolvedFilter = $request->query('resolved');
+        $expiryTypes = ['near_expiry', 'critical_expiry', 'expired'];
+
+        $multiBatchProductIds = Stock::query()
+            ->where('is_active', true)
+            ->where('track_expiry', true)
+            ->whereNotNull('expiry_date')
+            ->groupBy('product_id')
+            ->havingRaw('COUNT(*) >= 2')
+            ->pluck('product_id')
+            ->all();
+
+        $alertRows = StockAlert::query()
+            ->with(['clinic:id,name', 'product:id,name'])
+            ->when($typeFilter !== '', fn (Builder $query) => $query->where('type', $typeFilter))
+            ->when($request->filled('resolved'), fn (Builder $query) => $query->where('is_resolved', $request->string('resolved') === '1'))
+            ->when($multiBatchProductIds !== [], function (Builder $query) use ($multiBatchProductIds, $expiryTypes) {
+                $query->where(function (Builder $inner) use ($multiBatchProductIds, $expiryTypes) {
+                    $inner->whereNotIn('type', $expiryTypes)
+                        ->orWhereNull('product_id')
+                        ->orWhereNotIn('product_id', $multiBatchProductIds);
+                });
+            })
+            ->get()
+            ->map(fn (StockAlert $alert) => $this->normalizeStockAlertRow($alert))
+            ->toBase();
+
+        $dynamicRows = $this->buildDynamicBatchAlertRows($multiBatchProductIds, $typeFilter, $resolvedFilter);
+
+        $rows = $alertRows->merge($dynamicRows);
+
+        if ($search !== '') {
+            $needle = mb_strtolower($search);
+            $rows = $rows->filter(function (array $row) use ($needle) {
+                $haystack = mb_strtolower(
+                    implode(' ', [
+                        $row['title'] ?? '',
+                        $row['message'] ?? '',
+                        $row['product_name'] ?? '',
+                        $row['clinic_name'] ?? '',
+                        $row['batch_ref'] ?? '',
+                    ])
+                );
+
+                return str_contains($haystack, $needle);
+            });
+        }
+
+        $sorted = $rows->sort(function (array $a, array $b) {
+            $priorityCompare = $this->alertTypePriority($a['type']) <=> $this->alertTypePriority($b['type']);
+            if ($priorityCompare !== 0) {
+                return $priorityCompare;
+            }
+
+            return $b['created_at']->getTimestamp() <=> $a['created_at']->getTimestamp();
+        })->values();
+
+        $total = $sorted->count();
+        $items = $sorted->slice(($page - 1) * $perPage, $perPage)->values();
+
+        return new LengthAwarePaginator(
+            $items,
+            $total,
+            $perPage,
+            $page,
+            [
+                'path' => $request->url(),
+                'query' => $request->query(),
+            ]
+        );
+    }
+
+    private function normalizeStockAlertRow(StockAlert $alert): array
+    {
+        return [
+            'id' => 'alert-'.$alert->id,
+            'source' => 'alert',
+            'type' => $alert->type,
+            'severity' => $alert->severity,
+            'title' => $alert->title,
+            'message' => $alert->message,
+            'clinic_name' => $alert->clinic?->name ?? '-',
+            'product_name' => $alert->product?->name ?? '-',
+            'batch_ref' => null,
+            'created_at' => $alert->created_at ?? now(),
+            'created_at_label' => optional($alert->created_at)->format('d.m.Y H:i') ?? '-',
+        ];
+    }
+
+    private function buildDynamicBatchAlertRows(array $multiBatchProductIds, string $typeFilter, mixed $resolvedFilter): Collection
+    {
+        if ($multiBatchProductIds === [] || $resolvedFilter === '1') {
+            return collect();
+        }
+
+        $expiryTypes = ['near_expiry', 'critical_expiry', 'expired'];
+        if ($typeFilter !== '' && ! in_array($typeFilter, $expiryTypes, true)) {
+            return collect();
+        }
+
+        return Stock::query()
+            ->with(['product:id,name', 'clinic:id,name'])
+            ->whereIn('product_id', $multiBatchProductIds)
+            ->where('is_active', true)
+            ->where('track_expiry', true)
+            ->whereNotNull('expiry_date')
+            ->get()
+            ->map(function (Stock $batch) use ($typeFilter) {
+                $type = $this->resolveBatchExpiryType($batch);
+                if (! $type) {
+                    return null;
+                }
+
+                if ($typeFilter !== '' && $type !== $typeFilter) {
+                    return null;
+                }
+
+                $batchRef = $batch->batch_code ? 'Parti '.$batch->batch_code : 'Parti #'.$batch->id;
+                $daysToExpiry = (int) now()->startOfDay()->diffInDays($batch->expiry_date, false);
+                $productName = $batch->product?->name ?? 'Ürün';
+
+                $title = match ($type) {
+                    'expired' => 'Parti Bazlı Süresi Geçen Ürün',
+                    'critical_expiry' => 'Parti Bazlı Kritik SKT',
+                    default => 'Parti Bazlı Yaklaşan SKT',
+                };
+
+                $message = match ($type) {
+                    'expired' => "{$productName} için {$batchRef} son kullanma tarihini geçti.",
+                    'critical_expiry' => "{$productName} için {$batchRef} kritik seviyede. Kalan: {$daysToExpiry} gün.",
+                    default => "{$productName} için {$batchRef} son kullanma tarihine yaklaşıyor. Kalan: {$daysToExpiry} gün.",
+                };
+
+                return [
+                    'id' => 'batch-'.$batch->id.'-'.$type,
+                    'source' => 'batch',
+                    'type' => $type,
+                    'severity' => in_array($type, ['expired', 'critical_expiry'], true) ? 'critical' : 'high',
+                    'title' => $title,
+                    'message' => $message,
+                    'clinic_name' => $batch->clinic?->name ?? '-',
+                    'product_name' => $productName,
+                    'batch_ref' => $batchRef,
+                    'created_at' => $batch->expiry_date->copy()->endOfDay(),
+                    'created_at_label' => $batch->expiry_date->format('d.m.Y'),
+                ];
+            })
+            ->filter()
+            ->values();
+    }
+
+    private function resolveBatchExpiryType(Stock $batch): ?string
+    {
+        if (! $batch->expiry_date) {
+            return null;
+        }
+
+        $today = now()->startOfDay();
+        $expiryDate = $batch->expiry_date->copy()->startOfDay();
+
+        if ($expiryDate->lt($today)) {
+            return 'expired';
+        }
+
+        $redDays = (int) ($batch->expiry_red_days ?? 15);
+        $yellowDays = (int) ($batch->expiry_yellow_days ?? 30);
+
+        if ($expiryDate->lte($today->copy()->addDays($redDays))) {
+            return 'critical_expiry';
+        }
+
+        if ($expiryDate->lte($today->copy()->addDays($yellowDays))) {
+            return 'near_expiry';
+        }
+
+        return null;
+    }
+
+    private function alertTypePriority(string $type): int
+    {
+        return match ($type) {
+            'expired' => 1,
+            'critical_expiry' => 2,
+            'near_expiry' => 3,
+            'critical_stock' => 4,
+            'low_stock' => 5,
+            default => 6,
+        };
     }
 
     public function alertResolve(Request $request, StockAlert $stockAlert): RedirectResponse|JsonResponse

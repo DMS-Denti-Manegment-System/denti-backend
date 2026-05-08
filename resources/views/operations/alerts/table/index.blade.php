@@ -12,30 +12,30 @@
                     </tr>
                 </thead>
                 <tbody class="text-gray-600 fw-semibold">
-                    @forelse($alerts as $alert)
+                    @forelse($alerts as $row)
                         <tr>
                             <td>
                                 @php
                                     $severityLabel = [
                                         'critical' => ['danger', 'Kritik'],
                                         'high' => ['warning', 'Yüksek'],
-                                        'normal' => ['primary', 'Normal'],
+                                        'medium' => ['primary', 'Orta'],
                                         'info' => ['info', 'Bilgi'],
-                                    ][$alert->severity] ?? ['info', $alert->severity];
+                                    ][$row['severity'] ?? 'info'] ?? ['info', $row['severity'] ?? 'Bilgi'];
                                 @endphp
                                 <span class="badge badge-light-{{ $severityLabel[0] }}">{{ $severityLabel[1] }}</span>
                             </td>
                             <td>
-                                <div>{{ $alert->title }}</div>
-                                <div class="text-muted fs-7">{{ $alert->message }}</div>
+                                <div>{{ $row['title'] ?? '-' }}</div>
+                                <div class="text-muted fs-7">{{ $row['message'] ?? '-' }}</div>
                             </td>
-                            <td>{{ $alert->clinic?->name ?: '-' }}</td>
-                            <td>{{ $alert->product?->name ?: '-' }}</td>
-                            <td>{{ optional($alert->created_at)->format('d.m.Y H:i') }}</td>
+                            <td>{{ $row['clinic_name'] ?? '-' }}</td>
+                            <td>{{ $row['product_name'] ?? '-' }}</td>
+                            <td>{{ $row['created_at_label'] ?? '-' }}</td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-10 text-muted">Uyarı kaydı bulunamadı.</td>
+                            <td colspan="5" class="text-center py-10 text-muted">Uyarı kaydı bulunamadı.</td>
                         </tr>
                     @endforelse
                 </tbody>

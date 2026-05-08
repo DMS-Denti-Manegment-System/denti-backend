@@ -14,35 +14,11 @@
 @push('scripts')
     <script>
         $(function () {
-            const module = window.DentiUI.createModule({
+            window.DentiUI.createModule({
                 name: 'alerts',
                 root: '#alertsModule',
                 indexUrl: @json(route('alerts.index')),
                 actionFormSelector: '[data-module-action]',
-            });
-
-            // Bulk Actions Logic
-            const table = $('#alertsTable');
-            const bulkActions = $('#alertsBulkActions');
-            const selectedCount = $('#selectedCount');
-            const masterCheck = table.find('[data-kt-check="true"]');
-
-            function updateBulkActions() {
-                const checked = table.find('tbody .form-check-input:checked');
-                if (checked.length > 0) {
-                    bulkActions.removeClass('d-none').addClass('d-flex');
-                    selectedCount.text(checked.length);
-                } else {
-                    bulkActions.addClass('d-none').removeClass('d-flex');
-                }
-            }
-
-            table.on('change', '.form-check-input', function() {
-                setTimeout(updateBulkActions, 50);
-            });
-
-            table.on('change', '.form-check-input', function() {
-                setTimeout(updateBulkActions, 50);
             });
         });
     </script>
