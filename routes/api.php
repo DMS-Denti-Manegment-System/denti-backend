@@ -41,7 +41,7 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
 
     // Role Management (Company Owners)
     Route::get('/roles/permissions', [RoleController::class, 'permissions']);
-    Route::apiResource('roles', RoleController::class);
+    Route::apiResource('roles', RoleController::class)->names('api.roles');
 
     // Stock Transactions
     Route::get('/stocks/{id}/transactions', [\App\Http\Controllers\Api\StockController::class, 'getTransactions']);
