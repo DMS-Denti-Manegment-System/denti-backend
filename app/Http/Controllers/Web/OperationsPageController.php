@@ -40,8 +40,7 @@ class OperationsPageController extends Controller
     public function stocks(Request $request): View|JsonResponse
     {
         try {
-            $cacheKey = 'web.stocks.'.auth()->id().'.'.md5((string) $request->fullUrl());
-            $viewData = Cache::remember($cacheKey, 45, fn () => $this->getStocksViewData($request));
+            $viewData = $this->getStocksViewData($request);
 
             if ($request->ajax()) {
                 return response()->json([
@@ -123,9 +122,11 @@ class OperationsPageController extends Controller
             ->selectRaw("
                 SUM(
                     CASE
-                        WHEN type IN ('purchase', 'adjustment_increase', 'transfer_in', 'return_in')
+                        WHEN type IN ('entry', 'adjustment_plus', 'adjustment_increase', 'purchase', 'transfer_in', 'returned', 'return_in', 'adjustment_in')
                         THEN quantity
-                        ELSE -quantity
+                        WHEN type IN ('usage', 'loss', 'adjustment_minus', 'adjustment_decrease', 'transfer_out', 'expired', 'damaged', 'return_out', 'adjustment_out')
+                        THEN -quantity
+                        ELSE 0
                     END
                 ) as net_change
             ")
@@ -178,8 +179,6 @@ class OperationsPageController extends Controller
             'purchase_date' => 'nullable|date',
             'expiry_date' => 'required|date',
             'storage_location' => 'nullable|string|max:100',
-            'expiry_yellow_days' => 'nullable|integer|min:0',
-            'expiry_red_days' => 'nullable|integer|min:0',
             'unit' => 'required|string|max:20',
             'has_sub_unit' => 'nullable|boolean',
             'sub_unit_name' => 'nullable|required_if:has_sub_unit,1|string|max:50',
@@ -195,6 +194,10 @@ class OperationsPageController extends Controller
             'sub_unit_multiplier' => $request->boolean('has_sub_unit') ? $validated['sub_unit_multiplier'] : null,
         ]);
 
+        $latestBatch = $product->batches()->latest('id')->first();
+        $expiryYellowDays = (int) ($latestBatch?->expiry_yellow_days ?? 30);
+        $expiryRedDays = (int) ($latestBatch?->expiry_red_days ?? 15);
+
         app(StockService::class)->createStock([
             'product_id' => $product->id,
             'clinic_id' => $validated['clinic_id'],
@@ -206,8 +209,8 @@ class OperationsPageController extends Controller
             'purchase_date' => $validated['purchase_date'] ?? now()->toDateString(),
             'expiry_date' => $validated['expiry_date'],
             'storage_location' => $validated['storage_location'] ?? null,
-            'expiry_yellow_days' => $validated['expiry_yellow_days'] ?? 30,
-            'expiry_red_days' => $validated['expiry_red_days'] ?? 15,
+            'expiry_yellow_days' => $expiryYellowDays,
+            'expiry_red_days' => $expiryRedDays,
             'company_id' => $companyId,
             'track_expiry' => true,
             'is_active' => true,
@@ -1317,7 +1320,10 @@ class OperationsPageController extends Controller
                 ->paginate(10, ['*'], 'transactions_page')
                 ->withQueryString();
 
-            $chartSeries = $selectedTransactions->getCollection()
+            $chartSeries = $selectedProduct->stockTransactions()
+                ->latest('transaction_date')
+                ->limit(15)
+                ->get()
                 ->reverse()
                 ->values()
                 ->map(fn ($transaction) => [

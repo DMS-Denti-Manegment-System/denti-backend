@@ -1,14 +1,15 @@
 @php
     $modalMode = $modalMode ?? (isset($editingProduct) ? 'edit' : 'create');
     $hasExpirationDate = (bool) old('has_expiration_date', isset($editingProduct) && $editingProduct->has_expiration_date);
-    
-    $selectedClinicId = $editingBatch?->clinic_id ?? $editingProduct?->clinic_id ?? null;
-    $selectedSupplierId = $editingBatch?->supplier_id ?? null;
-    $selectedCurrency = $editingBatch?->currency ?? 'TRY';
-    $quantity = $editingBatch?->current_stock ?? 0;
-    
-    $purchaseDate = isset($editingBatch?->purchase_date) ? $editingBatch->purchase_date->format('Y-m-d') : now()->format('Y-m-d');
-    $expiryDate = isset($editingBatch?->expiry_date) ? $editingBatch->expiry_date->format('Y-m-d') : '';
+    $hasSubUnit = (bool) old('has_sub_unit', (bool) ($editingProduct?->has_sub_unit));
+
+    $selectedClinicId = old('clinic_id', $editingBatch?->clinic_id ?? $editingProduct?->clinic_id ?? null);
+    $selectedSupplierId = old('supplier_id', $editingBatch?->supplier_id ?? null);
+    $selectedCurrency = old('currency', $editingBatch?->currency ?? 'TRY');
+    $quantity = old('quantity', $editingBatch?->current_stock ?? 0);
+
+    $purchaseDate = old('purchase_date', isset($editingBatch?->purchase_date) ? $editingBatch->purchase_date->format('Y-m-d') : now()->format('Y-m-d'));
+    $expiryDate = old('expiry_date', isset($editingBatch?->expiry_date) ? $editingBatch->expiry_date->format('Y-m-d') : '');
 @endphp
 
 <div class="modal-content">
@@ -34,11 +35,11 @@
                     <div class="row g-5">
                         <div class="col-md-8">
                             <label class="required form-label">Ürün Adı</label>
-                            <input type="text" name="name" class="form-control form-control-solid" value="{{ $editingProduct?->name }}" required />
+                            <input type="text" name="name" class="form-control form-control-solid" value="{{ old('name', $editingProduct?->name) }}" required />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Barkod / SKU</label>
-                            <input type="text" name="sku" class="form-control form-control-solid" value="{{ $editingProduct?->sku }}" />
+                            <input type="text" name="sku" class="form-control form-control-solid" value="{{ old('sku', $editingProduct?->sku) }}" />
                         </div>
                     </div>
                     <div class="row g-5 mt-2">
@@ -46,7 +47,7 @@
                             <label class="required form-label">Birim</label>
                             <select name="unit" class="form-select form-select-solid" data-control="select2" data-hide-search="true">
                                 @foreach($units as $u)
-                                    <option value="{{ $u }}" @selected(($editingProduct?->unit ?? 'Adet') === $u)>{{ $u }}</option>
+                                    <option value="{{ $u }}" @selected(old('unit', $editingProduct?->unit ?? 'Adet') === $u)>{{ $u }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -55,13 +56,13 @@
                             <select name="category" class="form-select form-select-solid" data-control="select2">
                                 <option value="">Kategori Seçin</option>
                                 @foreach($categories as $cat)
-                                    <option value="{{ $cat->name }}" @selected(($editingProduct?->category ?? '') === $cat->name)>{{ $cat->name }}</option>
+                                    <option value="{{ $cat->name }}" @selected(old('category', $editingProduct?->category ?? '') === $cat->name)>{{ $cat->name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Marka</label>
-                            <input type="text" name="brand" class="form-control form-control-solid" value="{{ $editingProduct?->brand }}" placeholder="örn: 3M, Coltene" />
+                            <input type="text" name="brand" class="form-control form-control-solid" value="{{ old('brand', $editingProduct?->brand) }}" placeholder="örn: 3M, Coltene" />
                         </div>
                     </div>
                 </div>
@@ -96,7 +97,7 @@
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Alış Fiyatı</label>
-                            <input type="number" step="0.01" name="purchase_price" class="form-control form-control-solid" value="{{ $editingBatch?->purchase_price }}" />
+                            <input type="number" step="0.01" name="purchase_price" class="form-control form-control-solid" value="{{ old('purchase_price', $editingBatch?->purchase_price) }}" />
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Döviz</label>
@@ -138,8 +139,8 @@
                                     <div class="col-md-6">
                                         <label class="form-label fs-8 text-muted">Miyat Uyarı Günü (S/K)</label>
                                         <div class="d-flex gap-2">
-                                            <input type="number" name="expiry_yellow_days" class="form-control form-control-solid" value="{{ $editingBatch?->expiry_yellow_days ?? 30 }}" title="Sarı Uyarı (Gün)" />
-                                            <input type="number" name="expiry_red_days" class="form-control form-control-solid" value="{{ $editingBatch?->expiry_red_days ?? 15 }}" title="Kırmızı Uyarı (Gün)" />
+                                            <input type="number" name="expiry_yellow_days" class="form-control form-control-solid" value="{{ old('expiry_yellow_days', $editingBatch?->expiry_yellow_days ?? 30) }}" title="Sarı Uyarı (Gün)" />
+                                            <input type="number" name="expiry_red_days" class="form-control form-control-solid" value="{{ old('expiry_red_days', $editingBatch?->expiry_red_days ?? 15) }}" title="Kırmızı Uyarı (Gün)" />
                                         </div>
                                     </div>
                                 </div>
@@ -148,8 +149,8 @@
                         <div class="col-md-6">
                             <label class="form-label">Kritik Stok Seviyesi</label>
                             <div class="d-flex gap-3">
-                                <input type="number" name="yellow_alert_level" class="form-control form-control-solid" value="{{ $editingProduct?->yellow_alert_level ?? 10 }}" placeholder="Sarı" title="Sarı Uyarı" />
-                                <input type="number" name="red_alert_level" class="form-control form-control-solid" value="{{ $editingProduct?->red_alert_level ?? 5 }}" placeholder="Kırmızı" title="Kırmızı Uyarı" />
+                                <input type="number" name="yellow_alert_level" class="form-control form-control-solid" value="{{ old('yellow_alert_level', $editingProduct?->yellow_alert_level ?? 10) }}" placeholder="Sarı" title="Sarı Uyarı" />
+                                <input type="number" name="red_alert_level" class="form-control form-control-solid" value="{{ old('red_alert_level', $editingProduct?->red_alert_level ?? 5) }}" placeholder="Kırmızı" title="Kırmızı Uyarı" />
                             </div>
                         </div>
                     </div>
@@ -162,18 +163,18 @@
                         <div class="col-md-6">
                             <label class="form-check form-switch form-check-custom form-check-solid mb-3">
                                 <input type="hidden" name="has_sub_unit" value="0" />
-                                <input class="form-check-input" type="checkbox" name="has_sub_unit" value="1" id="sub_unit_toggle" @checked($editingProduct?->has_sub_unit) />
+                                <input class="form-check-input" type="checkbox" name="has_sub_unit" value="1" id="sub_unit_toggle" @checked($hasSubUnit) />
                                 <span class="form-check-label fw-bold text-gray-700">Alt Birim Kullanılsın mı?</span>
                             </label>
-                            <div id="sub_unit_container" class="{{ $editingProduct?->has_sub_unit ? '' : 'd-none' }} mt-3">
+                            <div id="sub_unit_container" class="{{ $hasSubUnit ? '' : 'd-none' }} mt-3">
                                 <div class="row g-3">
                                     <div class="col-md-6">
                                         <label class="form-label fs-8 text-muted">Alt Birim Adı</label>
-                                        <input type="text" name="sub_unit_name" class="form-control form-control-solid" value="{{ $editingProduct?->sub_unit_name }}" placeholder="örn: Adet" />
+                                        <input type="text" name="sub_unit_name" class="form-control form-control-solid" value="{{ old('sub_unit_name', $editingProduct?->sub_unit_name) }}" placeholder="örn: Adet" />
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label fs-8 text-muted">Çarpan (1 Ana Birim = ? Alt Birim)</label>
-                                        <input type="number" name="sub_unit_multiplier" class="form-control form-control-solid" value="{{ $editingProduct?->sub_unit_multiplier }}" placeholder="örn: 10" />
+                                        <input type="number" name="sub_unit_multiplier" class="form-control form-control-solid" value="{{ old('sub_unit_multiplier', $editingProduct?->sub_unit_multiplier) }}" placeholder="örn: 10" />
                                     </div>
                                 </div>
                             </div>

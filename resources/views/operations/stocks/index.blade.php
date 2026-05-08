@@ -37,6 +37,16 @@
 @push('scripts')
 <script>
     $(function () {
+        function bindStockModalToggles($modal) {
+            $modal.find('#expiry_toggle').off('change.stock').on('change.stock', function() {
+                $modal.find('#expiry_date_container').toggleClass('d-none', !$(this).is(':checked'));
+            });
+
+            $modal.find('#sub_unit_toggle').off('change.stock').on('change.stock', function() {
+                $modal.find('#sub_unit_container').toggleClass('d-none', !$(this).is(':checked'));
+            });
+        }
+
         window.StockModule = window.DentiUI.createModule({
             name: 'stocks',
             root: '#stockModule',
@@ -52,23 +62,7 @@
                 }
             },
             onModalLoaded: function($modal) {
-                // SKT Toggle
-                $modal.find('#expiry_toggle').on('change', function() {
-                    if ($(this).is(':checked')) {
-                        $('#expiry_date_container').removeClass('d-none');
-                    } else {
-                        $('#expiry_date_container').addClass('d-none');
-                    }
-                });
-
-                // Alt Birim Toggle
-                $modal.find('#sub_unit_toggle').on('change', function() {
-                    if ($(this).is(':checked')) {
-                        $('#sub_unit_container').removeClass('d-none');
-                    } else {
-                        $('#sub_unit_container').addClass('d-none');
-                    }
-                });
+                bindStockModalToggles($modal);
             }
         });
 
@@ -77,6 +71,7 @@
             if (!tpl) return;
             $('#stockModalContent').html(tpl.innerHTML);
             window.DentiUI?.init(document.getElementById('stockModalContent'));
+            bindStockModalToggles($('#stockModalContent'));
             bootstrap.Modal.getOrCreateInstance(document.getElementById('stockModal')).show();
         });
 

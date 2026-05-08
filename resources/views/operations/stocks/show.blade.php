@@ -446,13 +446,13 @@
                                 </div>
 
                                 <!-- Alarmlar -->
-                                <div class="col-md-6">
-                                    <label class="form-label">SKT Sarı Alarm (Gün)</label>
-                                    <input type="number" min="0" name="expiry_yellow_days" value="{{ old('expiry_yellow_days', 30) }}" class="form-control form-control-solid">
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">SKT Kritik Alarm (Gün)</label>
-                                    <input type="number" min="0" name="expiry_red_days" value="{{ old('expiry_red_days', 10) }}" class="form-control form-control-solid">
+                                <div class="col-12">
+                                    <div class="alert alert-light-info d-flex align-items-center p-4 mb-0">
+                                        <i class="ki-duotone ki-information-5 fs-2 text-info me-3"><span class="path1"></span><span class="path2"></span><span class="path3"></span></i>
+                                        <div class="fs-7">
+                                            SKT uyarı günleri ürünün ilk ayarından otomatik kullanılır.
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Konum -->
@@ -711,7 +711,18 @@
             });
         });
 
-        @if($hasExpiryTracking && $errors->hasAny(['supplier_id', 'quantity', 'purchase_price', 'currency', 'purchase_date', 'expiry_date', 'storage_location', 'expiry_yellow_days', 'expiry_red_days', 'batch_code']))
+        $(document).on('submit', '#stockUseForm, #stockBatchCreateModal form', function() {
+            var $form = $(this);
+            if ($form.data('submitting')) {
+                return false;
+            }
+
+            $form.data('submitting', true);
+            var $btn = $form.find('button[type="submit"]');
+            $btn.attr('data-kt-indicator', 'on').prop('disabled', true);
+        });
+
+        @if($hasExpiryTracking && $errors->hasAny(['supplier_id', 'quantity', 'purchase_price', 'currency', 'purchase_date', 'expiry_date', 'storage_location', 'batch_code']))
             stockBatchCreateModal?.show();
         @endif
     });
