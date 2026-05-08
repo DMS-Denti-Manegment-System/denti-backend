@@ -923,8 +923,10 @@ class OperationsPageController extends Controller
 
     public function employeeUpdate(Request $request, User $user): RedirectResponse|JsonResponse
     {
-        $companyId = auth()->user()->company_id;
-        abort_if($user->company_id !== $companyId, 403);
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        $companyId = (int) $authUser->getAttribute('company_id');
+        abort_if((int) $user->getAttribute('company_id') !== $companyId, 403);
 
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -955,7 +957,9 @@ class OperationsPageController extends Controller
 
     public function employeeDestroy(Request $request, User $user): RedirectResponse|JsonResponse
     {
-        abort_if($user->company_id !== auth()->user()->company_id, 403);
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        abort_if((int) $user->getAttribute('company_id') !== (int) $authUser->getAttribute('company_id'), 403);
 
         if ($user->id === auth()->id()) {
             return $this->actionErrorResponse($request, 'employees.index', 'employee', 'Kendi hesabinizi silemezsiniz.');
@@ -1450,7 +1454,9 @@ class OperationsPageController extends Controller
 
     public function profile2faRecoveryCodes(Request $request): JsonResponse
     {
-        $codes = app(TwoFactorService::class)->generateRecoveryCodes(auth()->user());
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        $codes = app(TwoFactorService::class)->generateRecoveryCodes($authUser);
 
         return response()->json(['recoveryCodes' => $codes]);
     }
@@ -1458,7 +1464,9 @@ class OperationsPageController extends Controller
     public function alertBulkResolve(Request $request): RedirectResponse|JsonResponse
     {
         $request->validate(['ids' => 'required|array', 'ids.*' => 'exists:stock_alerts,id']);
-        app(StockAlertService::class)->bulkResolve($request->ids, auth()->user()->name);
+        /** @var User $authUser */
+        $authUser = Auth::user();
+        app(StockAlertService::class)->bulkResolve($request->ids, (string) $authUser->getAttribute('name'));
 
         return $this->actionResponse($request, 'alerts.index', 'Secili uyarilar cozuldu.');
     }
