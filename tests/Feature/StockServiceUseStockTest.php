@@ -110,6 +110,63 @@ class StockServiceUseStockTest extends TestCase
         $this->assertSame('low_stock', $product->stock_status);
     }
 
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function it_does_not_update_zero_stock_visibility_when_only_one_batch_is_depleted(): void
+    {
+        $company = Company::factory()->create();
+        $clinic = Clinic::factory()->create(['company_id' => $company->id]);
+        $supplier = Supplier::factory()->create(['company_id' => $company->id]);
+        $product = Product::factory()->create([
+            'company_id' => $company->id,
+            'clinic_id' => $clinic->id,
+            'show_zero_stock_in_critical' => true,
+        ]);
+
+        $depletedBatch = Stock::create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'clinic_id' => $clinic->id,
+            'supplier_id' => $supplier->id,
+            'current_stock' => 1,
+            'current_sub_stock' => 0,
+            'reserved_stock' => 0,
+            'available_stock' => 1,
+            'has_sub_unit' => false,
+            'is_active' => true,
+            'track_expiry' => true,
+            'currency' => 'TRY',
+            'expiry_date' => now()->addDays(10)->toDateString(),
+        ]);
+
+        Stock::create([
+            'company_id' => $company->id,
+            'product_id' => $product->id,
+            'clinic_id' => $clinic->id,
+            'supplier_id' => $supplier->id,
+            'current_stock' => 3,
+            'current_sub_stock' => 0,
+            'reserved_stock' => 0,
+            'available_stock' => 3,
+            'has_sub_unit' => false,
+            'is_active' => true,
+            'track_expiry' => true,
+            'currency' => 'TRY',
+            'expiry_date' => now()->addDays(20)->toDateString(),
+        ]);
+
+        app(StockService::class)->useStock(
+            stockId: $depletedBatch->id,
+            quantity: 1,
+            performedBy: 'Test User',
+            isSubUnit: false,
+            showZeroStockInCritical: false
+        );
+
+        $product->refresh();
+        $this->assertTrue((bool) $product->show_zero_stock_in_critical);
+        $this->assertGreaterThan(0, $product->total_stock);
+    }
+
     private function createSubUnitStock(int $currentStock, int $currentSubStock, int $multiplier): Stock
     {
         $company = Company::factory()->create();
