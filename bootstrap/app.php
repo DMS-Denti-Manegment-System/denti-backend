@@ -30,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\EnsureRole::class,
             'permission' => \App\Http\Middleware\EnsurePermission::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
+            'set_permissions_team' => \App\Http\Middleware\SetPermissionsTeamId::class,
             '2fa.verified' => \App\Http\Middleware\EnsureTwoFactorIsVerified::class,
             'not_super_admin' => \App\Http\Middleware\EnsureNotSuperAdmin::class,
         ]);

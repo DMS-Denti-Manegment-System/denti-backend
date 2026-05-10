@@ -12,7 +12,7 @@ class EnsureNotSuperAdmin
     {
         $user = $request->user();
 
-        if ($user && $user->hasRole('Super Admin')) {
+        if ($user && $user->isSuperAdmin()) {
             return redirect()->route('admin.companies');
         }
 

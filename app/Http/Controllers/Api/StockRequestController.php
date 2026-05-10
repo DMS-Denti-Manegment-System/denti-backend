@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\Stock;
 use App\Services\StockRequestService;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class StockRequestController extends Controller
 {
@@ -33,7 +34,7 @@ class StockRequestController extends Controller
             $data['requester_clinic_id'] = $user->clinic_id;
         }
 
-        if (isset($data['requester_clinic_id']) && $data['requester_clinic_id'] != $user->clinic_id && ! $user->hasRole(User::ROLE_SUPER_ADMIN)) {
+        if (isset($data['requester_clinic_id']) && $data['requester_clinic_id'] != $user->clinic_id && ! $user->isSuperAdmin()) {
             return $this->error('Sadece kendi kliniginiz icin talep olusturabilirsiniz.', 403);
         }
 
@@ -41,14 +42,30 @@ class StockRequestController extends Controller
             $data['requested_by'] = $user->name;
         }
 
+        $clinicRule = Rule::exists('clinics', 'id');
+        $stockRule = Rule::exists('stocks', 'id');
+        if (! $user->isSuperAdmin()) {
+            $clinicRule = $clinicRule->where('company_id', $user->company_id);
+            $stockRule = $stockRule->where('company_id', $user->company_id);
+        }
+        $requestedFromClinicRule = Rule::exists('clinics', 'id');
+        if (! $user->isSuperAdmin()) {
+            $requestedFromClinicRule = $requestedFromClinicRule->where('company_id', $user->company_id);
+        }
+
         $validated = validator($data, [
-            'requester_clinic_id' => 'required|exists:clinics,id',
-            'requested_from_clinic_id' => 'required|exists:clinics,id|different:requester_clinic_id',
-            'stock_id' => 'required|exists:stocks,id',
+            'requester_clinic_id' => ['required', $clinicRule],
+            'requested_from_clinic_id' => ['required', $requestedFromClinicRule, 'different:requester_clinic_id'],
+            'stock_id' => ['required', $stockRule],
             'requested_quantity' => 'required|integer|min:1',
             'request_reason' => 'nullable|string|max:500',
             'requested_by' => 'required|string|max:255',
         ])->validate();
+
+        $stock = Stock::whereKey($validated['stock_id'])->firstOrFail();
+        if ((int) $stock->clinic_id !== (int) $validated['requested_from_clinic_id']) {
+            return $this->error('Talep edilen stok, ürünü gönderecek klinikte bulunmuyor.', 422);
+        }
 
         $stockRequest = $this->stockRequestService->createRequest($validated);
 

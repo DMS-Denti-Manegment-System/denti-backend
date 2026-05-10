@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreCompanyRequest;
 use App\Http\Requests\Admin\UpdateCompanyRequest;
 use App\Models\Company;
 use App\Models\User;
+use App\Services\CompanyRoleService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -65,6 +66,7 @@ class AdminCompanyPageController extends Controller
 
         DB::transaction(function () use ($payload) {
             $company = Company::create($payload);
+            app(CompanyRoleService::class)->ensureCompanyRoles($company->id);
 
             $temporaryPassword = Str::random(12);
 
@@ -77,6 +79,7 @@ class AdminCompanyPageController extends Controller
                 'email_verified_at' => now(),
             ]);
 
+            setPermissionsTeamId($company->id);
             $user->assignRole('Company Owner');
 
             session()->flash('status', "Sirket olusturuldu. Gecici sifre: {$temporaryPassword}");

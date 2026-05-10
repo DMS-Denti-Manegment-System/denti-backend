@@ -46,7 +46,7 @@ class AuthenticatedSessionController extends Controller
 
         // Eğer clinic_code YOKSA (Admin Login), Super Admin kontrolü yap
         if (empty($clinicCode)) {
-            if (! $user->hasRole('Super Admin')) {
+            if (! $user->isSuperAdmin()) {
                 return back()->withErrors(['username' => 'Bu alana sadece sistem yöneticileri erişebilir.']);
             }
         } else {
@@ -57,7 +57,7 @@ class AuthenticatedSessionController extends Controller
                 return back()->withErrors(['clinic_code' => 'Geçersiz klinik kodu.']);
             }
 
-            if ($user->company_id !== $company->id && ! $user->hasRole('Super Admin')) {
+            if ($user->company_id !== $company->id && ! $user->isSuperAdmin()) {
                 \Log::warning('Login yetki hatası', [
                     'user_id' => $user->id,
                     'user_company_id' => $user->company_id,
@@ -76,7 +76,7 @@ class AuthenticatedSessionController extends Controller
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
 
-        if ($user->hasRole('Super Admin')) {
+        if ($user->isSuperAdmin()) {
             return redirect()->route('admin.companies');
         }
 

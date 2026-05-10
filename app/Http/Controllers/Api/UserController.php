@@ -18,7 +18,7 @@ class UserController extends Controller
 
         // Super Admin ise tüm kullanıcıları görebilir, değilse sadece kendi şirketini
         $query = User::query();
-        if (! $user->hasRole(User::ROLE_SUPER_ADMIN)) {
+        if (! $user->isSuperAdmin()) {
             $query->where('company_id', $user->company_id);
         }
 
@@ -45,7 +45,9 @@ class UserController extends Controller
     {
         /** @var User $currentUser */
         $currentUser = Auth::user();
-        $companyId = $request->company_id ?? $currentUser->company_id;
+        $companyId = $currentUser->isSuperAdmin()
+            ? $request->integer('company_id')
+            : $currentUser->company_id;
 
         $user = User::create([
             'name' => $request->name,
@@ -98,7 +100,7 @@ class UserController extends Controller
         $query = User::query();
 
         // SECURITY: Non-Super Admins can only update users within their own company
-        if (! $currentUser->hasRole(User::ROLE_SUPER_ADMIN)) {
+        if (! $currentUser->isSuperAdmin()) {
             $query->where('company_id', $currentUser->company_id);
         }
 

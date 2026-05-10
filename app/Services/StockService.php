@@ -32,22 +32,42 @@ class StockService
     public function updateStock(int $id, array $data): ?Stock
     {
         return DB::transaction(function () use ($id, $data) {
-            $stock = $this->stockRepository->find($id);
+            $stock = $this->stockRepository->findAndLock($id);
             if (! $stock) {
                 return null;
             }
 
-            if (isset($data['current_stock']) || isset($data['reserved_stock'])) {
-                $currentStock = $data['current_stock'] ?? $stock->current_stock;
-                $reservedStock = $data['reserved_stock'] ?? $stock->reserved_stock;
-                $data['available_stock'] = $currentStock - $reservedStock;
+            $targetCurrentStock = array_key_exists('current_stock', $data) ? (int) $data['current_stock'] : null;
+            unset($data['current_stock'], $data['available_stock']);
+
+            if (array_key_exists('reserved_stock', $data)) {
+                $data['reserved_stock'] = max(0, (int) $data['reserved_stock']);
+                $data['available_stock'] = $stock->current_stock - $data['reserved_stock'];
             }
 
             $updatedStock = $this->stockRepository->update($id, $data);
 
+            if ($targetCurrentStock !== null && $targetCurrentStock !== (int) $stock->current_stock) {
+                $delta = $targetCurrentStock - (int) $stock->current_stock;
+                $this->createTransaction([
+                    'stock_id' => $stock->id,
+                    'clinic_id' => $stock->clinic_id,
+                    'type' => $delta > 0 ? 'adjustment_increase' : 'adjustment_decrease',
+                    'quantity' => abs($delta),
+                    'previous_stock' => $stock->current_stock,
+                    'new_stock' => $targetCurrentStock,
+                    'description' => 'Stok miktarı güncellemesi',
+                    'performed_by' => auth()->user()?->name ?? 'Sistem',
+                    'user_id' => auth()->id(),
+                    'transaction_date' => now(),
+                    'company_id' => $stock->company_id,
+                    'is_sub_unit' => false,
+                ]);
+            }
+
             if ($updatedStock) {
                 DB::afterCommit(function () use ($updatedStock) {
-                    StockLevelChanged::dispatch($updatedStock, $updatedStock->company_id, $updatedStock->clinic_id);
+                    StockLevelChanged::dispatch($updatedStock->fresh(), $updatedStock->company_id, $updatedStock->clinic_id);
                 });
             }
 
@@ -139,8 +159,7 @@ class StockService
         bool $isFromReserved = false,
         bool $isSubUnit = false,
         ?bool $showZeroStockInCritical = null
-    ): bool
-    {
+    ): bool {
         try {
             return DB::transaction(function () use ($stockId, $quantity, $performedBy, $userId, $notes, $isFromReserved, $isSubUnit, $showZeroStockInCritical) {
                 // 🔒 Pessimistic lock: eşzamanlı kullanımlarda veri bütünlüğünü korur
@@ -494,52 +513,85 @@ class StockService
     {
         try {
             return DB::transaction(function () use ($transactionId) {
-                $transaction = \App\Models\StockTransaction::findOrFail($transactionId);
+                $transaction = \App\Models\StockTransaction::whereKey($transactionId)
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+                if ($transaction->reversed_at !== null) {
+                    throw new \Exception('Bu stok hareketi zaten geri alınmış.');
+                }
+
+                if ($transaction->reversal_transaction_id !== null) {
+                    throw new \Exception('Geri alma hareketi tekrar geri alınamaz.');
+                }
+
                 $stock = $transaction->stock()->lockForUpdate()->first();
 
                 if (! $stock) {
                     return false;
                 }
 
-                $positiveTypes = ['purchase', 'adjustment_increase', 'transfer_in', 'return_in'];
-                $negativeTypes = ['usage', 'adjustment_decrease', 'transfer_out', 'damaged', 'expired', 'return_out'];
-
-                $isPositiveEffect = in_array($transaction->type, $positiveTypes);
-                $isNegativeEffect = in_array($transaction->type, $negativeTypes);
-
-                $quantity = $transaction->quantity;
-
-                if ($transaction->is_sub_unit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
-                    // if it was negative (usage), we ADD it back. if positive (purchase), we SUBTRACT.
-                    $delta = $isNegativeEffect ? $quantity : -$quantity;
-
-                    $newLevels = $this->calculatorService->calculateAdjustment(
-                        $stock->current_stock,
-                        $stock->current_sub_stock,
-                        $delta,
-                        $stock->sub_unit_multiplier
-                    );
-
-                    $stock->current_stock = $newLevels['current_stock'];
-                    $stock->current_sub_stock = $newLevels['current_sub_stock'];
-                } else {
-                    if ($isNegativeEffect) {
-                        $stock->current_stock += $quantity;
-                    } elseif ($isPositiveEffect) {
-                        $stock->current_stock -= $quantity;
-                    }
+                $reversalType = $this->oppositeTransactionType($transaction->type);
+                if ($reversalType === null) {
+                    throw new \Exception('Bu hareket tipi geri alınamaz: '.$transaction->type);
                 }
 
-                $stock->available_stock = $stock->current_stock - $stock->reserved_stock;
-                $stock->save();
+                $previousStock = $transaction->is_sub_unit && $stock->has_sub_unit
+                    ? $stock->total_base_units
+                    : $stock->current_stock;
+                $newStock = $this->calculateReversalNewStock($previousStock, (int) $transaction->quantity, $reversalType);
 
-                \App\Events\Stock\StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
+                $reversal = $this->transactionService->createTransaction([
+                    'transaction_number' => $this->generateTransactionNumber(),
+                    'stock_id' => $transaction->stock_id,
+                    'clinic_id' => $transaction->clinic_id,
+                    'type' => $reversalType,
+                    'quantity' => $transaction->quantity,
+                    'previous_stock' => $previousStock,
+                    'new_stock' => $newStock,
+                    'unit_price' => $transaction->unit_price,
+                    'total_price' => $transaction->total_price,
+                    'stock_request_id' => $transaction->stock_request_id,
+                    'reference_number' => $transaction->reference_number,
+                    'batch_number' => $transaction->batch_number,
+                    'description' => 'Reversal of '.$transaction->transaction_number,
+                    'notes' => $transaction->notes,
+                    'performed_by' => auth()->user()?->name ?? 'Sistem',
+                    'user_id' => auth()->id(),
+                    'transaction_date' => now(),
+                    'company_id' => $transaction->company_id,
+                    'is_sub_unit' => $transaction->is_sub_unit,
+                ]);
 
-                return $transaction->delete();
+                $transaction->update([
+                    'reversed_at' => now(),
+                    'reversed_by' => auth()->id(),
+                    'reversal_transaction_id' => $reversal->id,
+                ]);
+
+                return true;
             });
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Transaction Reversal Error: '.$e->getMessage(), ['transaction_id' => $transactionId]);
             throw $e;
         }
+    }
+
+    private function oppositeTransactionType(string $type): ?string
+    {
+        return match ($type) {
+            'purchase', 'entry', 'adjustment_plus', 'adjustment_increase', 'transfer_in', 'returned', 'return_in' => 'adjustment_decrease',
+            'usage', 'loss', 'adjustment_minus', 'adjustment_decrease', 'transfer_out', 'expired', 'damaged', 'return_out' => 'adjustment_increase',
+            default => null,
+        };
+    }
+
+    private function calculateReversalNewStock(int $previousStock, int $quantity, string $reversalType): int
+    {
+        return match ($reversalType) {
+            'adjustment_increase' => $previousStock + $quantity,
+            'adjustment_decrease' => $previousStock - $quantity,
+            default => $previousStock,
+        };
     }
 }

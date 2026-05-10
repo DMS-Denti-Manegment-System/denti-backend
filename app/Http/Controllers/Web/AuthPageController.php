@@ -39,7 +39,7 @@ class AuthPageController extends Controller
 
         $user = User::where('username', $request->input('username'))->first();
 
-        if (! $user || ! $user->hasRole(User::ROLE_SUPER_ADMIN) || ! Hash::check($request->input('password'), $user->password)) {
+        if (! $user || ! $user->isSuperAdmin() || ! Hash::check($request->input('password'), $user->password)) {
             RateLimiter::hit($throttleKey, 60);
 
             return back()->withErrors(['username' => 'Gecersiz kullanici adi veya sifre.'])->onlyInput('username');
@@ -78,6 +78,13 @@ class AuthPageController extends Controller
         }
 
         DB::transaction(function () use ($request, $invitation) {
+            $invitation = UserInvitation::whereKey($invitation->id)->lockForUpdate()->firstOrFail();
+            if ($invitation->accepted_at || $invitation->isExpired()) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'token' => 'Davet gecersiz veya suresi dolmus.',
+                ]);
+            }
+
             $user = User::create([
                 'name' => $request->input('name'),
                 'email' => $invitation->email,
@@ -85,6 +92,7 @@ class AuthPageController extends Controller
                 'company_id' => $invitation->company_id,
             ]);
 
+            setPermissionsTeamId($invitation->company_id);
             $user->assignRole($invitation->role);
             $invitation->update(['accepted_at' => now()]);
         });

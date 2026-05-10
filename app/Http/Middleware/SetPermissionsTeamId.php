@@ -16,8 +16,8 @@ class SetPermissionsTeamId
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (Auth::check() && Auth::user()->company_id) {
-            setPermissionsTeamId(Auth::user()->company_id);
+        if (Auth::check()) {
+            setPermissionsTeamId(Auth::user()->company_id ?? 0);
         }
 
         return $next($request);

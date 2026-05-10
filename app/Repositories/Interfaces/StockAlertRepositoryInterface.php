@@ -16,6 +16,8 @@ interface StockAlertRepositoryInterface
 
     public function create(array $data): StockAlert;
 
+    public function updateOrCreateActive(array $identity, array $data): StockAlert;
+
     public function update(int $id, array $data): ?StockAlert;
 
     public function delete(int $id): bool;
@@ -29,6 +31,8 @@ interface StockAlertRepositoryInterface
     public function deleteActiveAlerts(int $stockId): void;
 
     public function deleteActiveAlertsByProduct(int $productId): void;
+
+    public function resolveMissingActiveAlertsByProduct(int $productId, int $companyId, array $activeTypes): void;
 
     public function countActiveAlerts(?int $clinicId = null): int;
 

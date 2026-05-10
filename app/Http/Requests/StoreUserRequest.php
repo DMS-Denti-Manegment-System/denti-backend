@@ -23,7 +23,9 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $companyId = auth()->user()->company_id;
+        $user = $this->user();
+        $isSuperAdmin = $user->isSuperAdmin();
+        $companyId = $isSuperAdmin ? (int) $this->input('company_id') : $user->company_id;
 
         return array_merge($this->commonRules(), [
             'username' => [
@@ -45,7 +47,7 @@ class StoreUserRequest extends FormRequest
                     return $query->where('company_id', $companyId);
                 }),
             ],
-            'company_id' => 'nullable|integer',
+            'company_id' => $isSuperAdmin ? ['required', 'integer', Rule::exists('companies', 'id')] : ['prohibited'],
         ]);
     }
 }

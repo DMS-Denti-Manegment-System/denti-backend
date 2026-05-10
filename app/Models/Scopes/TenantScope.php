@@ -29,10 +29,7 @@ class TenantScope implements Scope
                 return;
             }
 
-            $builder->where(function ($query) use ($user, $model) {
-                $query->where($model->getTable().'.company_id', $user->company_id)
-                    ->orWhereNull($model->getTable().'.company_id');
-            });
+            $builder->where($model->getTable().'.company_id', $user->company_id);
         }
     }
 }

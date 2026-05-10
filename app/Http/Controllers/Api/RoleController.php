@@ -16,11 +16,9 @@ class RoleController extends Controller
      */
     public function index(): JsonResponse
     {
-        // Şirkete özel roller + Sistem genelindeki roller (Super Admin vb.)
         $roles = Role::withoutGlobalScopes()
-            ->where(function ($query) {
-                $query->where('company_id', auth()->user()->company_id)
-                    ->orWhereNull('company_id');
+            ->when(! auth()->user()->isSuperAdmin(), function ($query) {
+                $query->where('company_id', auth()->user()->company_id);
             })
             ->with('permissions')
             ->get();
@@ -84,7 +82,7 @@ class RoleController extends Controller
         $requestedPermissions = $request->permissions;
 
         // Eğer Super Admin değilse, sadece kendi sahip olduğu izinleri verebilir (Güvenlik)
-        if (! auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->isSuperAdmin()) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }
@@ -99,7 +97,7 @@ class RoleController extends Controller
      */
     public function show(Role $role): JsonResponse
     {
-        if ($role->company_id !== null && $role->company_id !== auth()->user()->company_id) {
+        if ((int) $role->company_id !== (int) auth()->user()->company_id && ! auth()->user()->isSuperAdmin()) {
             return $this->error('Unauthorized', 403);
         }
 
@@ -111,11 +109,11 @@ class RoleController extends Controller
      */
     public function update(UpdateRoleRequest $request, Role $role): JsonResponse
     {
-        if ($role->company_id !== null && $role->company_id !== auth()->user()->company_id) {
+        if ((int) $role->company_id !== (int) auth()->user()->company_id && ! auth()->user()->isSuperAdmin()) {
             return $this->error('Unauthorized', 403);
         }
 
-        if ($role->company_id === null && ! auth()->user()->hasRole('Super Admin')) {
+        if ((int) $role->company_id === 0 && ! auth()->user()->isSuperAdmin()) {
             return $this->error('System roles cannot be modified.', 403);
         }
 
@@ -126,7 +124,7 @@ class RoleController extends Controller
         $requestedPermissions = $request->permissions;
 
         // Eğer Super Admin değilse, sadece kendi sahip olduğu izinleri verebilir (Güvenlik)
-        if (! auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->isSuperAdmin()) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }
@@ -141,11 +139,11 @@ class RoleController extends Controller
      */
     public function destroy(Role $role): JsonResponse
     {
-        if ($role->company_id !== null && $role->company_id !== auth()->user()->company_id) {
+        if ((int) $role->company_id !== (int) auth()->user()->company_id && ! auth()->user()->isSuperAdmin()) {
             return $this->error('Unauthorized', 403);
         }
 
-        if ($role->company_id === null) {
+        if ((int) $role->company_id === 0) {
             return $this->error('System roles cannot be deleted.', 403);
         }
 

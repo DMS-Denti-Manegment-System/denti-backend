@@ -22,14 +22,14 @@ class StoreInvitationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $companyId = auth()->user()->company_id;
+        $companyId = $this->user()->company_id;
 
         return [
             'email' => 'required|email|unique:users,email',
             'role' => [
                 'required',
                 'string',
-                \Illuminate\Validation\Rule::exists('roles', 'name'),
+                \Illuminate\Validation\Rule::exists('roles', 'name')->where('company_id', $companyId),
             ],
         ];
     }

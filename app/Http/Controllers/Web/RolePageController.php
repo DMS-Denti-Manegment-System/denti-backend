@@ -17,9 +17,8 @@ class RolePageController extends Controller
     public function __invoke(Request $request): View|JsonResponse
     {
         $roles = Role::withoutGlobalScopes()
-            ->where(function ($query) {
-                $query->where('company_id', auth()->user()->company_id)
-                    ->orWhereNull('company_id');
+            ->when(! auth()->user()->isSuperAdmin(), function ($query) {
+                $query->where('company_id', auth()->user()->company_id);
             })
             ->with('permissions')
             ->when($request->filled('search'), function ($query) use ($request) {
@@ -71,7 +70,7 @@ class RolePageController extends Controller
         ]);
 
         $requestedPermissions = $request->permissions;
-        if (! auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->isSuperAdmin()) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }
@@ -89,21 +88,21 @@ class RolePageController extends Controller
 
     public function edit(Role $role): RedirectResponse
     {
-        abort_if($role->company_id !== null && $role->company_id !== auth()->user()->company_id, 403);
-        abort_if($role->company_id === null && ! auth()->user()->isSuperAdmin(), 403);
+        abort_if((int) $role->company_id !== (int) auth()->user()->company_id && ! auth()->user()->isSuperAdmin(), 403);
+        abort_if((int) $role->company_id === 0 && ! auth()->user()->isSuperAdmin(), 403);
 
         return redirect()->route('roles.index', ['modal' => 'edit', 'edit' => $role->id]);
     }
 
     public function update(UpdateRoleRequest $request, Role $role): RedirectResponse|JsonResponse
     {
-        abort_if($role->company_id !== null && $role->company_id !== auth()->user()->company_id, 403);
-        abort_if($role->company_id === null && ! auth()->user()->isSuperAdmin(), 403);
+        abort_if((int) $role->company_id !== (int) auth()->user()->company_id && ! auth()->user()->isSuperAdmin(), 403);
+        abort_if((int) $role->company_id === 0 && ! auth()->user()->isSuperAdmin(), 403);
 
         $role->update(['name' => $request->name]);
 
         $requestedPermissions = $request->permissions;
-        if (! auth()->user()->hasRole('Super Admin')) {
+        if (! auth()->user()->isSuperAdmin()) {
             $userPermissions = auth()->user()->getAllPermissions()->pluck('name')->toArray();
             $requestedPermissions = collect($request->permissions)->intersect($userPermissions)->toArray();
         }

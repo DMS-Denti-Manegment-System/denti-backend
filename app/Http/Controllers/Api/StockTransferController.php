@@ -6,10 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\Clinic;
 use App\Models\Stock;
 use App\Models\StockTransfer;
+use App\Services\StockTransactionService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class StockTransferController extends Controller
 {
@@ -63,8 +66,14 @@ class StockTransferController extends Controller
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'stock_id' => 'required|exists:stocks,id',
-            'to_clinic_id' => 'required|exists:clinics,id|different:from_clinic_id',
+            'stock_id' => [
+                'required',
+                Rule::exists('stocks', 'id')->where('company_id', Auth::user()->company_id),
+            ],
+            'to_clinic_id' => [
+                'required',
+                Rule::exists('clinics', 'id')->where('company_id', Auth::user()->company_id),
+            ],
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string|max:500',
         ]);
@@ -88,44 +97,44 @@ class StockTransferController extends Controller
             return $this->error('Bu stok için transfer yetkiniz yok.', 403);
         }
 
-        // Yeterli stok kontrolü
-        if ($stock->current_stock < $validated['quantity']) {
+        if ($stock->clinic_id === (int) $validated['to_clinic_id']) {
+            return $this->error('Hedef klinik kaynak klinik ile aynı olamaz.', 422);
+        }
+
+        if ($stock->available_stock < $validated['quantity']) {
             return $this->error(
-                "Yetersiz stok. Mevcut: {$stock->current_stock}, İstenen: {$validated['quantity']}",
+                "Yetersiz stok. Kullanılabilir: {$stock->available_stock}, İstenen: {$validated['quantity']}",
                 422
             );
         }
 
-        // Hedef klinik aynı şirkette mi?
         $toClinic = Clinic::findOrFail($validated['to_clinic_id']);
-        if ($toClinic->company_id !== $user->company_id) {
-            return $this->error('Hedef klinik farklı bir şirkete ait.', 403);
-        }
 
         try {
-            DB::beginTransaction();
+            $transfer = DB::transaction(function () use ($stock, $toClinic, $validated, $user) {
+                $lockedStock = Stock::whereKey($stock->id)->lockForUpdate()->firstOrFail();
+                if ($lockedStock->available_stock < $validated['quantity']) {
+                    throw new \RuntimeException('Yetersiz stok.');
+                }
 
-            $transfer = StockTransfer::create([
-                'product_id' => $stock->product_id,
-                'stock_id' => $stock->id,
-                'from_clinic_id' => $stock->clinic_id,
-                'to_clinic_id' => $toClinic->id,
-                'company_id' => $user->company_id,
-                'quantity' => $validated['quantity'],
-                'notes' => $validated['notes'],
-                'status' => StockTransfer::STATUS_PENDING,
-                'requested_by' => $user->id,
-                'requested_at' => now(),
-            ]);
+                $lockedStock->update([
+                    'reserved_stock' => $lockedStock->reserved_stock + $validated['quantity'],
+                    'available_stock' => $lockedStock->current_stock - ($lockedStock->reserved_stock + $validated['quantity']),
+                ]);
 
-            // Stok rezerve et (opsiyonel - stok miktarını düşürme, sadece ayırma)
-            // $stock->reserved_stock += $validated['quantity'];
-            // $stock->save();
-
-            DB::commit();
-
-            // Bildirim gönder (Queue)
-            // TODO: Transfer isteği bildirimi (hedef klinik admin'ine)
+                return StockTransfer::create([
+                    'product_id' => $lockedStock->product_id,
+                    'stock_id' => $lockedStock->id,
+                    'from_clinic_id' => $lockedStock->clinic_id,
+                    'to_clinic_id' => $toClinic->id,
+                    'company_id' => $user->company_id,
+                    'quantity' => $validated['quantity'],
+                    'notes' => $validated['notes'] ?? null,
+                    'status' => StockTransfer::STATUS_PENDING,
+                    'requested_by' => $user->id,
+                    'requested_at' => now(),
+                ]);
+            });
 
             return $this->success(
                 $transfer->load(['product', 'stock', 'fromClinic', 'toClinic', 'requestedBy']),
@@ -134,8 +143,6 @@ class StockTransferController extends Controller
             );
 
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return $this->error('Transfer oluşturulurken hata: '.$e->getMessage(), 500);
         }
     }
@@ -169,8 +176,7 @@ class StockTransferController extends Controller
     {
         $user = Auth::user();
 
-        $transfer = StockTransfer::where('company_id', $user->company_id)
-            ->findOrFail($id);
+        $transfer = StockTransfer::where('company_id', $user->company_id)->findOrFail($id);
 
         // Yetki kontrolü: Hedef klinik yetkilisi mi?
         if ($transfer->to_clinic_id !== $user->clinic_id && ! $user->hasPermissionTo('approve-transfers')) {
@@ -181,74 +187,75 @@ class StockTransferController extends Controller
             return $this->error('Bu transferi onaylama yetkiniz yok.', 403);
         }
 
-        if (! $transfer->canApprove()) {
-            return $this->error('Bu transfer onaylanamaz. Durum: '.$transfer->status_label, 422);
-        }
-
-        $stock = Stock::findOrFail($transfer->stock_id);
-
-        // Yeterli stok kontrolü
-        if ($stock->current_stock < $transfer->quantity) {
-            return $this->error(
-                'Kaynak stok yetersiz. Transfer edilemez.',
-                422
-            );
-        }
-
         try {
-            DB::beginTransaction();
+            $transfer = DB::transaction(function () use ($id, $user) {
+                $transfer = StockTransfer::where('company_id', $user->company_id)
+                    ->whereKey($id)
+                    ->lockForUpdate()
+                    ->firstOrFail();
 
-            // Transfer kaydını güncelle
-            $transfer->update([
-                'status' => StockTransfer::STATUS_APPROVED,
-                'approved_by' => $user->id,
-                'approved_at' => now(),
-            ]);
+                if (! $transfer->canApprove()) {
+                    throw new \RuntimeException('Bu transfer onaylanamaz. Durum: '.$transfer->status_label);
+                }
 
-            // Kaynak stoktan düş
-            $stock->current_stock -= $transfer->quantity;
-            $stock->save();
+                $stock = Stock::whereKey($transfer->stock_id)->lockForUpdate()->firstOrFail();
+                if ($stock->current_stock < $transfer->quantity || $stock->reserved_stock < $transfer->quantity) {
+                    throw new \RuntimeException('Kaynak stok yetersiz. Transfer edilemez.');
+                }
 
-            // Hedef klinikte stok oluştur veya güncelle
-            $targetStock = Stock::firstOrCreate(
-                [
-                    'product_id' => $transfer->product_id,
-                    'clinic_id' => $transfer->to_clinic_id,
+                $transfer->update([
+                    'status' => StockTransfer::STATUS_APPROVED,
+                    'approved_by' => $user->id,
+                    'approved_at' => now(),
+                ]);
+
+                $targetStock = $this->findOrCreateTargetStock($stock, $transfer->to_clinic_id);
+                $transactionService = app(StockTransactionService::class);
+
+                $transactionService->createTransaction([
+                    'transaction_number' => $this->generateTransactionNumber(),
+                    'stock_id' => $stock->id,
+                    'clinic_id' => $transfer->from_clinic_id,
+                    'type' => 'transfer_out',
+                    'quantity' => $transfer->quantity,
+                    'previous_stock' => $stock->current_stock,
+                    'new_stock' => $stock->current_stock - $transfer->quantity,
+                    'description' => "Transfer to {$transfer->toClinic?->name}",
+                    'performed_by' => $user->name,
+                    'user_id' => $user->id,
+                    'transaction_date' => now(),
                     'company_id' => $transfer->company_id,
-                    'batch_code' => $stock->batch_code,
-                ],
-                [
-                    'supplier_id' => $stock->supplier_id,
-                    'purchase_price' => $stock->purchase_price,
-                    'currency' => $stock->currency,
-                    'purchase_date' => $stock->purchase_date,
-                    'expiry_date' => $stock->expiry_date,
-                    'current_stock' => 0,
-                    'has_sub_unit' => $stock->has_sub_unit,
-                    'sub_unit_multiplier' => $stock->sub_unit_multiplier,
-                    'sub_unit_name' => $stock->sub_unit_name,
-                    'is_active' => true,
-                ]
-            );
+                ]);
 
-            // Hedef stoğu artır
-            $targetStock->current_stock += $transfer->quantity;
-            $targetStock->save();
+                $stock->refresh();
+                $stock->update([
+                    'reserved_stock' => $stock->reserved_stock - $transfer->quantity,
+                    'available_stock' => $stock->current_stock - ($stock->reserved_stock - $transfer->quantity),
+                ]);
 
-            // Stok hareket kaydı oluştur (opsiyonel)
-            // TODO: StockTransaction kaydı
+                $transactionService->createTransaction([
+                    'transaction_number' => $this->generateTransactionNumber(),
+                    'stock_id' => $targetStock->id,
+                    'clinic_id' => $transfer->to_clinic_id,
+                    'type' => 'transfer_in',
+                    'quantity' => $transfer->quantity,
+                    'previous_stock' => $targetStock->current_stock,
+                    'new_stock' => $targetStock->current_stock + $transfer->quantity,
+                    'description' => "Transfer from {$transfer->fromClinic?->name}",
+                    'performed_by' => $user->name,
+                    'user_id' => $user->id,
+                    'transaction_date' => now(),
+                    'company_id' => $transfer->company_id,
+                ]);
 
-            // Transfer tamamlandı olarak işaretle
-            $transfer->update([
-                'status' => StockTransfer::STATUS_COMPLETED,
-                'completed_by' => $user->id,
-                'completed_at' => now(),
-            ]);
+                $transfer->update([
+                    'status' => StockTransfer::STATUS_COMPLETED,
+                    'completed_by' => $user->id,
+                    'completed_at' => now(),
+                ]);
 
-            DB::commit();
-
-            // Bildirim gönder
-            // TODO: Transfer tamamlandı bildirimi
+                return $transfer;
+            });
 
             return $this->success(
                 $transfer->fresh(['product', 'stock', 'fromClinic', 'toClinic']),
@@ -256,8 +263,6 @@ class StockTransferController extends Controller
             );
 
         } catch (\Exception $e) {
-            DB::rollBack();
-
             return $this->error('Transfer onaylanırken hata: '.$e->getMessage(), 500);
         }
     }
@@ -289,17 +294,22 @@ class StockTransferController extends Controller
             return $this->error('Bu transfer reddedilemez.', 422);
         }
 
-        $transfer->update([
-            'status' => StockTransfer::STATUS_REJECTED,
-            'rejection_reason' => $validated['reason'],
-            'approved_by' => $user->id,  // Reddeden kişi
-            'approved_at' => now(),
-        ]);
+        DB::transaction(function () use ($transfer, $validated, $user) {
+            $lockedTransfer = StockTransfer::whereKey($transfer->id)->lockForUpdate()->firstOrFail();
+            if (! $lockedTransfer->canReject()) {
+                throw new \RuntimeException('Bu transfer reddedilemez.');
+            }
 
-        // Rezerve edilen stoğu serbest bırak (eğer rezervasyon varsa)
-        // $stock = Stock::find($transfer->stock_id);
-        // $stock->reserved_stock -= $transfer->quantity;
-        // $stock->save();
+            $stock = Stock::whereKey($lockedTransfer->stock_id)->lockForUpdate()->firstOrFail();
+            $this->releaseReservedStock($stock, $lockedTransfer->quantity);
+
+            $lockedTransfer->update([
+                'status' => StockTransfer::STATUS_REJECTED,
+                'rejection_reason' => $validated['reason'],
+                'approved_by' => $user->id,
+                'approved_at' => now(),
+            ]);
+        });
 
         // Bildirim gönder
         // TODO: Transfer reddedildi bildirimi (isteyen kişiye)
@@ -326,15 +336,20 @@ class StockTransferController extends Controller
             return $this->error('Bu transfer iptal edilemez.', 422);
         }
 
-        $transfer->update([
-            'status' => StockTransfer::STATUS_CANCELLED,
-            'cancelled_at' => now(),
-        ]);
+        DB::transaction(function () use ($transfer) {
+            $lockedTransfer = StockTransfer::whereKey($transfer->id)->lockForUpdate()->firstOrFail();
+            if (! $lockedTransfer->canCancel()) {
+                throw new \RuntimeException('Bu transfer iptal edilemez.');
+            }
 
-        // Rezerve edilen stoğu serbest bırak
-        // $stock = Stock::find($transfer->stock_id);
-        // $stock->reserved_stock -= $transfer->quantity;
-        // $stock->save();
+            $stock = Stock::whereKey($lockedTransfer->stock_id)->lockForUpdate()->firstOrFail();
+            $this->releaseReservedStock($stock, $lockedTransfer->quantity);
+
+            $lockedTransfer->update([
+                'status' => StockTransfer::STATUS_CANCELLED,
+                'cancelled_at' => now(),
+            ]);
+        });
 
         return $this->success($transfer, 'Transfer iptal edildi.');
     }
@@ -365,5 +380,52 @@ class StockTransferController extends Controller
         });
 
         return $this->success($stats, 'Pending transfer counts.');
+    }
+
+    private function findOrCreateTargetStock(Stock $sourceStock, int $targetClinicId): Stock
+    {
+        $targetStock = Stock::where('product_id', $sourceStock->product_id)
+            ->where('clinic_id', $targetClinicId)
+            ->where('company_id', $sourceStock->company_id)
+            ->where('batch_code', $sourceStock->batch_code)
+            ->lockForUpdate()
+            ->first();
+
+        if ($targetStock) {
+            return $targetStock;
+        }
+
+        return Stock::create([
+            'product_id' => $sourceStock->product_id,
+            'batch_code' => $sourceStock->batch_code,
+            'supplier_id' => $sourceStock->supplier_id,
+            'purchase_price' => $sourceStock->purchase_price,
+            'currency' => $sourceStock->currency,
+            'purchase_date' => $sourceStock->purchase_date,
+            'expiry_date' => $sourceStock->expiry_date,
+            'current_stock' => 0,
+            'reserved_stock' => 0,
+            'available_stock' => 0,
+            'clinic_id' => $targetClinicId,
+            'company_id' => $sourceStock->company_id,
+            'has_sub_unit' => $sourceStock->has_sub_unit,
+            'sub_unit_multiplier' => $sourceStock->sub_unit_multiplier,
+            'sub_unit_name' => $sourceStock->sub_unit_name,
+            'is_active' => true,
+        ]);
+    }
+
+    private function releaseReservedStock(Stock $stock, int $quantity): void
+    {
+        $reservedStock = max(0, $stock->reserved_stock - $quantity);
+        $stock->update([
+            'reserved_stock' => $reservedStock,
+            'available_stock' => $stock->current_stock - $reservedStock,
+        ]);
+    }
+
+    private function generateTransactionNumber(): string
+    {
+        return 'TXN-'.now()->format('Ymd').'-'.strtoupper(Str::random(12));
     }
 }

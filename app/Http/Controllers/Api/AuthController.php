@@ -122,7 +122,7 @@ class AuthController extends Controller
 
         $user = User::where('username', $request->username)->first();
 
-        if ($user && $user->hasRole('Super Admin') && Hash::check((string) $request->input('password'), $user->password)) {
+        if ($user && $user->isSuperAdmin() && Hash::check((string) $request->input('password'), $user->password)) {
             RateLimiter::clear($throttleKey);
             if (! $user->is_active) {
                 return $this->error('Hesabınız pasif durumdadır.', 403);

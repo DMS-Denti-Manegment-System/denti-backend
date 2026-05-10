@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesAndPermissionsSeeder::class);
 
         // 2. Super Admin Kullanıcısı oluştur (Şirket bağımsız)
+        setPermissionsTeamId(0);
         $superAdmin = User::create([
             'company_id' => null,
             'name' => 'Super Admin',

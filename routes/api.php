@@ -16,7 +16,7 @@ Route::post('/admin/login', [AuthController::class, 'adminLogin']);
 Route::post('/invitations/accept', [UserInvitationController::class, 'accept']);
 
 // Auth Routes (Protected)
-Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
+Route::middleware(['auth:sanctum', 'set_permissions_team', '2fa.verified'])->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::get('/dashboard/stats', [DashboardController::class, 'index']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -37,24 +37,20 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
     Route::apiResource('users', UserController::class)->middleware('permission:manage-users');
 
     // Invitation Routes
-    Route::post('/invitations/invite', [UserInvitationController::class, 'invite']);
+    Route::post('/invitations/invite', [UserInvitationController::class, 'invite'])->middleware('permission:manage-users');
 
     // Role Management (Company Owners)
     Route::get('/roles/permissions', [RoleController::class, 'permissions'])->middleware('permission:manage-users');
     Route::apiResource('roles', RoleController::class)->middleware('permission:manage-users')->names('api.roles');
 
-    // Stock Transactions
-    Route::get('/stocks/{id}/transactions', [\App\Http\Controllers\Api\StockController::class, 'getTransactions']);
-    Route::post('/stocks/{id}/adjust', [\App\Http\Controllers\Api\StockController::class, 'adjustStock']);
-
     // Categories
     Route::prefix('categories')->group(function () {
-        Route::get('/', [\App\Http\Controllers\Api\CategoryController::class, 'index']);
-        Route::post('/', [\App\Http\Controllers\Api\CategoryController::class, 'store']);
-        Route::get('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'show']);
-        Route::get('/{category}/stats', [\App\Http\Controllers\Api\CategoryController::class, 'stats']);
-        Route::put('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'update']);
-        Route::delete('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'destroy']);
+        Route::get('/', [\App\Http\Controllers\Api\CategoryController::class, 'index'])->middleware('permission:view-stocks');
+        Route::post('/', [\App\Http\Controllers\Api\CategoryController::class, 'store'])->middleware('permission:create-stocks');
+        Route::get('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'show'])->middleware('permission:view-stocks');
+        Route::get('/{category}/stats', [\App\Http\Controllers\Api\CategoryController::class, 'stats'])->middleware('permission:view-reports');
+        Route::put('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'update'])->middleware('permission:update-stocks');
+        Route::delete('/{category}', [\App\Http\Controllers\Api\CategoryController::class, 'destroy'])->middleware('permission:delete-stocks');
     });
 
     // Todo
@@ -174,6 +170,6 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
 });
 
 // Super Admin Panel
-Route::middleware(['auth:sanctum', 'role:Super Admin'])->prefix('admin')->group(function () {
+Route::middleware(['auth:sanctum', 'set_permissions_team', 'role:Super Admin'])->prefix('admin')->group(function () {
     Route::apiResource('companies', CompanyController::class);
 });

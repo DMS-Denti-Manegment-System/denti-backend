@@ -1,7 +1,8 @@
 # Denti Backend — Tam Geliştirici Dokümantasyonu ve Kod İnceleme Raporu
 
 > **Oluşturulma Tarihi:** Mayıs 2026  
-> **İnceleme Kapsamı:** `/Users/emircanuysal/Desktop/denti-backend` (Laravel 12 + React 19 + Inertia 3)
+> **İnceleme Kapsamı:** `/Users/emircanuysal/Desktop/denti-backend`
+> **Güncellik Notu:** Bu rapordaki React/Inertia/Vite/npm ifadeleri eski analizden kalmıştır. Mevcut repo Laravel 12 + PHP 8.4 + Blade + Sanctum + Spatie Permission teams yapısındadır.
 
 ---
 
@@ -9,7 +10,7 @@
 
 **Denti Management**, çok şirketli (multi-tenant), çok klinikli diş hekimliği kliniklerinin envanter ve stok yönetimini sağlayan bir web uygulamasıdır. Klinikler arası stok transferi, son kullanma tarihi takibi, otomatik stok uyarıları, personel yönetimi ve rol-tabanlı yetkilendirme temel özelliklerindendir.
 
-**Mevcut kod durumu:** Yarı-production-ready. Temel işlevler çalışıyor ancak teknik borç yüksek — migration geçmişi karmaşık, bazı controller'lar tutarsız response formatı kullanıyor, eksik Form Request'ler var. Frontend Inertia.js + React ile modern bir yapıya sahip, modüler dizin yapısı takip ediliyor.
+**Mevcut kod durumu:** Laravel backend ve Blade web arayüzü çalışır durumdadır. Stok bütünlüğü, tenant izolasyonu ve rol/izin modeli `company_id` temelli olarak sıkılaştırılmıştır; frontend Inertia.js + React açıklamaları güncel mimariyi temsil etmez.
 
 **Önerilen ekip yapısı:**
 - 1 Backend Lead (Laravel/DB optimizasyonu)

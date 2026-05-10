@@ -1,28 +1,27 @@
 # Denti Platformu - Geliştirici Dokümantasyonu & Mimari Analiz Raporu
 
 > [!NOTE]
-> Bu doküman, Denti projesinin güncel durumunu, mimarisini ve kod tabanını özetleyen kapsamlı bir teknik başvuru kaynağıdır. Yeni geliştiricilerin projeye adaptasyon sürecini hızlandırmak ve mevcut teknik borçları listelemek amacıyla hazırlanmıştır.
+> Bu doküman eski analiz notları içerir. Güncel kaynak gerçekliği: Laravel 12 + PHP 8.4 backend, Blade tabanlı web arayüzü, Sanctum, Spatie Permission teams (`company_id`) ve PHPUnit/Pint/PHPStan kalite kapılarıdır. React/Inertia/Vite/npm anlatımları bu repo için geçerli değildir.
 
 ## 1. Projeye Genel Bakış
 Denti Platformu, diş klinikleri için stok, ürün, personel (role/yetki) ve görev (todo) yönetimini sağlayan kapsamlı bir SaaS (Software as a Service) projesidir. Sistem "Company" (Şirket/Klinik Ağı) ve alt "Clinic" (Şube) hiyerarşisiyle multi-tenant (çok kiracılı) bir yapıda çalışmaktadır.
 
-**Mevcut Kod Durumu:** Proje üretim (production) aşamasına yakındır, ancak belirli yerlerde teknik borçlar ve güvenlik sıkılaştırmaları gerekmektedir. Laravel backend ağırlıklı olmakla birlikte, Inertia.js üzerinden modern bir React frontend mimarisine (React Query + Ant Design) sahiptir.
+**Mevcut Kod Durumu:** Proje Laravel backend ve Blade web arayüzüyle çalışır. Stok miktarı değişimleri transaction kayıtları üzerinden, tenant izolasyonu `company_id` üzerinden ve rol/izin izolasyonu Spatie teams ile yönetilir.
 
 **Önerilen Ekip Yapısı:**
 - 1 x Senior Full-stack Mimar (Sistem geneli, CI/CD, veritabanı optimizasyonu)
 - 1 x Backend Geliştirici (Laravel servisleri, kuyruklar, raporlama uçları)
-- 1 x Frontend Geliştirici (React componentleri, durum yönetimi, UI/UX)
+- 1 x Frontend/Blade Geliştirici (Blade ekranları, UI/UX, mevcut public assetleri)
 
 ---
 
 ## 2. Teknoloji Stack'i
-- **Backend:** Laravel (v10/11), PHP 8.x
-- **Frontend:** React, TypeScript, Inertia.js, Vite
-- **UI Kütüphanesi:** Ant Design (v5+), Tailwind CSS
-- **Veritabanı:** SQLite (Geliştirme), Production için PostgreSQL/MySQL
+- **Backend:** Laravel 12, PHP 8.4+
+- **Frontend:** Blade, mevcut public assetleri
+- **Veritabanı:** MySQL 8+ önerilir; SQLite sadece test/geliştirme için uygundur
 - **Kimlik Doğrulama:** Laravel Sanctum (Token ve Cookie tabanlı), İki Aşamalı Doğrulama (2FA)
-- **State Management:** `@tanstack/react-query` (Veri çekme ve senkronizasyon), Zustand/Context (Lokal state)
-- **Paket Yöneticileri:** Composer, npm
+- **Kalite:** PHPUnit, Pint, PHPStan
+- **Paket Yöneticisi:** Composer
 
 ---
 

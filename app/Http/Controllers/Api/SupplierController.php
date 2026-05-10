@@ -73,7 +73,7 @@ class SupplierController extends Controller
             return $this->error('Tedarikci bulunamadi', 404);
         }
 
-        if (! auth()->user()->hasRole('Super Admin') && $supplier->company_id !== auth()->user()->company_id) {
+        if (! auth()->user()->isSuperAdmin() && $supplier->company_id !== auth()->user()->company_id) {
             return $this->error('Bu islem icin yetkiniz yok.', 403);
         }
 

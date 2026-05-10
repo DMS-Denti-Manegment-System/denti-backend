@@ -23,7 +23,7 @@ class StockTransaction extends Model
         'unit_price', 'total_price', 'stock_request_id',
         'reference_number', 'batch_number', 'description',
         'notes', 'performed_by', 'transaction_date', 'company_id',
-        'is_sub_unit',
+        'is_sub_unit', 'reversed_at', 'reversed_by', 'reversal_transaction_id',
     ];
 
     protected $casts = [
@@ -31,6 +31,7 @@ class StockTransaction extends Model
         'total_price' => 'decimal:2',
         'transaction_date' => 'datetime',
         'is_sub_unit' => 'boolean',
+        'reversed_at' => 'datetime',
     ];
 
     public function company(): BelongsTo
@@ -56,6 +57,16 @@ class StockTransaction extends Model
     public function stockRequest(): BelongsTo
     {
         return $this->belongsTo(StockRequest::class);
+    }
+
+    public function reversedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'reversed_by');
+    }
+
+    public function reversalTransaction(): BelongsTo
+    {
+        return $this->belongsTo(self::class, 'reversal_transaction_id');
     }
 
     public function scopeByType($query, $type)

@@ -15,13 +15,10 @@ class StockTransactionObserver
         $this->updateStockLevel($transaction, 'apply');
     }
 
-    /**
-     * Handle the StockTransaction "deleted" event.
-     * Reverses the impact if a transaction is removed.
-     */
     public function deleted(StockTransaction $transaction): void
     {
-        $this->updateStockLevel($transaction, 'reverse');
+        // Transaction deletion is no longer a stock mutation path.
+        // Reversals must be represented by an explicit opposite transaction.
     }
 
     /**

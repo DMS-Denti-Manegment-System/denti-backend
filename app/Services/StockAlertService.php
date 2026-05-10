@@ -29,8 +29,11 @@ class StockAlertService
             return;
         }
 
-        // 🛡️ Ürün bazlı uyarı - önce ürünün mevcut uyarılarını temizle
-        $this->forceDeleteAlertsByProduct($stock->product_id);
+        $this->stockAlertRepository->resolveMissingActiveAlertsByProduct(
+            $stock->product_id,
+            (int) $stock->company_id,
+            array_column($alerts, 'type')
+        );
 
         foreach ($alerts as $alertData) {
             $this->createAlert($stock, $alertData);
@@ -155,6 +158,7 @@ class StockAlertService
     {
         // 🛡️ Ürün bazlı uyarı - her ürün için sadece 1 uyarı
         $alertData = array_merge($alertData, [
+            'company_id' => $stock->company_id,
             'product_id' => $stock->product_id,
             'stock_id' => $stock->id,
             'clinic_id' => $stock->clinic_id,
@@ -162,7 +166,12 @@ class StockAlertService
             'is_resolved' => false,
         ]);
 
-        return $this->stockAlertRepository->create($alertData);
+        return $this->stockAlertRepository->updateOrCreateActive([
+            'company_id' => $stock->company_id,
+            'product_id' => $stock->product_id,
+            'stock_id' => $stock->id,
+            'type' => $alertData['type'],
+        ], $alertData);
     }
 
     public function resolveExistingAlerts(Stock $stock): void
@@ -177,7 +186,6 @@ class StockAlertService
 
     public function forceDeleteAlertsByProduct(int $productId): void
     {
-        // 🛡️ Ürün bazlı uyarı temizleme - ürünün tüm uyarılarını sil
         $this->stockAlertRepository->deleteActiveAlertsByProduct($productId);
     }
 

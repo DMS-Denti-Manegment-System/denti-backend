@@ -5,6 +5,12 @@
 .env.production
 .phpactor.json
 .phpunit.result.cache
+denti-build.zip
+playwright-report/
+test-results/
+storage/phpstan/
+database/database.sqlite
+*.sqlite
 /.fleet
 /.idea
 /.nova

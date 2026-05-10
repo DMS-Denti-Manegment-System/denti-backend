@@ -73,4 +73,3 @@ class UserPermissionSyncTest extends TestCase
         $this->assertCount(0, $createdUser->permissions);
     }
 }
-

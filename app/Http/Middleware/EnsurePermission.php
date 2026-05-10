@@ -24,6 +24,8 @@ class EnsurePermission
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
 
+        setPermissionsTeamId($user->company_id ?? 0);
+
         $permissions = explode('|', $permission);
 
         if (! $user->canAny($permissions)) {

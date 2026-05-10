@@ -22,7 +22,6 @@ class ProductRepository
         $query = Product::query()
             ->with([
                 'clinic:id,name',
-                'batches' => fn ($q) => $q->with(['supplier:id,name', 'clinic:id,name'])->latest('id'),
             ])
             ->leftJoinSub($stockSummary, 'stock_summary', function ($join) {
                 $join->on('stock_summary.product_id', '=', 'products.id');

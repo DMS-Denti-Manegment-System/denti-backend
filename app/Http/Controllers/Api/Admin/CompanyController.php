@@ -7,6 +7,7 @@ use App\Http\Requests\Admin\StoreCompanyRequest;
 use App\Http\Requests\Admin\UpdateCompanyRequest;
 use App\Models\Company;
 use App\Models\User;
+use App\Services\CompanyRoleService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -33,6 +34,7 @@ class CompanyController extends Controller
             return DB::transaction(function () use ($request) {
                 // 1. Create Company
                 $company = Company::create($request->validated());
+                app(CompanyRoleService::class)->ensureCompanyRoles($company->id);
 
                 // 2. Create Default User (Company Owner)
                 $temporaryPassword = Str::random(12);
@@ -47,6 +49,7 @@ class CompanyController extends Controller
                 ]);
 
                 // 3. Assign Role
+                setPermissionsTeamId($company->id);
                 $user->assignRole('Company Owner');
 
                 return $this->success([

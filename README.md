@@ -4,10 +4,10 @@ Laravel 12 tabanlı, çok şirketli diş kliniği stok ve operasyon yönetim sis
 
 ## Güncel Stack
 
-- Backend: PHP 8.2+, Laravel 12, Sanctum, Spatie Permission
-- Frontend: Blade, Metronic 8 Demo 14 assetleri, Vite, Tailwind 4
+- Backend: PHP 8.4+, Laravel 12, Sanctum, Spatie Permission
+- Frontend: Blade ve mevcut public assetleri
 - Veritabanı: MySQL 8+ önerilir
-- Test: PHPUnit 11, Playwright
+- Test: PHPUnit 11, Pint, PHPStan
 
 ## Temel Modüller
 
@@ -21,20 +21,19 @@ Laravel 12 tabanlı, çok şirketli diş kliniği stok ve operasyon yönetim sis
 
 ```bash
 composer install
-npm install
 cp .env.example .env
 php artisan key:generate
 php artisan migrate --seed
-npm run build
 ```
 
 Geliştirme için:
 
 ```bash
-composer run dev
+php artisan serve
+php artisan queue:listen
 ```
 
-Bu komut Laravel server, queue listener, log stream ve Vite dev server'ı birlikte başlatır.
+Bu repo içinde güncel bir `package.json` yoktur. Node/Vite komutları eklenmeden `npm install`, `npm run build` veya Playwright akışları kurulum adımı değildir.
 
 ## Giriş
 
@@ -52,28 +51,21 @@ API korumalı endpoint'leri `auth:sanctum` ve ek olarak izin middleware'leri ile
 - `app/Services`: iş kuralları
 - `app/Repositories`: sorgu ve veri erişim katmanı
 - `resources/views`: Blade ekranları
-- `public/metronic`: tema assetleri
-- `tests`: unit, feature, e2e testleri
+- `public/ui-kit`: mevcut UI assetleri
+- `tests`: unit ve feature testleri
 
 ## Test ve Kalite
 
 ```bash
 php artisan test
-npm run build
 ./vendor/bin/pint
-```
-
-Playwright senaryoları için:
-
-```bash
-npx playwright test
+./vendor/bin/phpstan analyse --no-progress --memory-limit=1G
 ```
 
 ## Production Checklist
 
 - `.env` içinde `APP_ENV=production` ve `APP_DEBUG=false`
 - `php artisan optimize`
-- `npm run build`
 - Queue worker çalışır durumda olmalı
 - Scheduler cron eklenmeli: `* * * * * php /path/to/artisan schedule:run`
 - `storage` ve `bootstrap/cache` yazılabilir olmalı
@@ -83,4 +75,6 @@ npx playwright test
 ## Notlar
 
 - Eski README içeriğindeki React/Ant Design açıklamaları artık geçerli değildir.
-- Web arayüzü Blade tabanlıdır; frontend değişiklikleri `resources/views` ve `public/metronic` altında yapılmalıdır.
+- Web arayüzü Blade tabanlıdır; frontend değişiklikleri `resources/views` ve mevcut public assetleri altında yapılmalıdır.
+- Stok hareketlerinde miktar değişiminin ana sahibi `StockTransactionObserver`dır; servisler stok sayısını transaction kaydı üzerinden değiştirmelidir.
+- Spatie Permission teams özelliği `company_id` ile aktiftir. Rol/izin atamalarında team context şirket kimliğiyle set edilmelidir.

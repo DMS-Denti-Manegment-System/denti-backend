@@ -37,6 +37,22 @@ class StockAlertRepository implements StockAlertRepositoryInterface
         return $this->model->create($data);
     }
 
+    public function updateOrCreateActive(array $identity, array $data): StockAlert
+    {
+        return $this->model->updateOrCreate(
+            array_merge($identity, [
+                'is_active' => true,
+                'is_resolved' => false,
+            ]),
+            array_merge($data, [
+                'is_active' => true,
+                'is_resolved' => false,
+                'resolved_at' => null,
+                'resolved_by' => null,
+            ])
+        );
+    }
+
     public function update(int $id, array $data): ?StockAlert
     {
         $alert = $this->find($id);
@@ -135,10 +151,32 @@ class StockAlertRepository implements StockAlertRepositoryInterface
 
     public function deleteActiveAlertsByProduct(int $productId): void
     {
-        // 🛡️ Ürün bazlı uyarı temizleme - ürünün tüm aktif uyarılarını sil
         $this->model->where('product_id', $productId)
             ->where('is_active', true)
-            ->delete();
+            ->where('is_resolved', false)
+            ->update([
+                'is_active' => false,
+                'is_resolved' => true,
+                'resolved_at' => now(),
+            ]);
+    }
+
+    public function resolveMissingActiveAlertsByProduct(int $productId, int $companyId, array $activeTypes): void
+    {
+        $query = $this->model->where('product_id', $productId)
+            ->where('company_id', $companyId)
+            ->where('is_active', true)
+            ->where('is_resolved', false);
+
+        if ($activeTypes !== []) {
+            $query->whereNotIn('type', $activeTypes);
+        }
+
+        $query->update([
+            'is_active' => false,
+            'is_resolved' => true,
+            'resolved_at' => now(),
+        ]);
     }
 
     public function bulkResolve(array $ids, string $resolvedBy): int

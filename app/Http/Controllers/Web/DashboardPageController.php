@@ -6,12 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Clinic;
 use App\Models\Company;
 use App\Models\Product;
+use App\Models\Role;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
-use Spatie\Permission\Models\Role;
 
 class DashboardPageController extends Controller
 {

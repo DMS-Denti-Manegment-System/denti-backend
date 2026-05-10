@@ -34,7 +34,7 @@ class StockAlertPolicy
     public function create(User $user): bool
     {
         // Alerts are typically created by system, not users
-        return $user->hasRole('Super Admin') || $user->hasRole(User::ROLE_OWNER);
+        return $user->isSuperAdmin() || $user->hasRole(User::ROLE_OWNER);
     }
 
     /**

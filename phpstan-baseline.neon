@@ -217,12 +217,12 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Role\\:\\:\\$company_id\\.$#"
-			count: 3
+			count: 5
 			path: app/Http/Controllers/Api/RoleController.php
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
-			count: 10
+			count: 14
 			path: app/Http/Controllers/Api/RoleController.php
 
 		-
@@ -261,9 +261,89 @@ parameters:
 			path: app/Http/Controllers/Api/StockRequestController.php
 
 		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:whereKey\\(\\)\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockRequestController.php
+
+		-
 			message: "#^Parameter \\#2 \\$default of method Illuminate\\\\Http\\\\Request\\:\\:query\\(\\) expects array\\|string\\|null, int given\\.$#"
 			count: 1
 			path: app/Http/Controllers/Api/StockTransactionController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$batch_code\\.$#"
+			count: 2
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$company_id\\.$#"
+			count: 2
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$currency\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$current_stock\\.$#"
+			count: 3
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$expiry_date\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$has_sub_unit\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$id\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$product_id\\.$#"
+			count: 2
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$purchase_date\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$purchase_price\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$reserved_stock\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$sub_unit_multiplier\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$sub_unit_name\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$supplier_id\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\<int, App\\\\Models\\\\Stock\\>\\:\\:\\$available_stock\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\<int, App\\\\Models\\\\Stock\\>\\:\\:\\$clinic_id\\.$#"
@@ -271,18 +351,8 @@ parameters:
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\<int, App\\\\Models\\\\Stock\\>\\:\\:\\$current_stock\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/StockTransferController.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\<int, App\\\\Models\\\\Stock\\>\\:\\:\\$id\\.$#"
 			count: 2
-			path: app/Http/Controllers/Api/StockTransferController.php
-
-		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\|Illuminate\\\\Database\\\\Eloquent\\\\Collection\\<int, App\\\\Models\\\\Stock\\>\\:\\:\\$product_id\\.$#"
-			count: 1
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
@@ -292,12 +362,17 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:\\$company_id\\.$#"
-			count: 6
+			count: 9
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
 			message: "#^Access to an undefined property Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:\\$id\\.$#"
-			count: 7
+			count: 9
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Access to an undefined property Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:\\$name\\.$#"
+			count: 2
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
@@ -326,13 +401,18 @@ parameters:
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:findOrFail\\(\\)\\.$#"
+			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:create\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:firstOrCreate\\(\\)\\.$#"
+			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:where\\(\\)\\.$#"
 			count: 1
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:whereKey\\(\\)\\.$#"
+			count: 4
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
@@ -342,7 +422,12 @@ parameters:
 
 		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\StockTransfer\\:\\:where\\(\\)\\.$#"
-			count: 5
+			count: 6
+			path: app/Http/Controllers/Api/StockTransferController.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\StockTransfer\\:\\:whereKey\\(\\)\\.$#"
+			count: 2
 			path: app/Http/Controllers/Api/StockTransferController.php
 
 		-
@@ -416,23 +501,18 @@ parameters:
 			path: app/Http/Controllers/Api/UserController.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\StoreUserRequest\\:\\:\\$permissions\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/UserController.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\StoreUserRequest\\:\\:\\$username\\.$#"
 			count: 1
 			path: app/Http/Controllers/Api/UserController.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\UpdateUserRequest\\:\\:\\$permissions\\.$#"
-			count: 1
+			message: "#^Access to an undefined property App\\\\Models\\\\User\\:\\:\\$company_id\\.$#"
+			count: 2
 			path: app/Http/Controllers/Api/UserController.php
 
 		-
 			message: "#^Access to an undefined property Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:\\$company_id\\.$#"
-			count: 5
+			count: 3
 			path: app/Http/Controllers/Api/UserController.php
 
 		-
@@ -446,8 +526,8 @@ parameters:
 			path: app/Http/Controllers/Api/UserController.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:hasRole\\(\\)\\.$#"
-			count: 2
+			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:isSuperAdmin\\(\\)\\.$#"
+			count: 1
 			path: app/Http/Controllers/Api/UserController.php
 
 		-
@@ -486,7 +566,12 @@ parameters:
 			path: app/Http/Controllers/Api/UserInvitationController.php
 
 		-
-			message: "#^Access to an undefined property Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:\\$company\\.$#"
+			message: "#^Access to an undefined property Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:\\$company_id\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/UserInvitationController.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\Company\\:\\:whereKey\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Controllers/Api/UserInvitationController.php
 
@@ -502,6 +587,11 @@ parameters:
 
 		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\UserInvitation\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: app/Http/Controllers/Api/UserInvitationController.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\UserInvitation\\:\\:whereKey\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Controllers/Api/UserInvitationController.php
 
@@ -546,11 +636,6 @@ parameters:
 			path: app/Http/Controllers/Web/AdminCompanyPageController.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:isSuperAdmin\\(\\)\\.$#"
-			count: 3
-			path: app/Http/Controllers/Web/AdminCompanyPageController.php
-
-		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\Company\\:\\:create\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Controllers/Web/AdminCompanyPageController.php
@@ -583,6 +668,11 @@ parameters:
 		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\UserInvitation\\:\\:where\\(\\)\\.$#"
 			count: 2
+			path: app/Http/Controllers/Web/AuthPageController.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\UserInvitation\\:\\:whereKey\\(\\)\\.$#"
+			count: 1
 			path: app/Http/Controllers/Web/AuthPageController.php
 
 		-
@@ -686,13 +776,23 @@ parameters:
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$batch_code\\.$#"
+			count: 1
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$company_id\\.$#"
 			count: 1
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$expiry_date\\.$#"
+			count: 4
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$id\\.$#"
-			count: 1
+			count: 3
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
@@ -701,8 +801,33 @@ parameters:
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
+			message: "#^Access to an undefined property App\\\\Models\\\\StockAlert\\:\\:\\$created_at\\.$#"
+			count: 1
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Models\\\\StockAlert\\:\\:\\$id\\.$#"
-			count: 2
+			count: 3
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\StockAlert\\:\\:\\$message\\.$#"
+			count: 1
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\StockAlert\\:\\:\\$severity\\.$#"
+			count: 1
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\StockAlert\\:\\:\\$title\\.$#"
+			count: 1
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\StockAlert\\:\\:\\$type\\.$#"
+			count: 1
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
@@ -762,17 +887,12 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:id\\(\\)\\.$#"
-			count: 6
+			count: 5
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
-			count: 40
-			path: app/Http/Controllers/Web/OperationsPageController.php
-
-		-
-			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\View\\\\View\\:\\:withErrors\\(\\)\\.$#"
-			count: 1
+			count: 38
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
@@ -797,7 +917,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Support\\\\Optional\\:\\:format\\(\\)\\.$#"
-			count: 1
+			count: 2
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
@@ -891,6 +1011,11 @@ parameters:
 			path: app/Http/Controllers/Web/OperationsPageController.php
 
 		-
+			message: "#^Parameter \\#1 \\$callback of method Illuminate\\\\Support\\\\Collection\\<int,stdClass\\>\\:\\:map\\(\\) expects callable\\(stdClass, int\\)\\: \\(array\\{id\\: string, source\\: string, type\\: string, severity\\: string, title\\: string, message\\: string, clinic_name\\: mixed, product_name\\: mixed, batch_ref\\: string, created_at\\: mixed, created_at_label\\: mixed\\}\\|null\\), Closure\\(App\\\\Models\\\\Stock\\)\\: \\(array\\{id\\: non\\-falsy\\-string, source\\: 'batch', type\\: non\\-falsy\\-string, severity\\: 'critical'\\|'high', title\\: 'Parti Bazlı Kritik SKT'\\|'Parti Bazlı Süresi Geçen Ürün'\\|'Parti Bazlı Yaklaşan SKT', message\\: non\\-falsy\\-string, clinic_name\\: mixed, product_name\\: mixed, batch_ref\\: non\\-falsy\\-string, created_at\\: mixed, created_at_label\\: mixed\\}\\|null\\) given\\.$#"
+			count: 1
+			path: app/Http/Controllers/Web/OperationsPageController.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\StoreRoleRequest\\:\\:\\$name\\.$#"
 			count: 1
 			path: app/Http/Controllers/Web/RolePageController.php
@@ -917,7 +1042,7 @@ parameters:
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
-			count: 10
+			count: 13
 			path: app/Http/Controllers/Web/RolePageController.php
 
 		-
@@ -946,11 +1071,6 @@ parameters:
 			path: app/Http/Middleware/RequestContextMiddleware.php
 
 		-
-			message: "#^Access to an undefined property Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:\\$company_id\\.$#"
-			count: 1
-			path: app/Http/Middleware/SetPermissionsTeamId.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\Admin\\\\StoreCompanyRequest\\:\\:\\$code\\.$#"
 			count: 1
 			path: app/Http/Requests/Admin/StoreCompanyRequest.php
@@ -973,11 +1093,6 @@ parameters:
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
 			count: 1
-			path: app/Http/Requests/StoreInvitationRequest.php
-
-		-
-			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
-			count: 1
 			path: app/Http/Requests/StoreProductRequest.php
 
 		-
@@ -993,22 +1108,12 @@ parameters:
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
 			count: 1
-			path: app/Http/Requests/StoreUserRequest.php
-
-		-
-			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
-			count: 1
 			path: app/Http/Requests/UpdateRoleRequest.php
 
 		-
 			message: "#^Cannot access property \\$id on object\\|string\\.$#"
 			count: 1
 			path: app/Http/Requests/UpdateRoleRequest.php
-
-		-
-			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Requests/UpdateUserRequest.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Resources\\\\ProductListResource\\:\\:\\$brand\\.$#"
@@ -1052,6 +1157,11 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Resources\\\\ProductListResource\\:\\:\\$name\\.$#"
+			count: 1
+			path: app/Http/Resources/ProductListResource.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Http\\\\Resources\\\\ProductListResource\\:\\:\\$show_zero_stock_in_critical\\.$#"
 			count: 1
 			path: app/Http/Resources/ProductListResource.php
 
@@ -1167,6 +1277,11 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Resources\\\\ProductResource\\:\\:\\$red_alert_level\\.$#"
+			count: 1
+			path: app/Http/Resources/ProductResource.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Http\\\\Resources\\\\ProductResource\\:\\:\\$show_zero_stock_in_critical\\.$#"
 			count: 1
 			path: app/Http/Resources/ProductResource.php
 
@@ -1387,7 +1502,7 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Resources\\\\StockResource\\:\\:\\$product\\.$#"
-			count: 12
+			count: 13
 			path: app/Http/Resources/StockResource.php
 
 		-
@@ -1857,7 +1972,17 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\User\\:\\:\\$id\\.$#"
-			count: 4
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: "#^Access to an undefined property Spatie\\\\Permission\\\\Contracts\\\\Role\\:\\:\\$company_id\\.$#"
+			count: 1
+			path: app/Models/User.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\Role\\:\\:withoutGlobalScopes\\(\\)\\.$#"
+			count: 2
 			path: app/Models/User.php
 
 		-
@@ -2001,6 +2126,11 @@ parameters:
 			path: app/Services/ClinicService.php
 
 		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\Role\\:\\:withoutGlobalScopes\\(\\)\\.$#"
+			count: 2
+			path: app/Services/CompanyRoleService.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Product\\:\\:\\$company_id\\.$#"
 			count: 1
 			path: app/Services/ProductService.php
@@ -2026,8 +2156,13 @@ parameters:
 			path: app/Services/StockAlertService.php
 
 		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$company_id\\.$#"
+			count: 3
+			path: app/Services/StockAlertService.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$id\\.$#"
-			count: 2
+			count: 3
 			path: app/Services/StockAlertService.php
 
 		-
@@ -2042,7 +2177,7 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$product_id\\.$#"
-			count: 3
+			count: 4
 			path: app/Services/StockAlertService.php
 
 		-
@@ -2061,13 +2196,13 @@ parameters:
 			path: app/Services/StockAlertService.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$available_stock\\.$#"
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$current_stock\\.$#"
 			count: 1
 			path: app/Services/StockRequestService.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$reserved_stock\\.$#"
-			count: 1
+			count: 2
 			path: app/Services/StockRequestService.php
 
 		-
@@ -2087,7 +2222,7 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\StockRequest\\:\\:\\$requested_from_clinic_id\\.$#"
-			count: 1
+			count: 2
 			path: app/Services/StockRequestService.php
 
 		-
@@ -2101,7 +2236,12 @@ parameters:
 			path: app/Services/StockRequestService.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Models\\\\StockRequest\\:\\:\\$stock\\.$#"
+			message: "#^Access to an undefined property App\\\\Models\\\\StockRequest\\:\\:\\$status\\.$#"
+			count: 1
+			path: app/Services/StockRequestService.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\StockRequest\\:\\:\\$stock_id\\.$#"
 			count: 1
 			path: app/Services/StockRequestService.php
 
@@ -2116,33 +2256,48 @@ parameters:
 			path: app/Services/StockRequestService.php
 
 		-
-			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:hasRole\\(\\)\\.$#"
+			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:isSuperAdmin\\(\\)\\.$#"
 			count: 4
 			path: app/Services/StockRequestService.php
 
 		-
-			message: "#^Negated boolean expression is always true\\.$#"
+			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:create\\(\\)\\.$#"
 			count: 1
 			path: app/Services/StockRequestService.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$available_stock\\.$#"
+			message: "#^Call to an undefined static method App\\\\Models\\\\Stock\\:\\:whereKey\\(\\)\\.$#"
+			count: 3
+			path: app/Services/StockRequestService.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\StockRequest\\:\\:find\\(\\)\\.$#"
 			count: 1
-			path: app/Services/StockService.php
+			path: app/Services/StockRequestService.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$clinic_id\\.$#"
-			count: 5
-			path: app/Services/StockService.php
+			message: "#^Call to an undefined static method App\\\\Models\\\\StockRequest\\:\\:whereKey\\(\\)\\.$#"
+			count: 3
+			path: app/Services/StockRequestService.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$company_id\\.$#"
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$available_stock\\.$#"
 			count: 2
 			path: app/Services/StockService.php
 
 		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$clinic_id\\.$#"
+			count: 6
+			path: app/Services/StockService.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$company_id\\.$#"
+			count: 3
+			path: app/Services/StockService.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$current_stock\\.$#"
-			count: 9
+			count: 13
 			path: app/Services/StockService.php
 
 		-
@@ -2157,12 +2312,12 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$has_sub_unit\\.$#"
-			count: 2
+			count: 3
 			path: app/Services/StockService.php
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$id\\.$#"
-			count: 1
+			count: 2
 			path: app/Services/StockService.php
 
 		-
@@ -2171,8 +2326,13 @@ parameters:
 			path: app/Services/StockService.php
 
 		-
+			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$product\\.$#"
+			count: 1
+			path: app/Services/StockService.php
+
+		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$reserved_stock\\.$#"
-			count: 6
+			count: 5
 			path: app/Services/StockService.php
 
 		-
@@ -2182,26 +2342,31 @@ parameters:
 
 		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Stock\\:\\:\\$total_base_units\\.$#"
-			count: 4
+			count: 5
+			path: app/Services/StockService.php
+
+		-
+			message: "#^Access to an undefined property App\\\\Models\\\\StockTransaction\\:\\:\\$id\\.$#"
+			count: 1
 			path: app/Services/StockService.php
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:id\\(\\)\\.$#"
-			count: 1
+			count: 4
 			path: app/Services/StockService.php
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
-			count: 2
-			path: app/Services/StockService.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\StockTransaction\\:\\:findOrFail\\(\\)\\.$#"
-			count: 1
+			count: 4
 			path: app/Services/StockService.php
 
 		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\StockTransaction\\:\\:where\\(\\)\\.$#"
+			count: 1
+			path: app/Services/StockService.php
+
+		-
+			message: "#^Call to an undefined static method App\\\\Models\\\\StockTransaction\\:\\:whereKey\\(\\)\\.$#"
 			count: 1
 			path: app/Services/StockService.php
 
