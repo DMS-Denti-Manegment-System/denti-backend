@@ -28,7 +28,7 @@ class ClinicPolicy
     public function update(User $user, Clinic $clinic): bool
     {
         return ($user->isSuperAdmin() || $user->company_id === $clinic->company_id)
-            && ($user->hasPermissionTo('edit-clinics') || $user->hasRole('Company Owner'));
+            && ($user->hasPermissionTo('update-clinics') || $user->hasRole('Company Owner'));
     }
 
     public function delete(User $user, Clinic $clinic): bool

@@ -28,6 +28,7 @@ class UpdateUserRequest extends FormRequest
         return array_merge($this->commonRules(), [
             'is_active' => ['sometimes', 'boolean'],
             'permissions' => $this->permissionsRule(),
+            'permissions.*' => 'string|exists:permissions,name',
             'clinic_id' => [
                 'nullable',
                 'integer',

@@ -20,8 +20,6 @@ class AdminCompanyPageController extends Controller
 {
     public function __invoke(Request $request): View|JsonResponse
     {
-        abort_unless(Auth::user()?->isSuperAdmin(), 403);
-
         $companies = Company::withCount('users')
             ->when($request->filled('search'), function ($query) use ($request) {
                 $search = $request->string('search');
@@ -63,8 +61,6 @@ class AdminCompanyPageController extends Controller
 
     public function store(StoreCompanyRequest $request): RedirectResponse|JsonResponse
     {
-        abort_unless(Auth::user()?->isSuperAdmin(), 403);
-
         $payload = $request->validated();
 
         DB::transaction(function () use ($payload) {
@@ -103,8 +99,6 @@ class AdminCompanyPageController extends Controller
 
     public function update(UpdateCompanyRequest $request, Company $company): RedirectResponse|JsonResponse
     {
-        abort_unless(Auth::user()?->isSuperAdmin(), 403);
-
         $company->update($request->validated());
 
         if ($request->ajax()) {

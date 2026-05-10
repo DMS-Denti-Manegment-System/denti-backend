@@ -24,6 +24,7 @@ trait UserValidationRules
         return [
             'nullable',
             'array',
+            'max:200',
         ];
     }
 }

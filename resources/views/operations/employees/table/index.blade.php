@@ -16,7 +16,7 @@
                         <tr>
                             <td><div>{{ $employee->name }}</div><div class="text-muted fs-7">{{ $employee->username ?: $employee->email }}</div></td>
                             <td>{{ $employee->clinic?->name ?: '-' }}</td>
-                            <td><span class="badge badge-light-primary">{{ $employee->permissions->count() }} Yetki</span></td>
+                            <td><span class="badge badge-light-primary">{{ $employee->permissions_count }} Yetki</span></td>
                             <td><span class="badge {{ $employee->is_active ? 'badge-light-success' : 'badge-light-danger' }}">{{ $employee->is_active ? 'Aktif' : 'Pasif' }}</span></td>
                             <td>
                                 <div class="d-flex gap-2">

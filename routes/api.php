@@ -34,14 +34,14 @@ Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
     });
 
     // User Management (Employee Management)
-    Route::apiResource('users', UserController::class);
+    Route::apiResource('users', UserController::class)->middleware('permission:manage-users');
 
     // Invitation Routes
     Route::post('/invitations/invite', [UserInvitationController::class, 'invite']);
 
     // Role Management (Company Owners)
-    Route::get('/roles/permissions', [RoleController::class, 'permissions']);
-    Route::apiResource('roles', RoleController::class)->names('api.roles');
+    Route::get('/roles/permissions', [RoleController::class, 'permissions'])->middleware('permission:manage-users');
+    Route::apiResource('roles', RoleController::class)->middleware('permission:manage-users')->names('api.roles');
 
     // Stock Transactions
     Route::get('/stocks/{id}/transactions', [\App\Http\Controllers\Api\StockController::class, 'getTransactions']);

@@ -99,9 +99,10 @@ class User extends Authenticatable
             return $requestCache[$this->id];
         }
 
-        return $requestCache[$this->id] = \Illuminate\Support\Facades\Cache::remember("user_is_super_admin_{$this->id}", 3600, function () {
-            // 🛡️ TenantScope döngüsünü kırmak için rollerini scope olmadan kontrol et
-            return $this->roles()->withoutGlobalScopes()->where('name', self::ROLE_SUPER_ADMIN)->exists();
-        });
+        // TenantScope döngüsünü kırmak için rollerini scope olmadan kontrol et.
+        return $requestCache[$this->id] = $this->roles()
+            ->withoutGlobalScopes()
+            ->where('name', self::ROLE_SUPER_ADMIN)
+            ->exists();
     }
 }

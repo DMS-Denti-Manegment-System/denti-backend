@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use App\Support\PermissionCatalog;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 
@@ -42,6 +43,7 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
+        /** @var User $currentUser */
         $currentUser = Auth::user();
         $companyId = $request->company_id ?? $currentUser->company_id;
 
@@ -55,10 +57,11 @@ class UserController extends Controller
             'is_active' => true,
         ]);
 
-        // Yetki atama (Eğer permission dizisi geldiyse)
-        if ($request->has('permissions') && is_array($request->permissions)) {
-            $user->syncPermissions($request->permissions);
-        }
+        $permissions = PermissionCatalog::sanitizeForAssigner(
+            (array) $request->input('permissions', []),
+            $currentUser
+        );
+        $user->syncPermissions($permissions);
 
         return $this->success($user->load('permissions'), 'User created successfully.', 201);
     }
@@ -90,6 +93,7 @@ class UserController extends Controller
             return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
         }
 
+        /** @var User $currentUser */
         $currentUser = Auth::user();
         $query = User::query();
 
@@ -107,12 +111,11 @@ class UserController extends Controller
         // Update user details
         $user->update($request->only(['name', 'is_active', 'clinic_id']));
 
-        // Yetkileri Güncelle
-        if ($request->has('permissions') && is_array($request->permissions)) {
-            // Eğer bir Super Admin değilse ve bazı özel yetkileri kendisinde yoksa,
-            // atayabileceği yetkileri sınırlayabiliriz ancak şu an için basit tutalım.
-            $user->syncPermissions($request->permissions);
-        }
+        $permissions = PermissionCatalog::sanitizeForAssigner(
+            (array) $request->input('permissions', []),
+            $currentUser
+        );
+        $user->syncPermissions($permissions);
 
         return $this->success($user->load('permissions'), 'User updated successfully.');
     }

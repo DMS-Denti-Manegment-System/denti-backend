@@ -206,7 +206,7 @@
                     cleanUrl: null,
                     onAfterLoad: null,
                     onModalLoaded: null,
-                    initialLoad: true,
+                    initialLoad: false,
                 }, config || {});
 
                 const $root = $(settings.root);
@@ -329,11 +329,14 @@
                 }
 
                 function openRemote(url) {
+                    const remoteUrl = new URL(url, window.location.origin);
+                    remoteUrl.searchParams.set('include_modal', '1');
+
                     if (currentModalRequest && currentModalRequest.readyState !== 4) {
                         currentModalRequest.abort();
                     }
                     currentModalRequest = $.ajax({
-                        url: url,
+                        url: remoteUrl.toString(),
                         type: 'GET',
                         dataType: 'json',
                         headers: { 'X-Requested-With': 'XMLHttpRequest' },

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Support\PermissionCatalog;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -13,28 +14,7 @@ class RolesAndPermissionsSeeder extends Seeder
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();
 
-        $permissions = [
-            'view-stocks',
-            'create-stocks',
-            'update-stocks',
-            'delete-stocks',
-            'adjust-stocks',
-            'use-stocks',
-            'transfer-stocks',
-            'approve-transfers',
-            'cancel-transfers',
-            'view-clinics',
-            'create-clinics',
-            'update-clinics',
-            'delete-clinics',
-            'view-reports',
-            'export-reports',
-            'manage-users',
-            'manage-company',
-            'view-audit-logs',
-            'view-todos',
-            'manage-todos',
-        ];
+        $permissions = PermissionCatalog::all();
 
         foreach ($permissions as $permission) {
             Permission::findOrCreate($permission, 'web');

@@ -23,6 +23,10 @@ class EnsureRole
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
 
+        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
+            return $next($request);
+        }
+
         $roles = explode('|', $role);
 
         if (! $user->hasAnyRole($roles)) {

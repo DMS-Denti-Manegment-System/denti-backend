@@ -76,126 +76,140 @@
                 </a>
             </div>
 
-            <!-- Stoklar -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('stocks.*') ? 'active' : '' }}"
-                    href="{{ route('stocks.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-package fs-2">
-                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Ürün Listesi</span>
-                </a>
-            </div>
+            @can('view-stocks')
+                <!-- Stoklar -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('stocks.*') ? 'active' : '' }}"
+                        href="{{ route('stocks.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-package fs-2">
+                                <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Ürün Listesi</span>
+                    </a>
+                </div>
 
-            <!-- Kategoriler -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('categories.*') ? 'active' : '' }}"
-                    href="{{ route('categories.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-category fs-2">
-                            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
-                                class="path4"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Kategoriler</span>
-                </a>
-            </div>
+                <!-- Kategoriler -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('categories.*') ? 'active' : '' }}"
+                        href="{{ route('categories.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-category fs-2">
+                                <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
+                                    class="path4"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Kategoriler</span>
+                    </a>
+                </div>
 
-            <!-- Tedarikçiler -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}"
-                    href="{{ route('suppliers.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-truck fs-2">
-                            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
-                                class="path4"></span><span class="path5"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Tedarikçiler</span>
-                </a>
-            </div>
+                <!-- Tedarikçiler -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('suppliers.*') ? 'active' : '' }}"
+                        href="{{ route('suppliers.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-truck fs-2">
+                                <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
+                                    class="path4"></span><span class="path5"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Tedarikçiler</span>
+                    </a>
+                </div>
+            @endcan
 
-            <!-- Klinikler -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('clinics.*') ? 'active' : '' }}"
-                    href="{{ route('clinics.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-bank fs-2">
-                            <span class="path1"></span><span class="path2"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Klinikler</span>
-                </a>
-            </div>
+            @can('view-clinics')
+                <!-- Klinikler -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('clinics.*') ? 'active' : '' }}"
+                        href="{{ route('clinics.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-bank fs-2">
+                                <span class="path1"></span><span class="path2"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Klinikler</span>
+                    </a>
+                </div>
+            @endcan
 
-            <!-- Stok Talepleri -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('stock-requests.*') ? 'active' : '' }}"
-                    href="{{ route('stock-requests.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-document fs-2">
-                            <span class="path1"></span><span class="path2"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Stok Talepleri</span>
-                </a>
-            </div>
+            @canany(['view-stocks', 'transfer-stocks', 'approve-transfers', 'cancel-transfers'])
+                <!-- Stok Talepleri -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('stock-requests.*') ? 'active' : '' }}"
+                        href="{{ route('stock-requests.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-document fs-2">
+                                <span class="path1"></span><span class="path2"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Stok Talepleri</span>
+                    </a>
+                </div>
+            @endcanany
 
-            <!-- Uyarılar -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('alerts.*') ? 'active' : '' }}"
-                    href="{{ route('alerts.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-notification-on fs-2">
-                            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
-                                class="path4"></span><span class="path5"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Uyarılar</span>
-                </a>
-            </div>
+            @can('view-stocks')
+                <!-- Uyarılar -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('alerts.*') ? 'active' : '' }}"
+                        href="{{ route('alerts.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-notification-on fs-2">
+                                <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
+                                    class="path4"></span><span class="path5"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Uyarılar</span>
+                    </a>
+                </div>
+            @endcan
 
-            <!-- Yapılacaklar -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('todos.*') ? 'active' : '' }}"
-                    href="{{ route('todos.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-check-square fs-2">
-                            <span class="path1"></span><span class="path2"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Yapılacaklar</span>
-                </a>
-            </div>
+            @can('view-todos')
+                <!-- Yapılacaklar -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('todos.*') ? 'active' : '' }}"
+                        href="{{ route('todos.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-check-square fs-2">
+                                <span class="path1"></span><span class="path2"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Yapılacaklar</span>
+                    </a>
+                </div>
+            @endcan
 
-            <!-- Raporlar -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
-                    href="{{ route('reports.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-chart-line-star fs-2">
-                            <span class="path1"></span><span class="path2"></span><span class="path3"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Raporlar</span>
-                </a>
-            </div>
+            @can('view-reports')
+                <!-- Raporlar -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('reports.*') ? 'active' : '' }}"
+                        href="{{ route('reports.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-chart-line-star fs-2">
+                                <span class="path1"></span><span class="path2"></span><span class="path3"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Raporlar</span>
+                    </a>
+                </div>
+            @endcan
 
-            <!-- Personel -->
-            <div class="menu-item">
-                <a class="menu-link {{ request()->routeIs('employees.*') ? 'active' : '' }}"
-                    href="{{ route('employees.index') }}">
-                    <span class="menu-icon">
-                        <i class="ki-duotone ki-people fs-2">
-                            <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
-                                class="path4"></span><span class="path5"></span>
-                        </i>
-                    </span>
-                    <span class="menu-title">Personel</span>
-                </a>
-            </div>
+            @can('manage-users')
+                <!-- Personel -->
+                <div class="menu-item">
+                    <a class="menu-link {{ request()->routeIs('employees.*') ? 'active' : '' }}"
+                        href="{{ route('employees.index') }}">
+                        <span class="menu-icon">
+                            <i class="ki-duotone ki-people fs-2">
+                                <span class="path1"></span><span class="path2"></span><span class="path3"></span><span
+                                    class="path4"></span><span class="path5"></span>
+                            </i>
+                        </span>
+                        <span class="menu-title">Personel</span>
+                    </a>
+                </div>
+            @endcan
             @endif
 
 

@@ -12,6 +12,7 @@ use App\Models\StockRequest;
 use App\Models\Supplier;
 use App\Models\Todo;
 use App\Models\User;
+use App\Support\PermissionCatalog;
 use App\Services\ProductService;
 use App\Services\StockAlertService;
 use App\Services\StockRequestService;
@@ -29,7 +30,6 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Permission;
 
 class OperationsPageController extends Controller
 {
@@ -42,12 +42,14 @@ class OperationsPageController extends Controller
     {
         try {
             $viewData = $this->getStocksViewData($request);
+            $includeModal = $request->boolean('include_modal')
+                || in_array((string) $request->query('modal'), ['create', 'edit', 'detail'], true);
 
             if ($request->ajax()) {
                 return response()->json([
                     'statsHtml' => view('operations.stocks.components.stats', $viewData)->render(),
                     'tableHtml' => view('operations.stocks.table.index', $viewData)->render(),
-                    'modalHtml' => view('operations.stocks.modal.index', $viewData)->render(),
+                    'modalHtml' => $includeModal ? view('operations.stocks.modal.index', $viewData)->render() : '',
                 ]);
             }
 
@@ -589,6 +591,10 @@ class OperationsPageController extends Controller
 
     public function stockRequests(Request $request): View|JsonResponse
     {
+        $includeModalData = ! $request->ajax()
+            || $request->boolean('include_modal')
+            || in_array((string) $request->query('modal'), ['create', 'edit', 'detail'], true);
+
         $requests = StockRequest::query()
             ->with(['requesterClinic', 'requestedFromClinic', 'stock.product'])
             ->when($request->filled('search'), function (Builder $query) use ($request) {
@@ -614,8 +620,12 @@ class OperationsPageController extends Controller
 
         $viewData = [
             'requests' => $requests,
-            'stocks' => Stock::query()->with(['product', 'clinic'])->active()->orderBy('id', 'desc')->get(),
-            'clinics' => Clinic::query()->active()->orderBy('name')->get(['id', 'name']),
+            'stocks' => $includeModalData
+                ? Stock::query()->with(['product', 'clinic'])->active()->orderBy('id', 'desc')->get()
+                : collect(),
+            'clinics' => $includeModalData
+                ? Clinic::query()->active()->orderBy('name')->get(['id', 'name'])
+                : collect(),
             'modalMode' => $request->query('modal'),
             'stats' => $stats,
         ];
@@ -1026,9 +1036,13 @@ class OperationsPageController extends Controller
     public function employees(Request $request): View|JsonResponse
     {
         $companyId = auth()->user()->company_id;
+        $includeModalData = ! $request->ajax()
+            || $request->boolean('include_modal')
+            || in_array((string) $request->query('modal'), ['create', 'edit', 'detail'], true);
 
         $users = User::query()
-            ->with(['clinic', 'roles'])
+            ->with(['clinic'])
+            ->withCount('permissions')
             ->where('company_id', $companyId)
             ->when($request->filled('search'), function (Builder $query) use ($request) {
                 $search = $request->string('search');
@@ -1039,11 +1053,11 @@ class OperationsPageController extends Controller
                 });
             })
             ->latest()
-            ->paginate($request->integer('per_page', 20))
+            ->paginate($this->perPage($request))
             ->withQueryString();
 
         $editingEmployee = null;
-        if ($request->filled('edit')) {
+        if ($includeModalData && $request->filled('edit')) {
             $editingEmployee = User::with(['roles', 'permissions'])
                 ->where('company_id', $companyId)
                 ->findOrFail($request->integer('edit'));
@@ -1051,12 +1065,15 @@ class OperationsPageController extends Controller
 
         $viewData = [
             'users' => $users,
-            'permissions' => Permission::query()->orderBy('name')->get(),
-            'clinics' => Clinic::query()
-                ->active()
-                ->where('company_id', $companyId)
-                ->orderBy('name')
-                ->get(['id', 'name']),
+            'permissionCrudMatrix' => PermissionCatalog::crudMatrix(),
+            'permissionFeatureGroups' => PermissionCatalog::featurePermissions(),
+            'clinics' => $includeModalData
+                ? Clinic::query()
+                    ->active()
+                    ->where('company_id', $companyId)
+                    ->orderBy('name')
+                    ->get(['id', 'name'])
+                : collect(),
             'modalMode' => $request->query('modal'),
             'editingEmployee' => $editingEmployee,
         ];
@@ -1077,6 +1094,8 @@ class OperationsPageController extends Controller
 
     public function employeeStore(Request $request): RedirectResponse|JsonResponse
     {
+        /** @var User $authUser */
+        $authUser = Auth::user();
         $companyId = auth()->user()->company_id;
 
         $validated = $request->validate([
@@ -1099,9 +1118,11 @@ class OperationsPageController extends Controller
             'is_active' => true,
         ]);
 
-        if ($request->has('permission_names')) {
-            $employee->syncPermissions($validated['permission_names'] ?? []);
-        }
+        $permissionNames = PermissionCatalog::sanitizeForAssigner(
+            $validated['permission_names'] ?? [],
+            $authUser
+        );
+        $employee->syncPermissions($permissionNames);
 
         return $this->actionResponse($request, 'employees.index', 'Personel olusturuldu.');
     }
@@ -1140,7 +1161,11 @@ class OperationsPageController extends Controller
         }
 
         $user->update($payload);
-        $user->syncPermissions($validated['permission_names'] ?? []);
+        $permissionNames = PermissionCatalog::sanitizeForAssigner(
+            $validated['permission_names'] ?? [],
+            $authUser
+        );
+        $user->syncPermissions($permissionNames);
 
         return $this->actionResponse($request, 'employees.index', 'Personel guncellendi.');
     }
@@ -1482,6 +1507,9 @@ class OperationsPageController extends Controller
 
     private function getStocksViewData(Request $request): array
     {
+        $includeModalData = ! $request->ajax()
+            || $request->boolean('include_modal')
+            || in_array((string) $request->query('modal'), ['create', 'edit', 'detail'], true);
         $filters = $request->only(['search', 'clinic_id', 'category', 'status', 'level', 'per_page']);
         $products = app(ProductService::class)->getAllProducts($filters, $this->perPage($request));
 
@@ -1491,7 +1519,7 @@ class OperationsPageController extends Controller
 
         $editingProduct = null;
         $editingBatch = null;
-        if ($request->filled('edit')) {
+        if ($includeModalData && $request->filled('edit')) {
             $editingProduct = Product::with(['batches' => fn ($query) => $query->with(['supplier', 'clinic'])->latest('id')])
                 ->findOrFail($request->integer('edit'));
             $editingBatch = $editingProduct->batches->first();
@@ -1538,9 +1566,9 @@ class OperationsPageController extends Controller
 
         return [
             'products' => $products,
-            'clinics' => Clinic::query()->active()->orderBy('name')->get(['id', 'name']),
-            'suppliers' => Supplier::query()->active()->orderBy('name')->get(['id', 'name']),
-            'categories' => Category::query()->orderBy('name')->get(['id', 'name']),
+            'clinics' => $includeModalData ? Clinic::query()->active()->orderBy('name')->get(['id', 'name']) : collect(),
+            'suppliers' => $includeModalData ? Supplier::query()->active()->orderBy('name')->get(['id', 'name']) : collect(),
+            'categories' => $includeModalData ? Category::query()->orderBy('name')->get(['id', 'name']) : collect(),
             'units' => ['Adet', 'Kutu', 'Paket', 'Sise', 'Ml', 'Lt', 'Kg', 'Gr', 'Set'],
             'currencies' => ['TRY' => '₺ (TL)', 'USD' => '$ (USD)', 'EUR' => '€ (EUR)'],
             'stockStats' => $stockStats,
@@ -1565,9 +1593,12 @@ class OperationsPageController extends Controller
         array $extra = [],
     ): View|JsonResponse {
         if ($request->ajax()) {
+            $shouldRenderModal = $modalView
+                && ($request->boolean('include_modal') || in_array((string) $request->query('modal'), ['create', 'edit', 'detail'], true));
+
             return response()->json([
                 'tableHtml' => view($tableView, $viewData)->render(),
-                'modalHtml' => $modalView ? view($modalView, $viewData)->render() : '',
+                'modalHtml' => $shouldRenderModal ? view($modalView, $viewData)->render() : '',
                 ...$extra,
             ]);
         }
