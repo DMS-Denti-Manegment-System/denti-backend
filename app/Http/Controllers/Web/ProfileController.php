@@ -7,10 +7,10 @@ use App\Http\Controllers\Web\Traits\HandlesOperationsResponses;
 use App\Http\Requests\UpdateProfileInfoRequest;
 use App\Http\Requests\UpdateProfilePasswordRequest;
 use App\Services\TwoFactorService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Hash;
 
 class ProfileController extends Controller
@@ -20,12 +20,14 @@ class ProfileController extends Controller
     public function index(): View
     {
         $user = auth()->user()->load(['clinic', 'roles']);
+
         return view('operations.profile.index', compact('user'));
     }
 
     public function updateInfo(UpdateProfileInfoRequest $request): RedirectResponse
     {
         auth()->user()->update($request->validated());
+
         return redirect()->route('profile.index')->with('status', 'Profil bilgileri güncellendi.');
     }
 
@@ -73,6 +75,7 @@ class ProfileController extends Controller
     public function recoveryCodes(Request $request): JsonResponse
     {
         $codes = app(TwoFactorService::class)->generateRecoveryCodes(auth()->user());
+
         return response()->json(['recoveryCodes' => $codes]);
     }
 }

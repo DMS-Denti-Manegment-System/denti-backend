@@ -3,15 +3,14 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Supplier;
 use App\Models\Clinic;
+use App\Models\Product;
 use App\Models\StockRequest;
-use App\Models\Todo;
 use App\Models\StockTransaction;
-use Illuminate\Http\Request;
+use App\Models\Supplier;
+use App\Models\Todo;
 use Illuminate\Contracts\View\View;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {

@@ -6,12 +6,10 @@ use App\Events\Stock\StockLevelChanged;
 use App\Listeners\Stock\ClearStockCacheListener;
 use App\Models\Clinic;
 use App\Models\Product;
-use App\Models\StockAlert;
 use App\Models\StockTransaction;
 use App\Models\Supplier;
 use App\Models\User;
 use App\Observers\DashboardStatsObserver;
-use App\Observers\StockAlertObserver;
 use App\Observers\StockTransactionObserver;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Event;
@@ -79,7 +77,7 @@ class AppServiceProvider extends ServiceProvider
         Clinic::observe(DashboardStatsObserver::class);
         Supplier::observe(DashboardStatsObserver::class);
         User::observe(DashboardStatsObserver::class);
-        
+
         // Event Listeners
         Event::listen(StockLevelChanged::class, ClearStockCacheListener::class);
 

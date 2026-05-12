@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Product;
 use App\Models\Stock;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Support\Collection;
 
 class AlertService
 {
@@ -14,7 +13,7 @@ class AlertService
      */
     public function getDynamicAlerts(array $filters = [], int $perPage = 20): LengthAwarePaginator
     {
-        $query = Product::with(['batches' => fn($q) => $q->active()])
+        $query = Product::with(['batches' => fn ($q) => $q->active()])
             ->select('products.*')
             ->selectRaw('COALESCE((SELECT SUM(current_stock) FROM stocks WHERE stocks.product_id = products.id AND is_active = 1), 0) as total_stock');
 
@@ -22,18 +21,18 @@ class AlertService
         $query->where(function ($q) {
             // Low Stock Condition
             $q->whereRaw('COALESCE((SELECT SUM(current_stock) FROM stocks WHERE stocks.product_id = products.id AND is_active = 1), 0) <= COALESCE(red_alert_level, critical_stock_level)')
-              ->orWhereRaw('COALESCE((SELECT SUM(current_stock) FROM stocks WHERE stocks.product_id = products.id AND is_active = 1), 0) <= COALESCE(yellow_alert_level, min_stock_level)')
+                ->orWhereRaw('COALESCE((SELECT SUM(current_stock) FROM stocks WHERE stocks.product_id = products.id AND is_active = 1), 0) <= COALESCE(yellow_alert_level, min_stock_level)')
               // Expiry Condition (at least one batch expired or near expiry)
-              ->orWhereHas('batches', function ($batchQuery) {
-                  $batchQuery->where('is_active', 1)
-                      ->where('track_expiry', 1)
-                      ->whereNotNull('expiry_date')
-                      ->whereDate('expiry_date', '<=', now()->addDays(30));
-              });
+                ->orWhereHas('batches', function ($batchQuery) {
+                    $batchQuery->where('is_active', 1)
+                        ->where('track_expiry', 1)
+                        ->whereNotNull('expiry_date')
+                        ->whereDate('expiry_date', '<=', now()->addDays(30));
+                });
         });
 
-        if (!empty($filters['search'])) {
-            $search = '%' . $filters['search'] . '%';
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
             $query->where('name', 'like', $search);
         }
 
@@ -80,7 +79,7 @@ class AlertService
     private function formatAlert(string $type, string $title, string $message, Product $product, ?Stock $batch = null): array
     {
         return [
-            'id' => ($batch ? 'batch-' . $batch->id : 'prod-' . $product->id) . '-' . $type,
+            'id' => ($batch ? 'batch-'.$batch->id : 'prod-'.$product->id).'-'.$type,
             'type' => $type,
             'severity' => in_array($type, ['critical_stock', 'expired', 'critical_expiry']) ? 'critical' : 'warning',
             'title' => $title,

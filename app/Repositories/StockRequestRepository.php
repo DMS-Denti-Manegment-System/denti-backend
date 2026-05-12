@@ -148,11 +148,11 @@ class StockRequestRepository implements StockRequestRepositoryInterface
     {
         $query = \Illuminate\Support\Facades\DB::table('stock_requests')
             ->whereNull('deleted_at');
-        
+
         if ($clinicId) {
             $query->where(function ($q) use ($clinicId) {
                 $q->where('requester_clinic_id', $clinicId)
-                  ->orWhere('requested_from_clinic_id', $clinicId);
+                    ->orWhere('requested_from_clinic_id', $clinicId);
             });
         }
 

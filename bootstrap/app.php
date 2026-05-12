@@ -48,6 +48,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'meta' => null,
                 ], 422);
             }
+
             return null;
         });
 
@@ -75,6 +76,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'meta' => null,
                 ], 403);
             }
+
             return null;
         });
 
@@ -88,6 +90,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'meta' => null,
                 ], 419);
             }
+
             return redirect()->back()->withInput()->withErrors(['error' => 'Oturum süresi doldu, lütfen formu tekrar gönderin.']);
         });
 
@@ -101,6 +104,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'meta' => null,
                 ], 404);
             }
+
             return null;
         });
 
@@ -114,6 +118,7 @@ return Application::configure(basePath: dirname(__DIR__))
                     'meta' => null,
                 ], 429);
             }
+
             return null;
         });
 
@@ -148,6 +153,7 @@ return Application::configure(basePath: dirname(__DIR__))
                         'meta' => null,
                     ], $e->getStatusCode());
                 }
+
                 return null; // Fallback to default Laravel handler for web
             }
 

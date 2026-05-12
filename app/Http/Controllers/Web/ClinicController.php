@@ -8,10 +8,10 @@ use App\Http\Requests\StoreClinicRequest;
 use App\Http\Requests\UpdateClinicRequest;
 use App\Models\Clinic;
 use App\Repositories\ClinicRepository;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 
 class ClinicController extends Controller
 {
@@ -76,6 +76,7 @@ class ClinicController extends Controller
     public function edit(Clinic $clinic): RedirectResponse
     {
         $this->authorize('update', $clinic);
+
         return redirect()->route('clinics.index', ['modal' => 'edit', 'edit' => $clinic->id]);
     }
 
@@ -92,7 +93,7 @@ class ClinicController extends Controller
         $this->authorize('delete', $clinic);
         $success = $this->repository->delete($clinic->id);
 
-        if (!$success) {
+        if (! $success) {
             return $this->actionErrorResponse($request, 'clinics.index', 'error', 'Klinik silinirken bir hata oluştu.');
         }
 

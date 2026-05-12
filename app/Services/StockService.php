@@ -7,7 +7,6 @@ use App\Exceptions\Stock\InsufficientStockException;
 use App\Exceptions\Stock\StockNotFoundException;
 use App\Models\Stock;
 use App\Repositories\Interfaces\StockRepositoryInterface;
-use App\Support\StockStatsCache;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -383,26 +382,26 @@ class StockService
             $isPostgres = $driver === 'pgsql';
             $isSqlite = $driver === 'sqlite';
 
-            $redDaysSql = $isPostgres 
-                ? "CAST(? AS DATE) + CAST(COALESCE(stocks.expiry_red_days, 15) AS INTEGER)"
+            $redDaysSql = $isPostgres
+                ? 'CAST(? AS DATE) + CAST(COALESCE(stocks.expiry_red_days, 15) AS INTEGER)'
                 : ($isSqlite ? "date(?, '+' || COALESCE(stocks.expiry_red_days, 15) || ' days')" : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_red_days, 15) DAY)');
 
             $yellowDaysSql = $isPostgres
-                ? "CAST(? AS DATE) + CAST(COALESCE(stocks.expiry_yellow_days, 30) AS INTEGER)"
+                ? 'CAST(? AS DATE) + CAST(COALESCE(stocks.expiry_yellow_days, 30) AS INTEGER)'
                 : ($isSqlite ? "date(?, '+' || COALESCE(stocks.expiry_yellow_days, 30) || ' days')" : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_yellow_days, 30) DAY)');
 
             // 1. Ürün Bazlı Stok Özet Alt Sorgusu
             $stockSummaryQuery = DB::table('stocks')
                 ->select('product_id')
                 ->selectRaw("SUM({$totalUnitsRaw}) as total_stock")
-                ->selectRaw("SUM(purchase_price * current_stock) as total_value")
+                ->selectRaw('SUM(purchase_price * current_stock) as total_value')
                 ->whereNull('deleted_at')
                 ->where('is_active', true);
 
             if ($clinicId) {
                 $stockSummaryQuery->where('clinic_id', $clinicId);
             }
-            
+
             // 2. Ana Sorgu (Products üzerinden Left Join)
             $statsQuery = DB::table('products')
                 ->leftJoinSub($stockSummaryQuery, 'stock_summary', 'products.id', '=', 'stock_summary.product_id')
@@ -410,13 +409,13 @@ class StockService
                 ->where('products.is_active', true);
 
             if ($clinicId) {
-                $statsQuery->where(function($q) use ($clinicId) {
+                $statsQuery->where(function ($q) use ($clinicId) {
                     $q->where('products.clinic_id', $clinicId)
-                      ->orWhereNotNull('stock_summary.product_id');
+                        ->orWhereNotNull('stock_summary.product_id');
                 });
             }
 
-            $stats = $statsQuery->selectRaw("
+            $stats = $statsQuery->selectRaw('
                 COUNT(products.id) as total_items,
                 
                 -- Kritik Stok (Ürün Toplam Stok Bazlı)
@@ -431,7 +430,7 @@ class StockService
                     THEN 1 END) as low_stock_items,
                 
                 SUM(COALESCE(stock_summary.total_value, 0)) as total_value
-            ")->first();
+            ')->first();
 
             // 3. Miyat (SKT) Uyarıları (Batch Bazlı - Her zaman batch bazlı olmalı)
             $expiryQuery = DB::table('stocks')
@@ -450,7 +449,7 @@ class StockService
 
             return [
                 'total_items' => (int) ($stats->total_items ?? 0),
-                'total_batches' => (int) DB::table('stocks')->whereNull('deleted_at')->where('is_active', true)->when($clinicId, fn($q) => $q->where('clinic_id', $clinicId))->count(),
+                'total_batches' => (int) DB::table('stocks')->whereNull('deleted_at')->where('is_active', true)->when($clinicId, fn ($q) => $q->where('clinic_id', $clinicId))->count(),
                 'low_stock_items' => (int) ($stats->low_stock_items ?? 0),
                 'critical_stock_items' => (int) ($stats->critical_stock_items ?? 0),
                 'low_expiring_items' => (int) ($expiryStats->low_expiring_items ?? 0),
@@ -459,6 +458,7 @@ class StockService
             ];
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::error('Stock Stats Error: '.$e->getMessage());
+
             return [
                 'total_items' => 0,
                 'total_batches' => 0,
@@ -599,7 +599,7 @@ class StockService
                 // 🛡️ DEADLOCK PREVENTION: Always lock the parent resource (Stock) BEFORE the child (Transaction)
                 $tempTxn = \App\Models\StockTransaction::findOrFail($transactionId);
                 $stock = $tempTxn->stock()->lockForUpdate()->first();
-                
+
                 $transaction = \App\Models\StockTransaction::whereKey($transactionId)
                     ->lockForUpdate()
                     ->firstOrFail();

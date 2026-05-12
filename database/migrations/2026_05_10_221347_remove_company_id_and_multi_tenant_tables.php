@@ -17,7 +17,7 @@ return new class extends Migration
         $tables = [
             'clinics', 'users', 'products', 'stocks', 'stock_transactions',
             'stock_requests', 'stock_transfers', 'stock_alerts', 'suppliers',
-            'categories', 'todos'
+            'categories', 'todos',
         ];
 
         foreach ($tables as $table) {
@@ -25,9 +25,9 @@ return new class extends Migration
                 // Drop indexes manually so we can catch exceptions immediately
                 $indexesToDrop = [
                     $table.'_company_id_index',
-                    $table.'_company_id_foreign'
+                    $table.'_company_id_foreign',
                 ];
-                
+
                 if ($table === 'stocks') {
                     $indexesToDrop[] = 'idx_stocks_company_clinic_product';
                     $indexesToDrop[] = 'idx_stocks_company_active_expiry';
@@ -39,7 +39,9 @@ return new class extends Migration
                     $indexesToDrop[] = 'idx_users_company_clinic_active';
                     $indexesToDrop[] = 'users_company_id_username_unique';
                 }
-                if ($table === 'stock_transfers') $indexesToDrop[] = 'stock_transfers_company_id_status_index';
+                if ($table === 'stock_transfers') {
+                    $indexesToDrop[] = 'stock_transfers_company_id_status_index';
+                }
                 if ($table === 'stock_alerts') {
                     $indexesToDrop[] = 'idx_stock_alerts_company_active';
                     $indexesToDrop[] = 'idx_alerts_company_active_clinic';
@@ -51,7 +53,10 @@ return new class extends Migration
                 }
 
                 foreach ($indexesToDrop as $index) {
-                    try { \Illuminate\Support\Facades\DB::statement("DROP INDEX {$index}"); } catch (\Exception $e) {}
+                    try {
+                        \Illuminate\Support\Facades\DB::statement("DROP INDEX {$index}");
+                    } catch (\Exception $e) {
+                    }
                 }
 
                 // 1. Drop foreign key first (rebuilds table in SQLite)
@@ -79,8 +84,14 @@ return new class extends Migration
 
         // 3. Drop company_id from Spatie permission tables
         if (Schema::hasColumn('roles', 'company_id')) {
-            try { \Illuminate\Support\Facades\DB::statement("DROP INDEX roles_team_foreign_key_index"); } catch (\Exception $e) {}
-            try { \Illuminate\Support\Facades\DB::statement("DROP INDEX roles_company_id_name_guard_name_unique"); } catch (\Exception $e) {}
+            try {
+                \Illuminate\Support\Facades\DB::statement('DROP INDEX roles_team_foreign_key_index');
+            } catch (\Exception $e) {
+            }
+            try {
+                \Illuminate\Support\Facades\DB::statement('DROP INDEX roles_company_id_name_guard_name_unique');
+            } catch (\Exception $e) {
+            }
             Schema::table('roles', function (Blueprint $tableBlueprint) {
                 $tableBlueprint->dropColumn('company_id');
             });

@@ -48,7 +48,7 @@ class StockRequestService
     public function createRequest(array $data): StockRequest
     {
         $user = Auth::user();
-        if ($user && !$user->hasRole('Admin') && (int) $data['requester_clinic_id'] !== (int) $user->clinic_id) {
+        if ($user && ! $user->hasRole('Admin') && (int) $data['requester_clinic_id'] !== (int) $user->clinic_id) {
             throw new AuthorizationException('Sadece kendi kliniğiniz adına talep oluşturabilirsiniz.');
         }
 
@@ -84,7 +84,7 @@ class StockRequestService
         // 🔒 GÜVENLİK: Sadece ürünü VERECEK olan klinik veya ADMIN onaylayabilir.
         $user = Auth::user();
         $isAdmin = $user->hasRole('Admin');
-        if (!$isAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+        if (! $isAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
             throw new AuthorizationException('Bu talebi sadece ürünü gönderecek olan klinik onaylayabilir.');
         }
 
@@ -128,7 +128,7 @@ class StockRequestService
         // GÜVENLİK: Sadece ürünü GÖNDEREN klinik veya ADMIN transferi başlatabilir.
         $user = Auth::user();
         $isAdmin = $user->hasRole('Admin');
-        if (!$isAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+        if (! $isAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
             throw new AuthorizationException('Bu işlemi sadece ürünü gönderen klinik başlatabilir.');
         }
 
@@ -155,7 +155,7 @@ class StockRequestService
         // 🔒 GÜVENLİK: Sadece ürünü ALAN klinik veya ADMIN transferi tamamlayabilir.
         $user = Auth::user();
         $isAdmin = $user->hasRole('Admin');
-        if (!$isAdmin && $request->requester_clinic_id !== $user->clinic_id) {
+        if (! $isAdmin && $request->requester_clinic_id !== $user->clinic_id) {
             throw new AuthorizationException('Bu işlemi sadece ürünü teslim alan klinik tamamlayabilir.');
         }
 
@@ -194,7 +194,7 @@ class StockRequestService
         // 🔒 GÜVENLİK: Sadece ürünü VERECEK olan klinik veya ADMIN reddedebilir.
         $user = Auth::user();
         $isAdmin = $user->hasRole('Admin');
-        if (!$isAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
+        if (! $isAdmin && $request->requested_from_clinic_id !== $user->clinic_id) {
             throw new AuthorizationException('Bu talebi sadece ürünü gönderecek olan klinik reddedebilir.');
         }
 

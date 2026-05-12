@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Clinic;
-use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
@@ -18,7 +17,7 @@ class DashboardStatsService
     public function getStatsForUser(User $user): array
     {
         $clinicId = $user->clinic_id;
-        $cacheKey = 'dashboard_stats_v3_' . ($clinicId ?? 'global');
+        $cacheKey = 'dashboard_stats_v3_'.($clinicId ?? 'global');
 
         return Cache::remember($cacheKey, 120, fn () => $this->buildStats($clinicId));
     }
@@ -48,7 +47,7 @@ class DashboardStatsService
             'total_clinics' => Clinic::query()->count(),
             'total_suppliers' => Supplier::query()->count(),
             'is_super_admin' => false,
-            
+
             // Stock specific stats
             'total_stock_items' => $stockStats['total_items'],
             'low_stock_items' => $stockStats['low_stock_items'],

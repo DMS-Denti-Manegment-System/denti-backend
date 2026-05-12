@@ -28,7 +28,7 @@ class UpdateStockRequest extends FormRequest
             'expiry_date' => 'nullable|date',
             'storage_location' => 'nullable|string|max:255',
             'is_active' => 'boolean',
-            
+
             // Notification thresholds for this batch
             'expiry_yellow_days' => 'nullable|integer|min:0',
             'expiry_red_days' => 'nullable|integer|min:0',

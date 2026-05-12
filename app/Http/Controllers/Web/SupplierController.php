@@ -8,10 +8,10 @@ use App\Http\Requests\StoreSupplierRequest;
 use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Supplier;
 use App\Repositories\SupplierRepository;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 
 class SupplierController extends Controller
 {
@@ -76,6 +76,7 @@ class SupplierController extends Controller
     public function edit(Supplier $supplier): RedirectResponse
     {
         $this->authorize('update', $supplier);
+
         return redirect()->route('suppliers.index', ['modal' => 'edit', 'edit' => $supplier->id]);
     }
 
@@ -92,7 +93,7 @@ class SupplierController extends Controller
         $this->authorize('delete', $supplier);
         $success = $this->repository->delete($supplier->id);
 
-        if (!$success) {
+        if (! $success) {
             return $this->actionErrorResponse($request, 'suppliers.index', 'error', 'Tedarikçi silinirken bir hata oluştu.');
         }
 

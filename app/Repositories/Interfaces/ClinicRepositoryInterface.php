@@ -29,6 +29,6 @@ interface ClinicRepositoryInterface
     public function getStockSummary(int $clinicId): array;
 
     public function getGlobalStats(): array;
-    
+
     public function getClinicStats(): array;
 }

@@ -8,10 +8,10 @@ use App\Http\Requests\StoreCategoryRequest;
 use App\Http\Requests\UpdateCategoryRequest;
 use App\Models\Category;
 use App\Repositories\CategoryRepository;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 
 class CategoryController extends Controller
 {
@@ -87,6 +87,7 @@ class CategoryController extends Controller
         }
 
         $category->delete();
+
         return $this->actionResponse($request, 'categories.index', 'Kategori başarıyla silindi.');
     }
 }

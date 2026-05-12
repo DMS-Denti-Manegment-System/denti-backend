@@ -4,19 +4,19 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Web\Traits\HandlesOperationsResponses;
+use App\Http\Requests\AdjustStockRequest;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
-use App\Http\Requests\AdjustStockRequest;
 use App\Http\Requests\UseStockRequest;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Repositories\ProductRepository;
 use App\Services\ProductService;
 use App\Services\StockService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\Log;
 
 class StockController extends Controller
@@ -24,7 +24,9 @@ class StockController extends Controller
     use HandlesOperationsResponses;
 
     protected $productRepository;
+
     protected $productService;
+
     protected $stockService;
 
     public function __construct(
@@ -41,7 +43,7 @@ class StockController extends Controller
     {
         try {
             $filters = $request->only(['search', 'clinic_id', 'status']);
-            
+
             $query = Stock::with(['product', 'clinic'])
                 ->where('is_active', true)
                 ->where('available_stock', '>', 0);
@@ -51,10 +53,10 @@ class StockController extends Controller
             }
 
             if ($request->filled('search')) {
-                $search = '%' . $request->search . '%';
-                $query->whereHas('product', function($q) use ($search) {
+                $search = '%'.$request->search.'%';
+                $query->whereHas('product', function ($q) use ($search) {
                     $q->where('name', 'like', $search)
-                      ->orWhere('sku', 'like', $search);
+                        ->orWhere('sku', 'like', $search);
                 });
             }
 
@@ -63,21 +65,21 @@ class StockController extends Controller
             $results = $stocks->map(function ($stock) {
                 return [
                     'id' => $stock->id,
-                    'text' => ($stock->product->name ?? 'Bilinmeyen') . " [{$stock->clinic->name}]" . ($stock->batch_code ? " - {$stock->batch_code}" : ""),
+                    'text' => ($stock->product->name ?? 'Bilinmeyen')." [{$stock->clinic->name}]".($stock->batch_code ? " - {$stock->batch_code}" : ''),
                     'product_name' => $stock->product->name ?? 'Bilinmeyen',
                     'clinic_name' => $stock->clinic->name ?? 'Bilinmeyen',
-                    'available_stock' => $stock->available_stock
+                    'available_stock' => $stock->available_stock,
                 ];
             });
 
             return response()->json([
                 'success' => true,
-                'data' => $results
+                'data' => $results,
             ]);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => $e->getMessage()
+                'message' => $e->getMessage(),
             ], 500);
         }
     }
@@ -135,15 +137,15 @@ class StockController extends Controller
         $chartData = collect();
         $endDate = now();
         $startDate = now()->subDays(15);
-        
-        // Simple implementation: show current stock as last point, 
+
+        // Simple implementation: show current stock as last point,
         // and fill others with 0 or last known if we wanted to be precise.
         // For now, let's provide at least an empty array or basic data to avoid errors.
         for ($i = 15; $i >= 0; $i--) {
             $date = now()->subDays($i)->format('Y-m-d');
             $chartData->push([
                 'date' => $date,
-                'value' => (int) $product->total_stock // Simplified
+                'value' => (int) $product->total_stock, // Simplified
             ]);
         }
 
@@ -179,6 +181,7 @@ class StockController extends Controller
             return $this->actionResponse($request, 'stocks.index', 'Ürün başarıyla oluşturuldu.');
         } catch (\Throwable $e) {
             Log::error('web.stocks.store_failed', ['error' => $e->getMessage()]);
+
             return $this->actionErrorResponse($request, 'stocks.index', 'stock', 'Ürün oluşturulamadı.');
         }
     }
@@ -192,9 +195,11 @@ class StockController extends Controller
     {
         try {
             $this->productService->updateProduct($product->id, $request->validated());
+
             return $this->actionResponse($request, 'stocks.index', 'Ürün güncellendi.');
         } catch (\Throwable $e) {
             Log::error('web.stocks.update_failed', ['error' => $e->getMessage()]);
+
             return $this->actionErrorResponse($request, 'stocks.index', 'stock', 'Güncelleme sırasında hata oluştu.');
         }
     }
@@ -202,6 +207,7 @@ class StockController extends Controller
     public function destroy(Product $product): JsonResponse
     {
         $success = $this->productService->deleteProduct($product->id);
+
         return response()->json([
             'success' => $success,
             'message' => $success ? 'Ürün başarıyla silindi.' : 'Silme sırasında hata oluştu.',
@@ -218,7 +224,7 @@ class StockController extends Controller
         $this->stockService->adjustStock(
             $batch->id,
             (int) $request->quantity,
-            $request->reason . ($request->notes ? ' - ' . $request->notes : ''),
+            $request->reason.($request->notes ? ' - '.$request->notes : ''),
             auth()->user()->name,
             false,
             $request->operation_type,
@@ -245,6 +251,7 @@ class StockController extends Controller
             return $this->actionResponse($request, 'products.show', 'Stok kullanildi.', ['id' => $stock->product_id]);
         } catch (\Exception $e) {
             Log::error('web.stocks.use_failed', ['error' => $e->getMessage(), 'stock_id' => $stock->id]);
+
             return $this->actionErrorResponse($request, 'products.show', 'stock', $e->getMessage(), 422, ['id' => $stock->product_id]);
         }
     }
@@ -270,12 +277,13 @@ class StockController extends Controller
             $data['product_id'] = $product->id;
             $data['current_stock'] = $validated['quantity'];
             $data['track_expiry'] = (bool) ($validated['expiry_date'] ?? false);
-            
+
             $this->stockService->createStock($data);
 
             return $this->actionResponse($request, 'products.show', 'Stok girişi başarıyla yapıldı.', ['id' => $product->id]);
         } catch (\Throwable $e) {
             Log::error('web.stocks.store_batch_failed', ['error' => $e->getMessage(), 'product_id' => $product->id]);
+
             return $this->actionErrorResponse($request, 'products.show', 'stock', 'Stok girişi yapılamadı.', 422, ['id' => $product->id]);
         }
     }
@@ -304,10 +312,10 @@ class StockController extends Controller
 
         if ($request->filled('product')) {
             $selectedProduct = Product::with(['clinic'])->findOrFail($request->integer('product'));
-            
+
             // 🚀 PERFORMANCE FIX: Use relationship query instead of collection sorting to avoid OOM
             $selectedBatch = $selectedProduct->batches()->with(['supplier', 'clinic'])->latest('id')->first();
-            
+
             $selectedTransactions = $selectedProduct->stockTransactions()
                 ->with(['clinic', 'stock'])
                 ->latest('transaction_date')

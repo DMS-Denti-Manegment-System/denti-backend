@@ -26,6 +26,6 @@ interface TodoRepositoryInterface
     public function getByCategory(int $categoryId): Collection;
 
     public function getWithCategory(): Collection;
- 
+
     public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator;
 }

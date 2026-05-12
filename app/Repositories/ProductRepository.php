@@ -3,10 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\Product;
-use App\Models\Stock;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Builder;
 
 class ProductRepository
 {
@@ -98,11 +97,11 @@ class ProductRepository
                     $q->whereDate('expiry_date', '<', $now->toDateString());
                 } elseif ($level === 'critical_expiry') {
                     $q->whereDate('expiry_date', '>=', $now->toDateString())
-                        ->whereRaw("expiry_date <= " . $this->getDateAddSql('expiry_red_days', 15), [$now->toDateTimeString()]);
+                        ->whereRaw('expiry_date <= '.$this->getDateAddSql('expiry_red_days', 15), [$now->toDateTimeString()]);
                 } else { // near_expiry
                     $q->whereDate('expiry_date', '>=', $now->toDateString())
-                        ->whereRaw("expiry_date <= " . $this->getDateAddSql('expiry_yellow_days', 30), [$now->toDateTimeString()])
-                        ->whereRaw("expiry_date > " . $this->getDateAddSql('expiry_red_days', 15), [$now->toDateTimeString()]);
+                        ->whereRaw('expiry_date <= '.$this->getDateAddSql('expiry_yellow_days', 30), [$now->toDateTimeString()])
+                        ->whereRaw('expiry_date > '.$this->getDateAddSql('expiry_red_days', 15), [$now->toDateTimeString()]);
                 }
             });
         }

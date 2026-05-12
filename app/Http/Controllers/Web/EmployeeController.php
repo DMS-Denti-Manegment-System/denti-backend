@@ -7,10 +7,10 @@ use App\Http\Controllers\Web\Traits\HandlesOperationsResponses;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
 use Spatie\Permission\Models\Role;
 
 class EmployeeController extends Controller
@@ -105,6 +105,7 @@ class EmployeeController extends Controller
         }
 
         $user->delete();
+
         return response()->json(['success' => true, 'message' => 'Personel silindi.']);
     }
 }

@@ -8,7 +8,6 @@ use App\Http\Controllers\Web\CategoryController;
 use App\Http\Controllers\Web\ClinicController;
 use App\Http\Controllers\Web\DashboardPageController;
 use App\Http\Controllers\Web\EmployeeController;
-use App\Http\Controllers\Web\OperationsPageController;
 use App\Http\Controllers\Web\ProfileController;
 use App\Http\Controllers\Web\ReportController;
 use App\Http\Controllers\Web\RolePageController;
@@ -122,7 +121,7 @@ Route::middleware(['auth', 'set_permissions_team'])->group(function () {
     Route::post('/roles', [RolePageController::class, 'store'])->middleware('permission:manage-users')->name('roles.store');
     Route::get('/roles/{role}/edit', [RolePageController::class, 'edit'])->middleware('permission:manage-users')->name('roles.edit');
     Route::put('/roles/{role}', [RolePageController::class, 'update'])->middleware('permission:manage-users')->name('roles.update');
-    
+
     // Profile
     Route::controller(ProfileController::class)->group(function () {
         Route::get('/profile', 'index')->name('profile.index');

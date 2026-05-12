@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\Clinic;
 use App\Models\Product;
 use App\Models\Stock;
-use App\Models\StockRequest;
 use App\Models\User;
 use App\Services\StockRequestService;
 use Illuminate\Auth\Access\AuthorizationException;

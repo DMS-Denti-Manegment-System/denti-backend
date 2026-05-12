@@ -21,5 +21,4 @@ class StockTransactionObserver
         // Transaction deletion is no longer a stock mutation path.
         // Reversals must be represented by an explicit opposite transaction.
     }
-
 }

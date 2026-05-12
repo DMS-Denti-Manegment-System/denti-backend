@@ -28,7 +28,7 @@ class SupplierRepository implements SupplierRepositoryInterface
     public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = $this->model->newQuery();
- 
+
         if (! empty($filters['search'])) {
             $search = '%'.$filters['search'].'%';
             $query->where(function ($q) use ($search) {
@@ -37,11 +37,11 @@ class SupplierRepository implements SupplierRepositoryInterface
                     ->orWhere('email', 'like', $search);
             });
         }
- 
+
         if (! empty($filters['status'])) {
             $query->where('is_active', $filters['status'] === 'active');
         }
- 
+
         return $query->latest()->paginate($perPage);
     }
 
@@ -97,6 +97,7 @@ class SupplierRepository implements SupplierRepositoryInterface
             ->orderBy('name')
             ->get();
     }
+
     public function getSupplierStats(): array
     {
         $stats = \Illuminate\Support\Facades\DB::table('suppliers')

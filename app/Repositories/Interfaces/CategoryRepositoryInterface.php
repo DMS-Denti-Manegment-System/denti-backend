@@ -22,6 +22,6 @@ interface CategoryRepositoryInterface
     public function getActive(): Collection;
 
     public function getWithTodos(): Collection;
- 
+
     public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator;
 }

@@ -35,7 +35,7 @@ class UpdateProductRequest extends FormRequest
             'is_active' => 'nullable|boolean',
             'has_expiration_date' => 'nullable|boolean',
             'show_zero_stock_in_critical' => 'nullable|boolean',
-            
+
             // Sub-unit settings
             'has_sub_unit' => 'nullable|boolean',
             'sub_unit_name' => 'nullable|string|max:50',

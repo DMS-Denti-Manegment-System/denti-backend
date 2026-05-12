@@ -4,15 +4,13 @@ namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\Web\Traits\HandlesOperationsResponses;
-use App\Models\Stock;
 use App\Models\Clinic;
 use App\Models\StockRequest;
 use App\Services\StockRequestService;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Validation\Rule;
 
 class StockRequestController extends Controller
@@ -36,7 +34,7 @@ class StockRequestController extends Controller
         $requests = $this->service->getAllWithFilters($filters, $this->perPage($request));
 
         $clinicId = $filters['clinic_id'] ?? null;
-        if (!$clinicId && !auth()->user()->hasRole('Admin')) {
+        if (! $clinicId && ! auth()->user()->hasRole('Admin')) {
             $clinicId = auth()->user()->clinic_id;
         }
 
@@ -93,7 +91,7 @@ class StockRequestController extends Controller
         ]);
 
         $user = auth()->user();
-        if (!$user->hasRole('Admin') && (int) $validated['requester_clinic_id'] !== (int) $user->clinic_id) {
+        if (! $user->hasRole('Admin') && (int) $validated['requester_clinic_id'] !== (int) $user->clinic_id) {
             abort(403, 'Sadece kendi kliniğiniz adına talep oluşturabilirsiniz.');
         }
 
@@ -128,12 +126,14 @@ class StockRequestController extends Controller
     public function ship(Request $request, StockRequest $stockRequest): RedirectResponse|JsonResponse
     {
         $this->service->shipRequest($stockRequest->id, auth()->user()->name);
+
         return $this->actionResponse($request, 'stock-requests.index', 'Talep sevk sürecine alındı.');
     }
 
     public function complete(Request $request, StockRequest $stockRequest): RedirectResponse|JsonResponse
     {
         $this->service->completeRequest($stockRequest->id, auth()->user()->name);
+
         return $this->actionResponse($request, 'stock-requests.index', 'Talep tamamlandı.');
     }
 }

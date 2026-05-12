@@ -154,6 +154,7 @@ class ClinicRepository implements ClinicRepositoryInterface
             'critical_stock_items' => $stockStats->critical_stock_items ?? 0,
         ];
     }
+
     public function getClinicStats(): array
     {
         $stats = DB::table('clinics')

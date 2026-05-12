@@ -60,16 +60,16 @@ class CategoryRepository implements CategoryRepositoryInterface
     {
         return $this->model->with('todos')->orderBy('name', 'asc')->get();
     }
- 
+
     public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = $this->model->withCount('todos');
- 
+
         if (! empty($filters['search'])) {
             $search = '%'.$filters['search'].'%';
             $query->where('name', 'like', $search);
         }
- 
+
         return $query->orderBy('name')->paginate($perPage);
     }
 }
