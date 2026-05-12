@@ -15,7 +15,7 @@ Laravel 12 tabanlı, tek işletme kurulumuna göre çalışan diş kliniği stok
 - Stok yönetimi: ürün, batch, alt birim, son kullanma tarihi, manuel stok düzeltme
 - Operasyonlar: klinikler, tedarikçiler, personel, roller, todo, stok talepleri
 - Uyarılar: düşük stok, kritik stok, SKT yaklaşan ve süresi geçmiş ürünler
-- Tek işletme mimarisi: `company_id` kullanıcıya gösterilmez, permission ve veri sahipliği için iç sistem anahtarı olarak kalır
+- Tek işletme mimarisi: single-tenant deployment
 
 ## Kurulum
 
@@ -66,7 +66,7 @@ php artisan test
 - `.env` içinde `APP_ENV=production` ve `APP_DEBUG=false`
 - SQLite dosyası `DB_DATABASE` yolunda oluşturulmuş ve PHP-FPM kullanıcısı tarafından yazılabilir olmalı
 - `php artisan optimize`
-- `DENTI_COMPANY_*` ve `DENTI_OWNER_*` env değerleri kurulum yapılan kliniğe göre set edilmeli
+- `DENTI_SYSTEM_*` ve `DENTI_OWNER_*` env değerleri kurulum yapılan kliniğe göre set edilmeli
 - Queue worker çalışır durumda olmalı
 - Scheduler cron eklenmeli: `* * * * * php /path/to/artisan schedule:run`
 - `storage` ve `bootstrap/cache` yazılabilir olmalı
@@ -78,4 +78,3 @@ php artisan test
 - Eski README içeriğindeki React/Ant Design açıklamaları artık geçerli değildir.
 - Web arayüzü Blade tabanlıdır; frontend değişiklikleri `resources/views` ve mevcut public assetleri altında yapılmalıdır.
 - Stok hareketlerinde miktar değişiminin ana sahibi `StockTransactionObserver`dır; servisler stok sayısını transaction kaydı üzerinden değiştirmelidir.
-- Spatie Permission teams özelliği `company_id` ile aktiftir. Ürün tek işletme çalışsa da bu kolon kaldırılmamalıdır; roller, indeksler ve veri sahipliği bu anahtar üzerinden tutarlı kalır.

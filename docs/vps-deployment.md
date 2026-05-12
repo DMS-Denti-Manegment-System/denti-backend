@@ -1,6 +1,6 @@
 # VPS Deployment Model
 
-Denti now targets a single-company deployment model: one application instance, one database and one internal company record per customer/clinic group.
+Denti now targets a single-tenant deployment model: one application instance, one database per customer/clinic group.
 
 ## Recommended VPS Stack
 
@@ -13,17 +13,6 @@ Denti now targets a single-company deployment model: one application instance, o
 - Cron for Laravel scheduler
 
 Hestia is acceptable for this project because the app is a conventional Laravel app and does not need AWS-specific infrastructure. If the VPS will host only this app and the team is comfortable with terminal operations, a plain Nginx/PHP-FPM/Supervisor setup is leaner. If the VPS will be managed by non-dev operators, Hestia is the more practical choice.
-
-## Data Model Rule
-
-Do not remove `company_id` columns. They are internal ownership keys used by:
-
-- Spatie Permission teams
-- query indexes
-- data ownership checks
-- future migration path if a customer outgrows a single VPS
-
-The product UI must not expose company creation or company switching.
 
 ## Install Flow
 
@@ -60,17 +49,14 @@ php /home/USER/web/DOMAIN/private/artisan queue:work --sleep=3 --tries=3 --timeo
 ## Required Env Values
 
 ```dotenv
-DENTI_COMPANY_NAME="Clinic Name"
-DENTI_COMPANY_CODE=default
-DENTI_COMPANY_DOMAIN=clinic.example.com
-DENTI_COMPANY_EMAIL=admin@clinic.example.com
+DENTI_SYSTEM_NAME="Clinic Name"
+DENTI_SYSTEM_DOMAIN=clinic.example.com
+DENTI_SYSTEM_EMAIL=admin@clinic.example.com
 DENTI_OWNER_NAME="Clinic Owner"
 DENTI_OWNER_USERNAME=admin
 DENTI_OWNER_EMAIL=admin@clinic.example.com
 DENTI_OWNER_PASSWORD=change-this-before-seed
 ```
-
-`DENTI_COMPANY_CODE` is internal. It is not entered on the login screen.
 
 ## SQLite Production Notes
 

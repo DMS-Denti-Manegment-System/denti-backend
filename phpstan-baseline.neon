@@ -2051,11 +2051,6 @@ parameters:
 			path: app/Services/ClinicService.php
 
 		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Role\\:\\:withoutGlobalScopes\\(\\)\\.$#"
-			count: 2
-			path: app/Services/CompanyRoleService.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Models\\\\Product\\:\\:\\$company_id\\.$#"
 			count: 1
 			path: app/Services/ProductService.php

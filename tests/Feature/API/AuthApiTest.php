@@ -50,10 +50,11 @@ class AuthApiTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function legacy_company_code_is_ignored_in_single_company_login()
+    public function legacy_fields_are_ignored_in_login()
     {
         $response = $this->postJson('/api/login', [
             'company_code' => 'INVALID',
+            'clinic_code' => 'IGNORED',
             'username' => 'admin',
             'password' => 'password123',
         ]);
@@ -154,25 +155,7 @@ class AuthApiTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function legacy_clinic_code_is_ignored_in_single_company_login()
-    {
-        $response = $this->postJson('/api/login', [
-            'clinic_code' => 'IGNORED',
-            'username' => 'admin',
-            'password' => 'password123',
-        ]);
-
-        $response->assertStatus(200)
-            ->assertJsonStructure([
-                'success',
-                'data' => [
-                    'user',
-                ],
-            ]);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_can_login_without_clinic_or_company_code()
+    public function user_can_login_with_username_only()
     {
         $response = $this->postJson('/api/login', [
             'username' => 'admin',

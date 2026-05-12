@@ -42,8 +42,6 @@ return new class extends Migration
             $table->dropForeign(['product_id']);
             $table->dropColumn('product_id');
 
-            $table->dropColumn('company_id');
-
             $table->enum('type', [
                 'low_stock',
                 'critical_stock',
@@ -52,7 +50,6 @@ return new class extends Migration
             ])->change();
 
             $table->dropIndex('idx_stock_alerts_product_active');
-            $table->dropIndex('idx_stock_alerts_company_active');
         });
     }
 };

@@ -2,13 +2,13 @@
 
 namespace Database\Seeders;
 
-use App\Services\CompanyRoleService;
+use App\Services\RoleService;
 use Illuminate\Database\Seeder;
 
 class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        app(CompanyRoleService::class)->ensureRoles();
+        app(RoleService::class)->ensureRoles();
     }
 }

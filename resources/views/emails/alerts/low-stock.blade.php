@@ -106,7 +106,7 @@
             <h1 class="title">Düşük Stok Uyarısı</h1>
         </div>
 
-        <p>Sayın {{ $companyName }} Yetkilisi,</p>
+        <p>Sayın {{ $clinicName }} Yetkilisi,</p>
         
         <p>Aşağıdaki ürünün stoğu kritik seviyenin altına düşmüştür:</p>
 
@@ -144,7 +144,7 @@
         </ul>
 
         <div class="footer">
-            <p>Bu e-posta {{ $companyName }} stok yönetim sistemi tarafından otomatik gönderilmiştir.</p>
+            <p>Bu e-posta {{ $clinicName }} stok yönetim sistemi tarafından otomatik gönderilmiştir.</p>
             <p>© {{ date('Y') }} Denti Stok Yönetimi</p>
         </div>
     </div>

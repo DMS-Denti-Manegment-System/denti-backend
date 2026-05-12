@@ -162,7 +162,7 @@
             </h1>
         </div>
 
-        <p>Sayın {{ $companyName }} Yetkilisi,</p>
+        <p>Sayın {{ $clinicName }} Yetkilisi,</p>
         
         @if($alertType === 'expired')
             <p><strong style="color: #ff4d4f;">Aşağıdaki ürünün son kullanma tarihi geçmiştir!</strong></p>
@@ -245,7 +245,7 @@
         @endif
 
         <div class="footer">
-            <p>Bu e-posta {{ $companyName }} stok yönetim sistemi tarafından otomatik gönderilmiştir.</p>
+            <p>Bu e-posta {{ $clinicName }} stok yönetim sistemi tarafından otomatik gönderilmiştir.</p>
             <p>© {{ date('Y') }} Denti Stok Yönetimi</p>
         </div>
     </div>

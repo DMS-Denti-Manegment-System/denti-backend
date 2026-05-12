@@ -3,16 +3,12 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | Deployment Model
+    | System Configuration
     |--------------------------------------------------------------------------
     |
-    | Denti is deployed as a single-tenant application. The system record is
-    | kept as an internal boundary for permissions, indexes and data ownership;
-    | users should not create or switch systems from the product UI.
+    | Denti is deployed as a single-tenant application.
     |
     */
-    'deployment_model' => env('DENTI_DEPLOYMENT_MODEL', 'single_tenant'),
-
     'system' => [
         'name' => env('DENTI_SYSTEM_NAME', 'Denti Klinik'),
         'domain' => env('DENTI_SYSTEM_DOMAIN', 'local'),

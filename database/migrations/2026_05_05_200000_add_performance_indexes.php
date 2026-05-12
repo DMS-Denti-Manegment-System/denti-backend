@@ -41,27 +41,27 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('stocks', function (Blueprint $table) {
-            $table->dropIndex('idx_stocks_company_clinic_product');
-            $table->dropIndex('idx_stocks_company_active_expiry');
+            $table->dropIndex('idx_stocks_clinic_product');
+            $table->dropIndex('idx_stocks_active_expiry');
         });
 
         Schema::table('stock_transactions', function (Blueprint $table) {
             $table->dropIndex('idx_transactions_stock_created');
-            $table->dropIndex('idx_transactions_company_clinic_created');
+            $table->dropIndex('idx_transactions_clinic_created');
         });
 
         Schema::table('stock_alerts', function (Blueprint $table) {
-            $table->dropIndex('idx_alerts_company_active_clinic');
+            $table->dropIndex('idx_alerts_active_clinic');
             $table->dropIndex('idx_alerts_product_active');
         });
 
         Schema::table('products', function (Blueprint $table) {
-            $table->dropIndex('idx_products_company_sku');
-            $table->dropIndex('idx_products_company_name');
+            $table->dropIndex('idx_products_sku');
+            $table->dropIndex('idx_products_name');
         });
 
         Schema::table('users', function (Blueprint $table) {
-            $table->dropIndex('idx_users_company_clinic_active');
+            $table->dropIndex('idx_users_clinic_active');
         });
     }
 };
