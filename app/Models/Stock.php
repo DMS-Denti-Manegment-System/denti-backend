@@ -35,7 +35,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string|null $sub_unit_name
  * @property int|null $sub_unit_multiplier
  * @property int $current_sub_stock
- * @property int|null $company_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at

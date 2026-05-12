@@ -25,7 +25,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property-read \App\Models\Clinic|null $clinic
- * @property-read \App\Models\Company|null $company
  *
  * @method bool hasRole(string|array $roles, string|null $guard = null)
  * @method bool hasPermissionTo(string|int|\Spatie\Permission\Contracts\Permission $permission, string|null $guardName = null)
@@ -96,5 +95,13 @@ class User extends Authenticatable
     public function clinic(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Clinic::class);
+    }
+
+    /**
+     * Check if the user is a super admin.
+     */
+    public function isSuperAdmin(): bool
+    {
+        return $this->hasRole(self::ROLE_OWNER);
     }
 }

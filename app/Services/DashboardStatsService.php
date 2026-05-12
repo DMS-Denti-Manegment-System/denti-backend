@@ -17,7 +17,8 @@ class DashboardStatsService
     public function getStatsForUser(User $user): array
     {
         $clinicId = $user->clinic_id;
-        $cacheKey = 'dashboard_stats_v3_'.($clinicId ?? 'global');
+        $version = \App\Support\StockStatsCache::version();
+        $cacheKey = "dashboard_stats_v3_{$version}_".($clinicId ?? 'global');
 
         return Cache::remember($cacheKey, 120, fn () => $this->buildStats($clinicId));
     }

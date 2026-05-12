@@ -3,7 +3,6 @@
 namespace Tests\Feature\API;
 
 use App\Models\Clinic;
-use App\Models\Company;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,29 +14,30 @@ class ProductApiTest extends TestCase
 
     private User $user;
 
-    private Company $company;
-
     private Clinic $clinic;
+
+    private \App\Models\Supplier $supplier;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->company = Company::factory()->create();
-        $this->clinic = Clinic::factory()->create([
-            'company_id' => $this->company->id,
+        $this->clinic = Clinic::factory()->create();
+        $this->supplier = \App\Models\Supplier::create([
+            'name' => 'Test Supplier',
+            'email' => 'supplier@test.com',
+            'is_active' => true,
         ]);
 
         $this->user = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
         ]);
 
         // Permission'ları oluştur ve kullanıcıya ver (routes'deki doğru isimler)
-        \Spatie\Permission\Models\Permission::create(['name' => 'view-stocks']);
-        \Spatie\Permission\Models\Permission::create(['name' => 'create-stocks']);
-        \Spatie\Permission\Models\Permission::create(['name' => 'update-stocks']);
-        \Spatie\Permission\Models\Permission::create(['name' => 'delete-stocks']);
+        \Spatie\Permission\Models\Permission::findOrCreate('view-stocks', 'web');
+        \Spatie\Permission\Models\Permission::findOrCreate('create-stocks', 'web');
+        \Spatie\Permission\Models\Permission::findOrCreate('update-stocks', 'web');
+        \Spatie\Permission\Models\Permission::findOrCreate('delete-stocks', 'web');
         $this->user->givePermissionTo(['view-stocks', 'create-stocks', 'update-stocks', 'delete-stocks']);
     }
 
@@ -46,9 +46,7 @@ class ProductApiTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        Product::factory()->count(3)->create([
-            'company_id' => $this->company->id,
-        ]);
+        Product::factory()->count(3)->create();
 
         $response = $this->getJson('/api/products');
 
@@ -81,6 +79,9 @@ class ProductApiTest extends TestCase
             'critical_stock_level' => 5,
             'category' => 'İlaç',
             'is_active' => true,
+            'quantity' => 100,
+            'clinic_id' => $this->clinic->id,
+            'supplier_id' => $this->supplier->id,
         ]);
 
         $response->assertStatus(201)
@@ -95,7 +96,6 @@ class ProductApiTest extends TestCase
         $this->assertDatabaseHas('products', [
             'name' => 'Parol 500mg',
             'sku' => 'PR-001',
-            'company_id' => $this->company->id,
         ]);
     }
 
@@ -133,7 +133,6 @@ class ProductApiTest extends TestCase
         $this->actingAs($this->user);
 
         $product = Product::factory()->create([
-            'company_id' => $this->company->id,
             'name' => 'Test Ürün',
         ]);
 
@@ -150,27 +149,11 @@ class ProductApiTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function user_cannot_view_product_from_other_company()
-    {
-        $otherCompany = Company::factory()->create();
-        $otherProduct = Product::factory()->create([
-            'company_id' => $otherCompany->id,
-        ]);
-
-        $this->actingAs($this->user);
-
-        $response = $this->getJson("/api/products/{$otherProduct->id}");
-
-        $response->assertStatus(404);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
     public function user_can_update_product()
     {
         $this->actingAs($this->user);
 
         $product = Product::factory()->create([
-            'company_id' => $this->company->id,
             'name' => 'Eski İsim',
         ]);
 
@@ -198,9 +181,7 @@ class ProductApiTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $product = Product::factory()->create([
-            'company_id' => $this->company->id,
-        ]);
+        $product = Product::factory()->create();
 
         $response = $this->deleteJson("/api/products/{$product->id}");
 
@@ -221,12 +202,10 @@ class ProductApiTest extends TestCase
         $this->actingAs($this->user);
 
         Product::factory()->create([
-            'company_id' => $this->company->id,
             'name' => 'Parol 500mg',
         ]);
 
         Product::factory()->create([
-            'company_id' => $this->company->id,
             'name' => 'Aspirin',
         ]);
 
@@ -243,9 +222,7 @@ class ProductApiTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        Product::factory()->count(5)->create([
-            'company_id' => $this->company->id,
-        ]);
+        Product::factory()->count(5)->create();
 
         $response = $this->getJson('/api/products');
 
@@ -267,16 +244,12 @@ class ProductApiTest extends TestCase
         $this->actingAs($this->user);
 
         $product1 = Product::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
         ]);
 
-        $otherClinic = Clinic::factory()->create([
-            'company_id' => $this->company->id,
-        ]);
+        $otherClinic = Clinic::factory()->create();
 
         $product2 = Product::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $otherClinic->id,
         ]);
 
@@ -293,7 +266,6 @@ class ProductApiTest extends TestCase
     {
         // Yetkileri olmayan yeni bir user
         $unauthorizedUser = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
         ]);
 
@@ -306,8 +278,6 @@ class ProductApiTest extends TestCase
             'is_active' => true,
         ]);
 
-        // Forbidden veya yetkisiz işlemi kontrol eder (Spatie permission kullanıldığı var sayılıyor)
-        // Eğer route model binding veya form request authorize() metodunda kontrol varsa 403 döner.
         $response->assertStatus(403);
     }
 }

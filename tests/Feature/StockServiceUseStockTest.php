@@ -3,7 +3,6 @@
 namespace Tests\Feature;
 
 use App\Models\Clinic;
-use App\Models\Company;
 use App\Models\Product;
 use App\Models\Stock;
 use App\Models\StockTransaction;
@@ -69,11 +68,9 @@ class StockServiceUseStockTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Test]
     public function it_updates_zero_stock_critical_visibility_when_stock_becomes_zero(): void
     {
-        $company = Company::factory()->create();
-        $clinic = Clinic::factory()->create(['company_id' => $company->id]);
-        $supplier = Supplier::factory()->create(['company_id' => $company->id]);
+        $clinic = Clinic::factory()->create();
+        $supplier = Supplier::factory()->create();
         $product = Product::factory()->create([
-            'company_id' => $company->id,
             'clinic_id' => $clinic->id,
             'show_zero_stock_in_critical' => true,
             'yellow_alert_level' => 10,
@@ -83,7 +80,6 @@ class StockServiceUseStockTest extends TestCase
         ]);
 
         $stock = Stock::create([
-            'company_id' => $company->id,
             'product_id' => $product->id,
             'clinic_id' => $clinic->id,
             'supplier_id' => $supplier->id,
@@ -113,17 +109,14 @@ class StockServiceUseStockTest extends TestCase
     #[\PHPUnit\Framework\Attributes\Test]
     public function it_does_not_update_zero_stock_visibility_when_only_one_batch_is_depleted(): void
     {
-        $company = Company::factory()->create();
-        $clinic = Clinic::factory()->create(['company_id' => $company->id]);
-        $supplier = Supplier::factory()->create(['company_id' => $company->id]);
+        $clinic = Clinic::factory()->create();
+        $supplier = Supplier::factory()->create();
         $product = Product::factory()->create([
-            'company_id' => $company->id,
             'clinic_id' => $clinic->id,
             'show_zero_stock_in_critical' => true,
         ]);
 
         $depletedBatch = Stock::create([
-            'company_id' => $company->id,
             'product_id' => $product->id,
             'clinic_id' => $clinic->id,
             'supplier_id' => $supplier->id,
@@ -139,7 +132,6 @@ class StockServiceUseStockTest extends TestCase
         ]);
 
         Stock::create([
-            'company_id' => $company->id,
             'product_id' => $product->id,
             'clinic_id' => $clinic->id,
             'supplier_id' => $supplier->id,
@@ -169,11 +161,9 @@ class StockServiceUseStockTest extends TestCase
 
     private function createSubUnitStock(int $currentStock, int $currentSubStock, int $multiplier): Stock
     {
-        $company = Company::factory()->create();
-        $clinic = Clinic::factory()->create(['company_id' => $company->id]);
-        $supplier = Supplier::factory()->create(['company_id' => $company->id]);
+        $clinic = Clinic::factory()->create();
+        $supplier = Supplier::factory()->create();
         $product = Product::factory()->create([
-            'company_id' => $company->id,
             'clinic_id' => $clinic->id,
             'has_sub_unit' => true,
             'sub_unit_name' => 'Adet',
@@ -181,7 +171,6 @@ class StockServiceUseStockTest extends TestCase
         ]);
 
         return Stock::create([
-            'company_id' => $company->id,
             'product_id' => $product->id,
             'clinic_id' => $clinic->id,
             'supplier_id' => $supplier->id,

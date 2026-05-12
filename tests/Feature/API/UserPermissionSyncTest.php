@@ -3,7 +3,6 @@
 namespace Tests\Feature\API;
 
 use App\Models\Clinic;
-use App\Models\Company;
 use App\Models\User;
 use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -17,18 +16,13 @@ class UserPermissionSyncTest extends TestCase
 
     public function test_api_user_store_and_update_sync_permissions_deterministically(): void
     {
-        $company = Company::factory()->create([
-            'status' => 'active',
-            'is_active' => true,
-        ]);
-        $clinic = Clinic::factory()->create(['company_id' => $company->id]);
+        $clinic = Clinic::factory()->create();
 
         foreach (PermissionCatalog::all() as $permission) {
             Permission::findOrCreate($permission, 'web');
         }
 
         $manager = User::factory()->create([
-            'company_id' => $company->id,
             'clinic_id' => $clinic->id,
             'username' => 'api-manager',
             'is_active' => true,

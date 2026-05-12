@@ -33,33 +33,48 @@ class AlertService
 
         if (! empty($filters['search'])) {
             $search = '%'.$filters['search'].'%';
-            $query->where('name', 'like', $search);
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', $search)
+                    ->orWhereHas('batches', function ($bq) use ($search) {
+                        $bq->where('batch_code', 'like', $search);
+                    });
+            });
         }
 
         $products = $query->latest()->paginate($perPage);
 
         // Transform products into "Alert" objects for the view
-        $items = $products->getCollection()->flatMap(function ($product) {
+        $items = $products->getCollection()->flatMap(function ($product) use ($filters) {
             $alerts = [];
+            $search = $filters['search'] ?? null;
             $totalStock = $product->total_stock;
             $redLevel = $product->red_alert_level ?? $product->critical_stock_level ?? 5;
             $yellowLevel = $product->yellow_alert_level ?? $product->min_stock_level ?? 10;
 
-            if ($totalStock <= $redLevel) {
-                $alerts[] = $this->formatAlert('critical_stock', 'Kritik Stok', "{$product->name} stok seviyesi kritik: {$totalStock}", $product);
-            } elseif ($totalStock <= $yellowLevel) {
-                $alerts[] = $this->formatAlert('low_stock', 'Düşük Stok', "{$product->name} stok seviyesi düşük: {$totalStock}", $product);
+            // Only show stock alerts if not searching for a specific batch (or if search matches product name)
+            if (! $search || str_contains(strtolower($product->name), strtolower($search))) {
+                if ($totalStock <= $redLevel) {
+                    $alerts[] = $this->formatAlert('critical_stock', 'Kritik Stok', "{$product->name} stok seviyesi kritik: {$totalStock}", $product);
+                } elseif ($totalStock <= $yellowLevel) {
+                    $alerts[] = $this->formatAlert('low_stock', 'Düşük Stok', "{$product->name} stok seviyesi düşük: {$totalStock}", $product);
+                }
             }
 
             foreach ($product->batches as $batch) {
                 if ($batch->track_expiry && $batch->expiry_date) {
+                    // If searching, filter batches
+                    if ($search && $batch->batch_code && ! str_contains(strtolower($batch->batch_code), strtolower($search)) && ! str_contains(strtolower($product->name), strtolower($search))) {
+                        continue;
+                    }
+
                     $days = now()->diffInDays($batch->expiry_date, false);
+                    $batchLabel = $batch->batch_code ? "Parti {$batch->batch_code}" : "#{$batch->id}";
                     if ($days < 0) {
-                        $alerts[] = $this->formatAlert('expired', 'Süresi Geçmiş', "{$product->name} (#{$batch->id}) süresi geçti.", $product, $batch);
+                        $alerts[] = $this->formatAlert('expired', 'Süresi Geçmiş', "{$product->name} ({$batchLabel}) süresi geçti.", $product, $batch);
                     } elseif ($days <= ($batch->expiry_red_days ?? 15)) {
-                        $alerts[] = $this->formatAlert('critical_expiry', 'Kritik SKT', "{$product->name} (#{$batch->id}) SKT kritik: {$days} gün kaldı.", $product, $batch);
+                        $alerts[] = $this->formatAlert('critical_expiry', 'Kritik SKT', "{$product->name} ({$batchLabel}) SKT kritik: {$days} gün kaldı.", $product, $batch);
                     } elseif ($days <= ($batch->expiry_yellow_days ?? 30)) {
-                        $alerts[] = $this->formatAlert('near_expiry', 'Yaklaşan SKT', "{$product->name} (#{$batch->id}) SKT yaklaşıyor: {$days} gün kaldı.", $product, $batch);
+                        $alerts[] = $this->formatAlert('near_expiry', 'Yaklaşan SKT', "{$product->name} ({$batchLabel}) SKT yaklaşıyor: {$days} gün kaldı.", $product, $batch);
                     }
                 }
             }
@@ -67,8 +82,13 @@ class AlertService
             return $alerts;
         });
 
+        // Filter items by type if specified
+        if (! empty($filters['type'])) {
+            $items = $items->filter(fn ($item) => $item['type'] === $filters['type']);
+        }
+
         return new LengthAwarePaginator(
-            $items,
+            $items->values(), // values() to reset keys after filter
             $products->total(),
             $perPage,
             $products->currentPage(),

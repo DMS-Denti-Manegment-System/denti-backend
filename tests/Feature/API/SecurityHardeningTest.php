@@ -2,10 +2,6 @@
 
 namespace Tests\Feature\API;
 
-use App\Models\Clinic;
-use App\Models\Company;
-use App\Models\Product;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -31,23 +27,5 @@ class SecurityHardeningTest extends TestCase
                 'errors',
                 'meta',
             ]);
-    }
-
-    public function test_tenant_isolation_blocks_other_company_product_read(): void
-    {
-        $companyA = Company::factory()->create();
-        $clinicA = Clinic::factory()->create(['company_id' => $companyA->id]);
-        $userA = User::factory()->create(['company_id' => $companyA->id, 'clinic_id' => $clinicA->id]);
-
-        $companyB = Company::factory()->create();
-        $productB = Product::factory()->create(['company_id' => $companyB->id]);
-
-        \Spatie\Permission\Models\Permission::firstOrCreate(['name' => 'view-stocks']);
-        $userA->givePermissionTo('view-stocks');
-
-        $this->actingAs($userA);
-
-        $this->getJson('/api/products/'.$productB->id)
-            ->assertStatus(404);
     }
 }

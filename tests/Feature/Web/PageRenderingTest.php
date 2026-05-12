@@ -4,7 +4,6 @@ namespace Tests\Feature\Web;
 
 use App\Models\Category;
 use App\Models\Clinic;
-use App\Models\Company;
 use App\Models\Product;
 use App\Models\Supplier;
 use App\Models\Todo;
@@ -17,8 +16,6 @@ use Tests\TestCase;
 class PageRenderingTest extends TestCase
 {
     use RefreshDatabase;
-
-    private Company $company;
 
     private Clinic $clinic;
 
@@ -36,17 +33,9 @@ class PageRenderingTest extends TestCase
     {
         parent::setUp();
 
-        $this->company = Company::factory()->create([
-            'status' => 'active',
-            'is_active' => true,
-        ]);
-
-        $this->clinic = Clinic::factory()->create([
-            'company_id' => $this->company->id,
-        ]);
+        $this->clinic = Clinic::factory()->create();
 
         $this->user = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'username' => 'blade-user',
             'is_active' => true,
@@ -73,6 +62,14 @@ class PageRenderingTest extends TestCase
             'view-audit-logs',
             'view-todos',
             'manage-todos',
+            'view-categories',
+            'create-categories',
+            'update-categories',
+            'delete-categories',
+            'view-suppliers',
+            'create-suppliers',
+            'update-suppliers',
+            'delete-suppliers',
         ];
 
         foreach ($permissionNames as $permissionName) {
@@ -84,21 +81,18 @@ class PageRenderingTest extends TestCase
         $this->user->assignRole($role);
 
         $this->category = Category::create([
-            'company_id' => $this->company->id,
             'name' => 'Sterilizasyon',
             'color' => '#0d6efd',
             'is_active' => true,
         ]);
 
         $this->supplier = Supplier::create([
-            'company_id' => $this->company->id,
             'name' => 'Demo Supplier',
             'email' => 'supplier@example.com',
             'is_active' => true,
         ]);
 
         $this->product = Product::create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'name' => 'Demo Product',
             'sku' => 'DP-001',
@@ -113,7 +107,6 @@ class PageRenderingTest extends TestCase
         ]);
 
         $this->todo = Todo::create([
-            'company_id' => $this->company->id,
             'category_id' => $this->category->id,
             'title' => 'Demo todo',
             'description' => 'Blade render smoke test',
@@ -151,7 +144,11 @@ class PageRenderingTest extends TestCase
         ];
 
         foreach ($urls as $url) {
-            $this->get($url)->assertOk();
+            $response = $this->get($url);
+            if ($response->status() !== 200) {
+                dump('Failed URL: '.$url.' Status: '.$response->status());
+            }
+            $response->assertOk();
         }
     }
 

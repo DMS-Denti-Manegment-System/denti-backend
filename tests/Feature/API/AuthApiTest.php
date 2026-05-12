@@ -3,7 +3,6 @@
 namespace Tests\Feature\API;
 
 use App\Models\Clinic;
-use App\Models\Company;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -11,8 +10,6 @@ use Tests\TestCase;
 class AuthApiTest extends TestCase
 {
     use RefreshDatabase;
-
-    private Company $company;
 
     private Clinic $clinic;
 
@@ -22,18 +19,9 @@ class AuthApiTest extends TestCase
     {
         parent::setUp();
 
-        config(['denti.company.code' => 'DEMO']);
-
-        $this->company = Company::factory()->create([
-            'code' => 'DEMO',
-        ]);
-
-        $this->clinic = Clinic::factory()->create([
-            'company_id' => $this->company->id,
-        ]);
+        $this->clinic = Clinic::factory()->create();
 
         $this->user = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'username' => 'admin',
             'password' => bcrypt('password123'),
@@ -57,7 +45,6 @@ class AuthApiTest extends TestCase
                     'user',
                     'roles',
                     'permissions',
-                    'company',
                 ],
             ]);
     }
@@ -116,7 +103,6 @@ class AuthApiTest extends TestCase
                     'user',
                     'roles',
                     'permissions',
-                    'company',
                 ],
             ]);
     }
@@ -181,31 +167,7 @@ class AuthApiTest extends TestCase
                 'success',
                 'data' => [
                     'user',
-                    'company',
                 ],
-            ]);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function user_from_another_company_cannot_login()
-    {
-        $otherCompany = Company::factory()->create(['code' => 'OTHER']);
-        User::factory()->create([
-            'company_id' => $otherCompany->id,
-            'username' => 'other-admin',
-            'password' => bcrypt('password123'),
-            'is_active' => true,
-        ]);
-
-        $response = $this->postJson('/api/login', [
-            'username' => 'other-admin',
-            'password' => 'password123',
-        ]);
-
-        $response->assertStatus(422)
-            ->assertJson([
-                'success' => false,
-                'message' => 'Geçersiz kullanıcı adı veya şifre',
             ]);
     }
 

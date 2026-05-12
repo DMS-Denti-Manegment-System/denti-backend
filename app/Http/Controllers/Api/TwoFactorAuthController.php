@@ -80,13 +80,12 @@ class TwoFactorAuthController extends Controller
 
         if ($isVerified) {
             $request->session()->put('2fa_verified', true);
-            $user->load(['company', 'roles']);
+            $user->load(['roles']);
 
             return $this->success([
                 'user' => $user,
                 'roles' => $user->getRoleNames(),
                 'permissions' => $user->getAllPermissions()->pluck('name'),
-                'company' => $user->company,
             ], '2FA verification successful');
         }
 

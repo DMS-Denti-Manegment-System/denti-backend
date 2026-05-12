@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * @property int $id
  * @property string $email
- * @property int $company_id
  * @property string $role
  * @property string $token
  * @property \Illuminate\Support\Carbon $expires_at
@@ -22,7 +21,6 @@ class UserInvitation extends Model
 
     protected $fillable = [
         'email',
-        'company_id',
         'role',
         'token',
         'expires_at',

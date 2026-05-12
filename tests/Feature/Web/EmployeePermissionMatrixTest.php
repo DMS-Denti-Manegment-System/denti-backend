@@ -3,7 +3,6 @@
 namespace Tests\Feature\Web;
 
 use App\Models\Clinic;
-use App\Models\Company;
 use App\Models\User;
 use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,8 +14,6 @@ class EmployeePermissionMatrixTest extends TestCase
 {
     use RefreshDatabase;
 
-    private Company $company;
-
     private Clinic $clinic;
 
     private User $manager;
@@ -25,13 +22,7 @@ class EmployeePermissionMatrixTest extends TestCase
     {
         parent::setUp();
 
-        $this->company = Company::factory()->create([
-            'status' => 'active',
-            'is_active' => true,
-        ]);
-
         $this->clinic = Clinic::factory()->create([
-            'company_id' => $this->company->id,
             'name' => 'Merkez Klinik',
         ]);
 
@@ -40,7 +31,6 @@ class EmployeePermissionMatrixTest extends TestCase
         }
 
         $this->manager = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'username' => 'manager-user',
             'is_active' => true,
@@ -91,7 +81,7 @@ class EmployeePermissionMatrixTest extends TestCase
             'email' => 'yeni2@example.com',
             'clinic_id' => $this->clinic->id,
             'is_active' => 1,
-            'permission_names' => ['view-stocks', 'update-clinics'],
+            'permissions' => ['view-stocks', 'update-clinics'],
         ]);
 
         $updateResponse->assertRedirect(route('employees.index'));
@@ -116,7 +106,6 @@ class EmployeePermissionMatrixTest extends TestCase
     public function test_sidebar_and_routes_follow_permissions(): void
     {
         $restrictedUser = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'username' => 'todo-only-user',
             'is_active' => true,
@@ -138,7 +127,6 @@ class EmployeePermissionMatrixTest extends TestCase
     public function test_clinic_update_policy_accepts_update_clinics_permission(): void
     {
         $user = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'username' => 'clinic-update-user',
             'is_active' => true,

@@ -3,10 +3,8 @@
 namespace Tests\Feature\Web;
 
 use App\Models\Clinic;
-use App\Models\Company;
 use App\Models\Product;
 use App\Models\Stock;
-use App\Models\StockAlert;
 use App\Models\Supplier;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,8 +16,6 @@ class AlertsPageTest extends TestCase
 {
     use RefreshDatabase;
 
-    private Company $company;
-
     private Clinic $clinic;
 
     private User $user;
@@ -28,18 +24,11 @@ class AlertsPageTest extends TestCase
     {
         parent::setUp();
 
-        $this->company = Company::factory()->create([
-            'status' => 'active',
-            'is_active' => true,
-        ]);
-
         $this->clinic = Clinic::factory()->create([
-            'company_id' => $this->company->id,
             'name' => 'Merkez Klinik',
         ]);
 
         $this->user = User::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'username' => 'alerts-user',
             'is_active' => true,
@@ -82,17 +71,15 @@ class AlertsPageTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $supplier = Supplier::factory()->create(['company_id' => $this->company->id]);
+        $supplier = Supplier::factory()->create();
 
         $multiProduct = Product::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'name' => 'Kompozit Refil',
             'has_expiration_date' => true,
         ]);
 
         $batchCritical = Stock::create([
-            'company_id' => $this->company->id,
             'product_id' => $multiProduct->id,
             'clinic_id' => $this->clinic->id,
             'supplier_id' => $supplier->id,
@@ -109,7 +96,6 @@ class AlertsPageTest extends TestCase
         ]);
 
         Stock::create([
-            'company_id' => $this->company->id,
             'product_id' => $multiProduct->id,
             'clinic_id' => $this->clinic->id,
             'supplier_id' => $supplier->id,
@@ -125,28 +111,13 @@ class AlertsPageTest extends TestCase
             'currency' => 'TRY',
         ]);
 
-        // This product-level alert should be replaced on alerts page by batch-level rows.
-        StockAlert::create([
-            'company_id' => $this->company->id,
-            'stock_id' => $batchCritical->id,
-            'product_id' => $multiProduct->id,
-            'clinic_id' => $this->clinic->id,
-            'type' => 'near_expiry',
-            'title' => 'OLD_EXPIRY_TITLE',
-            'message' => 'OLD_EXPIRY_MESSAGE',
-            'is_active' => true,
-            'is_resolved' => false,
-        ]);
-
         $singleProduct = Product::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'name' => 'Anestezi Kartuşu',
             'has_expiration_date' => true,
         ]);
 
         $singleBatch = Stock::create([
-            'company_id' => $this->company->id,
             'product_id' => $singleProduct->id,
             'clinic_id' => $this->clinic->id,
             'supplier_id' => $supplier->id,
@@ -162,25 +133,12 @@ class AlertsPageTest extends TestCase
             'currency' => 'TRY',
         ]);
 
-        StockAlert::create([
-            'company_id' => $this->company->id,
-            'stock_id' => $singleBatch->id,
-            'product_id' => $singleProduct->id,
-            'clinic_id' => $this->clinic->id,
-            'type' => 'near_expiry',
-            'title' => 'SINGLE_ALERT_TITLE',
-            'message' => 'SINGLE_ALERT_MESSAGE',
-            'is_active' => true,
-            'is_resolved' => false,
-        ]);
-
         $response = $this->get('/alerts');
 
         $response->assertOk();
         $response->assertSee('Parti MB-CRT');
         $response->assertSee('Parti MB-NEAR');
-        $response->assertDontSee('OLD_EXPIRY_MESSAGE');
-        $response->assertSee('SINGLE_ALERT_MESSAGE');
+        $response->assertSee('Parti SB-001');
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
@@ -188,16 +146,14 @@ class AlertsPageTest extends TestCase
     {
         $this->actingAs($this->user);
 
-        $supplier = Supplier::factory()->create(['company_id' => $this->company->id]);
+        $supplier = Supplier::factory()->create();
         $product = Product::factory()->create([
-            'company_id' => $this->company->id,
             'clinic_id' => $this->clinic->id,
             'name' => 'Endo Solüsyon',
             'has_expiration_date' => true,
         ]);
 
         Stock::create([
-            'company_id' => $this->company->id,
             'product_id' => $product->id,
             'clinic_id' => $this->clinic->id,
             'supplier_id' => $supplier->id,
@@ -214,7 +170,6 @@ class AlertsPageTest extends TestCase
         ]);
 
         Stock::create([
-            'company_id' => $this->company->id,
             'product_id' => $product->id,
             'clinic_id' => $this->clinic->id,
             'supplier_id' => $supplier->id,

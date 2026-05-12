@@ -43,7 +43,7 @@ class AuthController extends Controller
 
             /** @var User $user */
             $user = Auth::user();
-            $user->load(['company', 'roles', 'clinic']);
+            $user->load(['roles', 'clinic']);
 
             if ($user->hasTwoFactorEnabled()) {
                 Log::info('auth.login.2fa_required', [

@@ -71,13 +71,12 @@ class EmployeeController extends Controller
     public function store(StoreUserRequest $request): RedirectResponse|JsonResponse
     {
         $user = User::create([
-            ...$request->validated(),
+            ...$request->safe()->except(['permissions', 'roles']),
             'password' => bcrypt($request->password),
         ]);
 
-        if ($request->filled('roles')) {
-            $user->syncRoles($request->roles);
-        }
+        $user->syncRoles($request->get('roles', []));
+        $user->syncPermissions($request->get('permissions', []));
 
         return $this->actionResponse($request, 'employees.index', 'Personel oluşturuldu.');
     }
@@ -89,11 +88,10 @@ class EmployeeController extends Controller
 
     public function update(UpdateUserRequest $request, User $user): RedirectResponse|JsonResponse
     {
-        $user->update($request->validated());
+        $user->update($request->safe()->except(['permissions', 'roles']));
 
-        if ($request->filled('roles')) {
-            $user->syncRoles($request->roles);
-        }
+        $user->syncRoles($request->get('roles', []));
+        $user->syncPermissions($request->get('permissions', []));
 
         return $this->actionResponse($request, 'employees.index', 'Personel güncellendi.');
     }
