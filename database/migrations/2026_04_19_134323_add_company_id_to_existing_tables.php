@@ -11,27 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        $tables = [
-            'users',
-            'stocks',
-            'clinics',
-            'suppliers',
-            'stock_requests',
-            'stock_transactions',
-            'stock_alerts',
-            'categories',
-            'todos',
-        ];
-
-        foreach ($tables as $tableName) {
-            Schema::table($tableName, function (Blueprint $table) use ($tableName) {
-                // Eğer company_id kolonu yoksa ekle
-                if (! Schema::hasColumn($tableName, 'company_id')) {
-                    $table->foreignId('company_id')->after('id')->nullable()->constrained('companies')->onDelete('cascade');
-                    $table->index('company_id');
-                }
-            });
-        }
+        // Deprecated - company_id no longer needed
     }
 
     /**

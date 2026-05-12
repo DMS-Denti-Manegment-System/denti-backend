@@ -11,15 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('companies', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('domain')->nullable()->unique();
-            $table->string('subscription_plan')->default('basic'); // basic, pro, premium
-            $table->integer('max_users')->default(5);
-            $table->enum('status', ['active', 'inactive', 'suspended'])->default('active');
-            $table->timestamps();
-        });
+        // Deprecated - Companies table no longer used in single-tenant mode
     }
 
     /**

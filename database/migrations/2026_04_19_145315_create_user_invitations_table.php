@@ -11,18 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_invitations', function (Blueprint $table) {
-            $table->id();
-            $table->string('email');
-            $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->string('role')->default('Employee');
-            $table->string('token')->unique();
-            $table->timestamp('expires_at');
-            $table->timestamp('accepted_at')->nullable();
-            $table->timestamps();
-
-            $table->unique(['email', 'company_id']);
-        });
+        // Deprecated - User invitations no longer used
     }
 
     /**

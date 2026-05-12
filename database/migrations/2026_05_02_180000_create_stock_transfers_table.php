@@ -31,9 +31,7 @@ return new class extends Migration
                 ->constrained('clinics')
                 ->onDelete('cascade');
 
-            $table->foreignId('company_id')
-                ->constrained('companies')
-                ->onDelete('cascade');
+
 
             // Transfer detayları
             $table->integer('quantity');
@@ -77,7 +75,7 @@ return new class extends Migration
             $table->softDeletes();
 
             // İndeksler
-            $table->index(['company_id', 'status']);
+            $table->index(['status']);
             $table->index(['from_clinic_id', 'status']);
             $table->index(['to_clinic_id', 'status']);
             $table->index(['product_id', 'status']);

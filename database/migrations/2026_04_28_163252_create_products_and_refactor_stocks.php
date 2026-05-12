@@ -28,11 +28,10 @@ return new class extends Migration
                 $table->integer('red_alert_level')->default(5);
 
                 $table->boolean('is_active')->default(true);
-                $table->foreignId('company_id')->constrained()->onDelete('cascade');
                 $table->timestamps();
                 $table->softDeletes();
 
-                $table->index(['name', 'company_id']);
+                $table->index(['name']);
             });
         }
 
@@ -43,11 +42,10 @@ return new class extends Migration
             });
         }
 
-        // 3. Data Migration
+        // Data Migration (No company_id)
         $stocks = DB::table('stocks')->whereNull('product_id')->get();
         foreach ($stocks as $stock) {
             $productId = DB::table('products')->where('name', $stock->name)
-                ->where('company_id', $stock->company_id)
                 ->value('id');
 
             if (! $productId) {
@@ -63,7 +61,6 @@ return new class extends Migration
                     'yellow_alert_level' => $stock->yellow_alert_level,
                     'red_alert_level' => $stock->red_alert_level,
                     'is_active' => $stock->is_active,
-                    'company_id' => $stock->company_id,
                     'created_at' => now(),
                     'updated_at' => now(),
                 ]);

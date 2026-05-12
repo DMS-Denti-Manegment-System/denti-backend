@@ -14,10 +14,7 @@ return new class extends Migration
                 $table->foreignId('product_id')->nullable()->after('stock_id')->constrained()->onDelete('cascade');
             }
 
-            // Multi-tenant için company_id (eğer yoksa)
-            if (! Schema::hasColumn('stock_alerts', 'company_id')) {
-                $table->foreignId('company_id')->nullable()->after('clinic_id');
-            }
+
 
             // critical_expiry tipi için enum güncellemesi
             // SQLite'da enum değiştirme desteklenmez, sadece MySQL/MariaDB için
@@ -35,9 +32,7 @@ return new class extends Migration
             if (! Schema::hasIndex('stock_alerts', 'idx_stock_alerts_product_active')) {
                 $table->index(['product_id', 'is_active'], 'idx_stock_alerts_product_active');
             }
-            if (! Schema::hasIndex('stock_alerts', 'idx_stock_alerts_company_active')) {
-                $table->index(['company_id', 'is_active'], 'idx_stock_alerts_company_active');
-            }
+
         });
     }
 

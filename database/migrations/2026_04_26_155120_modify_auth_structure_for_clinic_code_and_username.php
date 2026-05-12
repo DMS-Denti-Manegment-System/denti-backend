@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->string('code')->unique()->nullable()->after('name');
-        });
+        // Schema::table('companies' ... ) removed
 
         Schema::table('users', function (Blueprint $table) {
             $table->string('username')->nullable()->after('name');
             $table->string('email')->nullable()->change();
 
-            $table->unique(['company_id', 'username']);
+            $table->unique(['username']);
         });
     }
 

@@ -11,11 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('companies', function (Blueprint $table) {
-            if (! Schema::hasColumn('companies', 'max_users')) {
-                $table->integer('max_users')->default(5)->after('subscription_plan');
-            }
-        });
+        // Deprecated - Companies table no longer used
     }
 
     /**
@@ -23,8 +19,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('companies', function (Blueprint $table) {
-            $table->dropColumn('max_users');
-        });
+        //
     }
 };
