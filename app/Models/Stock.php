@@ -10,6 +10,59 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $product_id
+ * @property string|null $batch_code
+ * @property int|null $supplier_id
+ * @property float|null $purchase_price
+ * @property string $currency
+ * @property \Illuminate\Support\Carbon|null $purchase_date
+ * @property \Illuminate\Support\Carbon|null $expiry_date
+ * @property int $current_stock
+ * @property int $reserved_stock
+ * @property int $available_stock
+ * @property int $internal_usage_count
+ * @property \App\Enums\StockStatus $status
+ * @property bool $is_active
+ * @property bool $track_expiry
+ * @property bool $track_batch
+ * @property int|null $expiry_yellow_days
+ * @property int|null $expiry_red_days
+ * @property int $clinic_id
+ * @property string|null $storage_location
+ * @property bool $has_sub_unit
+ * @property string|null $sub_unit_name
+ * @property int|null $sub_unit_multiplier
+ * @property int $current_sub_stock
+ * @property int|null $company_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read int $total_base_units
+ * @property-read string $stock_status
+ * @property-read bool $is_expired
+ * @property-read bool $is_near_expiry
+ * @property-read string $expiry_status
+ * @property-read int|null $days_to_expiry
+ *
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\Supplier|null $supplier
+ * @property-read \App\Models\Clinic $clinic
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\StockTransaction[] $transactions
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\StockRequest[] $requests
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\StockAlert[] $alerts
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock active()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock inactive()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock lowStock()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock criticalStock()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock nearExpiry(?int $days = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock expired()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Stock where(string $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+ */
 class Stock extends Model
 {
     use HasFactory, SoftDeletes;

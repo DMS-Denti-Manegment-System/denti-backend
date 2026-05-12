@@ -57,7 +57,7 @@ class StockService
                     'previous_stock' => $stock->current_stock,
                     'new_stock' => $targetCurrentStock,
                     'description' => 'Stok miktarı güncellemesi',
-                    'performed_by' => auth()->user()?->name ?? 'Sistem',
+                    'performed_by' => auth()->user()->name ?? 'Sistem',
                     'user_id' => auth()->id(),
                     'transaction_date' => now(),
                     'is_sub_unit' => false,
@@ -321,7 +321,7 @@ class StockService
                     'previous_stock' => 0,
                     'new_stock' => $initialQuantity,
                     'description' => 'İlk stok girişi',
-                    'performed_by' => auth()->user()?->name ?? 'Sistem',
+                    'performed_by' => auth()->user()->name ?? 'Sistem',
                     'transaction_date' => now(),
                     'is_sub_unit' => false,
                 ]);
@@ -600,6 +600,7 @@ class StockService
                 $tempTxn = \App\Models\StockTransaction::findOrFail($transactionId);
                 $stock = $tempTxn->stock()->lockForUpdate()->first();
 
+                /** @var \App\Models\Stock $stock */
                 $transaction = \App\Models\StockTransaction::whereKey($transactionId)
                     ->lockForUpdate()
                     ->firstOrFail();
@@ -621,6 +622,7 @@ class StockService
                     throw new \Exception('Bu hareket tipi geri alınamaz: '.$transaction->type);
                 }
 
+                /** @var \App\Models\Stock $stock */
                 $previousStock = $transaction->is_sub_unit && $stock->has_sub_unit
                     ? $stock->total_base_units
                     : $stock->current_stock;
@@ -641,7 +643,7 @@ class StockService
                     'batch_number' => $transaction->batch_number,
                     'description' => 'Reversal of '.$transaction->transaction_number,
                     'notes' => $transaction->notes,
-                    'performed_by' => auth()->user()?->name ?? 'Sistem',
+                    'performed_by' => auth()->user()->name ?? 'Sistem',
                     'user_id' => auth()->id(),
                     'transaction_date' => now(),
                     'is_sub_unit' => $transaction->is_sub_unit,

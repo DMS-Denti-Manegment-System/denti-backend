@@ -7,6 +7,47 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property int $product_id
+ * @property int $stock_id
+ * @property int $from_clinic_id
+ * @property int $to_clinic_id
+ * @property int $quantity
+ * @property string|null $notes
+ * @property string $status
+ * @property int $requested_by
+ * @property int|null $approved_by
+ * @property int|null $completed_by
+ * @property \Illuminate\Support\Carbon|null $requested_at
+ * @property \Illuminate\Support\Carbon|null $approved_at
+ * @property \Illuminate\Support\Carbon|null $completed_at
+ * @property \Illuminate\Support\Carbon|null $cancelled_at
+ * @property string|null $rejection_reason
+ * @property int|null $company_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read string $status_label
+ * @property-read string $status_color
+ *
+ * @property-read \App\Models\Product $product
+ * @property-read \App\Models\Stock $stock
+ * @property-read \App\Models\Clinic $fromClinic
+ * @property-read \App\Models\Clinic $toClinic
+ * @property-read \App\Models\User $requestedBy
+ * @property-read \App\Models\User|null $approvedBy
+ * @property-read \App\Models\User|null $completedBy
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransfer pending()
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransfer approved()
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransfer completed()
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransfer forClinic(int $clinicId)
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransfer outgoing(int $clinicId)
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransfer incoming(int $clinicId)
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransfer query()
+ */
 class StockTransfer extends Model
 {
     use HasFactory, SoftDeletes;

@@ -60,6 +60,11 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Interfaces\StockTransactionRepositoryInterface::class,
             \App\Repositories\StockTransactionRepository::class
         );
+
+        $this->app->bind(
+            \App\Repositories\Interfaces\StockAlertRepositoryInterface::class,
+            \App\Repositories\StockAlertRepository::class
+        );
     }
 
     /**

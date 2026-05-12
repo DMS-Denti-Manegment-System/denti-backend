@@ -85,7 +85,7 @@ class AlertService
             'title' => $title,
             'message' => $message,
             'product_name' => $product->name,
-            'clinic_name' => $batch?->clinic?->name ?? 'Genel',
+            'clinic_name' => $batch?->clinic->name ?? 'Genel',
             'created_at' => now(),
             'created_at_label' => now()->format('d.m.Y H:i'),
         ];

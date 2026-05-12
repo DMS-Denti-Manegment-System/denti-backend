@@ -221,6 +221,7 @@ class StockController extends Controller
             return $this->actionErrorResponse($request, 'stocks.index', 'stock', 'Ayarlanabilir stok partisi bulunamadı.');
         }
 
+        /** @var \App\Models\Stock $batch */
         $this->stockService->adjustStock(
             $batch->id,
             (int) $request->quantity,
@@ -330,7 +331,7 @@ class StockController extends Controller
             $detailMeta = [
                 'total_stock_value' => $totalStockValue,
                 'weighted_average_price' => $weightedAveragePrice,
-                'last_purchase_price' => (float) ($selectedBatch?->purchase_price ?? 0),
+                'last_purchase_price' => (float) ($selectedBatch->purchase_price ?? 0),
                 'batch_count' => $selectedProduct->batches()->count(),
                 'tracking_type' => $selectedProduct->has_expiration_date ? 'SKT Takipli' : 'Genel Stok Takibi',
             ];

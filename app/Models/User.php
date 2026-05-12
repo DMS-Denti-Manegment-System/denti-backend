@@ -9,6 +9,29 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string $username
+ * @property string $email
+ * @property string $password
+ * @property int|null $clinic_id
+ * @property bool $is_active
+ * @property string|null $two_factor_secret
+ * @property \Illuminate\Support\Carbon|null $two_factor_confirmed_at
+ * @property array|null $two_factor_recovery_codes
+ * @property \Illuminate\Support\Carbon|null $email_verified_at
+ * @property string|null $remember_token
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @property-read \App\Models\Clinic|null $clinic
+ * @property-read \App\Models\Company|null $company
+ *
+ * @method bool hasRole(string|array $roles, string|null $guard = null)
+ * @method bool hasPermissionTo(string|int|\Spatie\Permission\Contracts\Permission $permission, string|null $guardName = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|User query()
+ */
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -21,7 +44,7 @@ class User extends Authenticatable
     /**
      * The attributes that are mass assignable.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $fillable = [
         'name',

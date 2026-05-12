@@ -12,6 +12,45 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * @property int $id
+ * @property string $transaction_number
+ * @property int $stock_id
+ * @property int $user_id
+ * @property int $clinic_id
+ * @property string $type
+ * @property int $quantity
+ * @property int $previous_stock
+ * @property int $new_stock
+ * @property float|null $unit_price
+ * @property float|null $total_price
+ * @property int|null $stock_request_id
+ * @property string|null $reference_number
+ * @property string|null $batch_number
+ * @property string|null $description
+ * @property string|null $notes
+ * @property string|null $performed_by
+ * @property \Illuminate\Support\Carbon|null $transaction_date
+ * @property bool $is_sub_unit
+ * @property \Illuminate\Support\Carbon|null $reversed_at
+ * @property int|null $reversed_by
+ * @property int|null $reversal_transaction_id
+ * @property int|null $company_id
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read string $type_text
+ *
+ * @property-read \App\Models\Stock $stock
+ * @property-read \App\Models\User $user
+ * @property-read \App\Models\Clinic $clinic
+ * @property-read \App\Models\StockRequest|null $stockRequest
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransaction byType(string $type)
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransaction byDateRange($startDate, $endDate)
+ * @method static \Illuminate\Database\Eloquent\Builder|StockTransaction query()
+ */
 class StockTransaction extends Model
 {
     use HasFactory, SoftDeletes;

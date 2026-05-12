@@ -10,6 +10,49 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
+/**
+ * @property int $id
+ * @property string $name
+ * @property string|null $sku
+ * @property string|null $description
+ * @property string|null $unit
+ * @property string|null $category
+ * @property string|null $brand
+ * @property int $min_stock_level
+ * @property int $critical_stock_level
+ * @property int|null $yellow_alert_level
+ * @property int|null $red_alert_level
+ * @property bool $is_active
+ * @property bool $has_expiration_date
+ * @property int|null $clinic_id
+ * @property bool $has_sub_unit
+ * @property string|null $sub_unit_name
+ * @property int|null $sub_unit_multiplier
+ * @property bool $show_zero_stock_in_critical
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property \Illuminate\Support\Carbon|null $deleted_at
+ *
+ * @property-read int $total_stock
+ * @property-read int $batches_count
+ * @property-read string $stock_status
+ * @property-read float $total_stock_value
+ * @property-read float $average_cost
+ * @property-read float $potential_revenue
+ * @property-read float $potential_profit
+ * @property-read float $profit_margin
+ * @property-read float $last_purchase_price
+ * @property-read int $total_in
+ * @property-read int $total_out
+ * @property-read float|null $sale_price
+ *
+ * @property-read \App\Models\Clinic|null $clinic
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Stock[] $batches
+ *
+ * @method static \Illuminate\Database\Eloquent\Builder|Product joinStockSummary(?int $clinicId = null)
+ * @method static \Illuminate\Database\Eloquent\Builder|Product query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Product where(string $column, mixed $operator = null, mixed $value = null, string $boolean = 'and')
+ */
 class Product extends Model
 {
     use HasFactory, SoftDeletes;
