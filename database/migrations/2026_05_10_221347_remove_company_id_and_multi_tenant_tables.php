@@ -21,48 +21,44 @@ return new class extends Migration
         ];
 
         foreach ($tables as $table) {
+            if (! Schema::hasTable($table)) {
+                continue;
+            }
+
+            // Kolon var mı kontrol et
             if (Schema::hasColumn($table, 'company_id')) {
-                Schema::table($table, function (Blueprint $blueprint) use ($table) {
-                    // List of potential indexes that might contain company_id
-                    $indexes = [
-                        'company_id_index',
-                        'company_id_foreign',
-                        'company_id_unique',
-                        'idx_stocks_company_clinic_product',
-                        'idx_stocks_company_active_expiry',
-                        'idx_transactions_company_clinic_created',
-                        'idx_users_company_clinic_active',
-                        'users_company_id_username_unique',
-                        'stock_transfers_company_id_status_index',
-                        'idx_stock_alerts_company_active',
-                        'idx_alerts_company_active_clinic',
-                        'products_name_company_id_index',
-                        'idx_products_company_name',
-                        'idx_products_company_sku',
-                        $table . '_company_id_index',
-                        $table . '_company_id_foreign',
-                        $table . '_company_id_unique'
-                    ];
-
-                    foreach ($indexes as $index) {
-                        try {
-                            $blueprint->dropUnique($index);
-                        } catch (\Exception $e) {}
-                        try {
-                            $blueprint->dropForeign($index);
-                        } catch (\Exception $e) {}
-                        try {
-                            $blueprint->dropIndex($index);
-                        } catch (\Exception $e) {}
-                    }
-
-                    // Try to drop by array if named drop failed
+                // 1. Foreign Keyleri silmeyi dene
+                $fks = ["{$table}_company_id_foreign", 'company_id_foreign'];
+                foreach ($fks as $fk) {
                     try {
-                        $blueprint->dropForeign(['company_id']);
-                    } catch (\Exception $e) {}
+                        \Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$table}` DROP FOREIGN KEY `{$fk}`");
+                    } catch (\Exception $e) {
+                    }
+                }
 
-                    $blueprint->dropColumn('company_id');
-                });
+                // 2. Indexleri silmeyi dene
+                $indexes = [
+                    'company_id_index', 'company_id_unique',
+                    'idx_stocks_company_clinic_product', 'idx_stocks_company_active_expiry',
+                    'idx_transactions_company_clinic_created', 'idx_users_company_clinic_active',
+                    'users_company_id_username_unique', 'stock_transfers_company_id_status_index',
+                    'idx_stock_alerts_company_active', 'idx_alerts_company_active_clinic',
+                    'products_name_company_id_index', 'idx_products_company_name', 'idx_products_company_sku',
+                    "{$table}_company_id_index", "{$table}_company_id_unique",
+                ];
+
+                foreach ($indexes as $index) {
+                    try {
+                        \Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$table}` DROP INDEX `{$index}`");
+                    } catch (\Exception $e) {
+                    }
+                }
+
+                // 3. Kolonu sil
+                try {
+                    \Illuminate\Support\Facades\DB::statement("ALTER TABLE `{$table}` DROP COLUMN `company_id`");
+                } catch (\Exception $e) {
+                }
             }
         }
 
