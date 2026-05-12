@@ -49,7 +49,7 @@ class LowStockAlert extends Mailable implements ShouldQueue
                 'threshold' => $this->threshold,
                 'unit' => $this->product->unit,
                 'productUrl' => url("/stock/products/{$this->product->id}"),
-                'companyName' => $this->product->company->name ?? 'Klinik',
+                'companyName' => config('app.name', 'Klinik'),
             ],
         );
     }

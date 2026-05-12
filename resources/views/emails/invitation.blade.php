@@ -1,7 +1,7 @@
 <x-mail::message>
 # Merhaba,
 
-{{ $invitation->company->name }} ekibine katılmaya davet edildiniz.
+{{ config('app.name') }} ekibine katılmaya davet edildiniz.
 
 Aşağıdaki butona tıklayarak şifrenizi belirleyebilir ve sisteme giriş yapabilirsiniz.
 

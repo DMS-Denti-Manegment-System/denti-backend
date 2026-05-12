@@ -49,7 +49,7 @@ class CompanyRoleService
                 'transfer-stocks', 'approve-transfers', 'cancel-transfers',
                 'view-clinics', 'create-clinics', 'update-clinics', 'delete-clinics',
                 'view-reports', 'export-reports', 'view-audit-logs',
-                'manage-users', 'manage-company',
+                'manage-users',
                 'view-todos', 'manage-todos',
             ],
             'Doctor' => [

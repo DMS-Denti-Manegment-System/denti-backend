@@ -16,7 +16,7 @@ class AuthController extends Controller
 {
     private function throttleKey(LoginRequest $request): string
     {
-        return Str::lower($request->input('username')).'|single-company|'.$request->ip();
+        return Str::lower($request->input('username')).'|denti|'.$request->ip();
     }
 
     public function login(LoginRequest $request): JsonResponse

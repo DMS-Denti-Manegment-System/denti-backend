@@ -7,36 +7,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        if (DB::getDriverName() !== 'mysql') {
-            return;
-        }
-
-        DB::transaction(function () {
-            DB::table('roles')->whereNull('company_id')->update(['company_id' => 0]);
-            if ($this->indexExists('roles', 'roles_name_guard_name_unique')) {
-                DB::statement('ALTER TABLE roles DROP INDEX roles_name_guard_name_unique');
-            }
-
-            if (! $this->indexExists('roles', 'roles_company_id_name_guard_name_unique')) {
-                DB::statement('ALTER TABLE roles ADD UNIQUE roles_company_id_name_guard_name_unique (company_id, name, guard_name)');
-            }
-
-            $this->provisionCompanyRoles();
-            $this->moveUserRoleAssignmentsToUserCompanies();
-            $this->moveUserPermissionAssignmentsToUserCompanies();
-
-            $this->rebuildPrimaryKey(
-                'model_has_permissions',
-                'BIGINT UNSIGNED NOT NULL',
-                'company_id, permission_id, model_id, model_type'
-            );
-
-            $this->rebuildPrimaryKey(
-                'model_has_roles',
-                'BIGINT UNSIGNED NOT NULL',
-                'company_id, role_id, model_id, model_type'
-            );
-        });
+        // Skipped because we are removing multi-tenant structures
     }
 
     public function down(): void

@@ -51,7 +51,6 @@ class AlertsPageTest extends TestCase
             'view-reports',
             'export-reports',
             'manage-users',
-            'manage-company',
             'view-audit-logs',
             'view-todos',
             'manage-todos',

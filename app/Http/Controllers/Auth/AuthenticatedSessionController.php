@@ -18,7 +18,7 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request)
     {
-        $throttleKey = Str::lower($request->input('username')).'|single-company|'.$request->ip();
+        $throttleKey = Str::lower($request->input('username')).'|denti|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);

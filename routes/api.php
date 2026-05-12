@@ -155,8 +155,8 @@ Route::middleware(['auth:sanctum', 'set_permissions_team', '2fa.verified'])->gro
         Route::post('/sync', [\App\Http\Controllers\Api\StockAlertController::class, 'sync'])->middleware('permission:adjust-stocks');
         Route::get('/active', [\App\Http\Controllers\Api\StockAlertController::class, 'getActive'])->middleware('permission:view-stocks');
         Route::get('/statistics', [\App\Http\Controllers\Api\StockAlertController::class, 'getStatistics'])->middleware('permission:view-reports');
-        Route::get('/settings', [\App\Http\Controllers\Api\StockAlertController::class, 'getSettings'])->middleware('permission:manage-company');
-        Route::put('/settings', [\App\Http\Controllers\Api\StockAlertController::class, 'updateSettings'])->middleware('permission:manage-company');
+        Route::get('/settings', [\App\Http\Controllers\Api\StockAlertController::class, 'getSettings'])->middleware('permission:manage-users');
+        Route::put('/settings', [\App\Http\Controllers\Api\StockAlertController::class, 'updateSettings'])->middleware('permission:manage-users');
         Route::post('/bulk/resolve', [\App\Http\Controllers\Api\StockAlertController::class, 'bulkResolve'])->middleware('permission:adjust-stocks');
         Route::post('/bulk/dismiss', [\App\Http\Controllers\Api\StockAlertController::class, 'bulkDismiss'])->middleware('permission:adjust-stocks');
         Route::post('/bulk/delete', [\App\Http\Controllers\Api\StockAlertController::class, 'bulkDelete'])->middleware('permission:delete-stocks');

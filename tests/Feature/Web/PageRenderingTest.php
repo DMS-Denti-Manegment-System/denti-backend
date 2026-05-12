@@ -58,7 +58,6 @@ class PageRenderingTest extends TestCase
             'view-reports',
             'export-reports',
             'manage-users',
-            'manage-company',
             'view-audit-logs',
             'view-todos',
             'manage-todos',
@@ -114,7 +113,7 @@ class PageRenderingTest extends TestCase
         ]);
     }
 
-    public function test_main_web_pages_render_for_company_user(): void
+    public function test_main_web_pages_render_for_authenticated_user(): void
     {
         $this->actingAs($this->user);
 

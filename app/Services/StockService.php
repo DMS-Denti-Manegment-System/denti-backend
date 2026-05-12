@@ -402,6 +402,8 @@ class StockService
                 $stockSummaryQuery->where('clinic_id', $clinicId);
             }
 
+            $stockSummaryQuery->groupBy('product_id');
+
             // 2. Ana Sorgu (Products üzerinden Left Join)
             $statsQuery = DB::table('products')
                 ->leftJoinSub($stockSummaryQuery, 'stock_summary', 'products.id', '=', 'stock_summary.product_id')

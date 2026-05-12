@@ -16,16 +16,14 @@
                         <tr>
                             <td>{{ $role->name }}</td>
                             <td>
-                                <span class="badge {{ is_null($role->company_id) ? 'badge-light-danger' : 'badge-light-primary' }}">
-                                    {{ is_null($role->company_id) ? 'Sistem' : 'Sirket' }}
+                                <span class="badge badge-light-primary">
+                                    Sistem
                                 </span>
                             </td>
                             <td>{{ $role->permissions->count() }}</td>
                             <td>{{ $role->permissions->pluck('name')->take(4)->implode(', ') ?: '-' }}</td>
                             <td>
-                                @if(!is_null($role->company_id) || auth()->user()->isSuperAdmin())
-                                    <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-light-primary" data-module-edit>Duzenle</a>
-                                @endif
+                                <a href="{{ route('roles.edit', $role) }}" class="btn btn-sm btn-light-primary" data-module-edit>Düzenle</a>
                             </td>
                         </tr>
                     @empty

@@ -59,7 +59,7 @@ class ExpiryAlert extends Mailable implements ShouldQueue
                 'unit' => $this->stock->product->unit,
                 'alertType' => $this->alertType,
                 'stockUrl' => url("/stock/products/{$this->stock->product_id}"),
-                'companyName' => $this->stock->product->company->name ?? 'Klinik',
+                'companyName' => config('app.name', 'Klinik'),
             ],
         );
     }

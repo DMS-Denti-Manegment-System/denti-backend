@@ -22,62 +22,46 @@ return new class extends Migration
 
         foreach ($tables as $table) {
             if (Schema::hasColumn($table, 'company_id')) {
-                // Drop indexes manually so we can catch exceptions immediately
-                $indexesToDrop = [
-                    $table.'_company_id_index',
-                    $table.'_company_id_foreign',
-                ];
+                Schema::table($table, function (Blueprint $blueprint) use ($table) {
+                    // List of potential indexes that might contain company_id
+                    $indexes = [
+                        'company_id_index',
+                        'company_id_foreign',
+                        'company_id_unique',
+                        'idx_stocks_company_clinic_product',
+                        'idx_stocks_company_active_expiry',
+                        'idx_transactions_company_clinic_created',
+                        'idx_users_company_clinic_active',
+                        'users_company_id_username_unique',
+                        'stock_transfers_company_id_status_index',
+                        'idx_stock_alerts_company_active',
+                        'idx_alerts_company_active_clinic',
+                        'products_name_company_id_index',
+                        'idx_products_company_name',
+                        'idx_products_company_sku',
+                        $table . '_company_id_index',
+                        $table . '_company_id_foreign',
+                        $table . '_company_id_unique'
+                    ];
 
-                if ($table === 'stocks') {
-                    $indexesToDrop[] = 'idx_stocks_company_clinic_product';
-                    $indexesToDrop[] = 'idx_stocks_company_active_expiry';
-                }
-                if ($table === 'stock_transactions') {
-                    $indexesToDrop[] = 'idx_transactions_company_clinic_created';
-                }
-                if ($table === 'users') {
-                    $indexesToDrop[] = 'idx_users_company_clinic_active';
-                    $indexesToDrop[] = 'users_company_id_username_unique';
-                }
-                if ($table === 'stock_transfers') {
-                    $indexesToDrop[] = 'stock_transfers_company_id_status_index';
-                }
-                if ($table === 'stock_alerts') {
-                    $indexesToDrop[] = 'idx_stock_alerts_company_active';
-                    $indexesToDrop[] = 'idx_alerts_company_active_clinic';
-                }
-                if ($table === 'products') {
-                    $indexesToDrop[] = 'products_name_company_id_index';
-                    $indexesToDrop[] = 'idx_products_company_name';
-                    $indexesToDrop[] = 'idx_products_company_sku';
-                }
-
-                foreach ($indexesToDrop as $index) {
-                    try {
-                        \Illuminate\Support\Facades\DB::statement("DROP INDEX {$index}");
-                    } catch (\Exception $e) {
+                    foreach ($indexes as $index) {
+                        try {
+                            $blueprint->dropUnique($index);
+                        } catch (\Exception $e) {}
+                        try {
+                            $blueprint->dropForeign($index);
+                        } catch (\Exception $e) {}
+                        try {
+                            $blueprint->dropIndex($index);
+                        } catch (\Exception $e) {}
                     }
-                }
 
-                // 1. Drop foreign key first (rebuilds table in SQLite)
-                try {
-                    Schema::table($table, function (Blueprint $tableBlueprint) use ($table) {
-                        $tableBlueprint->dropForeign([$table.'_company_id_foreign']);
-                    });
-                } catch (\Exception $e) {
-                    // Ignore if no foreign key
-                }
-                try {
-                    Schema::table($table, function (Blueprint $tableBlueprint) {
-                        $tableBlueprint->dropForeign(['company_id']);
-                    });
-                } catch (\Exception $e) {
-                    // Ignore if no foreign key
-                }
+                    // Try to drop by array if named drop failed
+                    try {
+                        $blueprint->dropForeign(['company_id']);
+                    } catch (\Exception $e) {}
 
-                // 2. Drop the column
-                Schema::table($table, function (Blueprint $tableBlueprint) {
-                    $tableBlueprint->dropColumn('company_id');
+                    $blueprint->dropColumn('company_id');
                 });
             }
         }

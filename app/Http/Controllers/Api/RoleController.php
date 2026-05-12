@@ -38,9 +38,6 @@ class RoleController extends Controller
             if (str_contains($permission->name, 'users')) {
                 return 'User Management';
             }
-            if (str_contains($permission->name, 'company')) {
-                return 'Company Management';
-            }
             if (str_contains($permission->name, 'audit')) {
                 return 'Logs';
             }
