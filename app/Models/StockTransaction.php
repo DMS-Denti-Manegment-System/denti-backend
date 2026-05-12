@@ -39,9 +39,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- *
  * @property-read string $type_text
- *
  * @property-read \App\Models\Stock $stock
  * @property-read \App\Models\User $user
  * @property-read \App\Models\Clinic $clinic

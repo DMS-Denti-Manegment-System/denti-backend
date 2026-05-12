@@ -24,7 +24,6 @@ use Spatie\Permission\Traits\HasRoles;
  * @property string|null $remember_token
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- *
  * @property-read \App\Models\Clinic|null $clinic
  * @property-read \App\Models\Company|null $company
  *

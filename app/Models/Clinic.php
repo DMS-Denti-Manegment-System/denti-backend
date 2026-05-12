@@ -30,7 +30,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- *
  * @property-read int $total_stock_items
  * @property-read int $total_stock_quantity
  * @property-read int $low_stock_items_count

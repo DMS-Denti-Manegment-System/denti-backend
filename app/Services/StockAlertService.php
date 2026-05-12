@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Stock;
 use App\Models\StockAlert;
 use App\Models\User;
-use App\Notifications\StockLowLevelNotification;
 use App\Repositories\Interfaces\StockAlertRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Notification;
@@ -66,7 +65,9 @@ class StockAlertService
         $alerts = [];
         $product = $stock->product;
 
-        if (!$product) return [];
+        if (! $product) {
+            return [];
+        }
 
         // Low stock check
         $totalStock = $stock->current_stock;

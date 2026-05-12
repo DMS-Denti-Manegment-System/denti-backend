@@ -32,7 +32,6 @@ use Illuminate\Support\Collection;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- *
  * @property-read int $total_stock
  * @property-read int $batches_count
  * @property-read string $stock_status
@@ -45,7 +44,6 @@ use Illuminate\Support\Collection;
  * @property-read int $total_in
  * @property-read int $total_out
  * @property-read float|null $sale_price
- *
  * @property-read \App\Models\Clinic|null $clinic
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Stock[] $batches
  *

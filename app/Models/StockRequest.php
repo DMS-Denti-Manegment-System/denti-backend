@@ -31,10 +31,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- *
  * @property-read bool $can_be_approved
  * @property-read string $status_color
- *
  * @property-read \App\Models\Clinic $requesterClinic
  * @property-read \App\Models\Clinic $requestedFromClinic
  * @property-read \App\Models\Stock $stock
