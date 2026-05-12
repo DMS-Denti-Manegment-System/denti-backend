@@ -23,9 +23,7 @@ class ClinicService
 
     public function getAllClinics()
     {
-        $companyId = auth()->user()->company_id ?? 'global';
-
-        return Cache::remember("all_clinics_{$companyId}", 300, function () {
+        return Cache::remember('all_clinics', 300, function () {
             return $this->clinicRepository->all();
         });
     }

@@ -19,7 +19,7 @@ class StockRepository implements StockRepositoryInterface
 
     public function all(): Collection
     {
-        return $this->model->with(['product', 'supplier', 'clinic'])->latest()->get();
+        return $this->model->with(['product', 'supplier', 'clinic'])->latest()->limit(1000)->get();
     }
 
     public function find(int $id): ?Stock
@@ -30,7 +30,8 @@ class StockRepository implements StockRepositoryInterface
     /**
      * Satırı kilitlererek bul (Pessimistic Locking).
      * Sadece DB::transaction() bloğu içinde kullanılmalıdır.
-     * NOT: SQLite desteklemez. Production'da MySQL/PostgreSQL gerektirir.
+     * SQLite'da row-level lock yoktur; WAL + busy_timeout ile tek dosya
+     * seviyesinde yazma sırası korunur.
      */
     public function findAndLock(int $id): ?Stock
     {
@@ -73,9 +74,9 @@ class StockRepository implements StockRepositoryInterface
     public function getAllWithFilters(array $filters, int $perPage = 50)
     {
         $query = $this->model->with([
-            'product:id,name,sku,unit,category,brand,show_zero_stock_in_critical',
-            'supplier:id,name',
-            'clinic:id,name',
+            'product',
+            'supplier',
+            'clinic',
             'alerts',
         ]);
 
@@ -88,24 +89,27 @@ class StockRepository implements StockRepositoryInterface
         }
 
         if (! empty($filters['category'])) {
-            $query->where('category', $filters['category']);
+            $query->whereHas('product', function ($q) use ($filters) {
+                $q->where('category', $filters['category']);
+            });
         }
 
         if (! empty($filters['status'])) {
-            $query->where('status', $filters['status']);
+            if ($filters['status'] === 'active') {
+                $query->active();
+            } else {
+                $query->where('status', $filters['status']);
+            }
         }
 
-        $hasProductJoin = false;
         if (! empty($filters['stock_status']) || ! empty($filters['level'])) {
             $statusFilter = $filters['stock_status'] ?? $filters['level'];
             switch ($statusFilter) {
                 case 'low':
                     $query->lowStock();
-                    $hasProductJoin = true;
                     break;
                 case 'critical':
                     $query->criticalStock();
-                    $hasProductJoin = true;
                     break;
                 case 'expired':
                     $query->expired();
@@ -118,14 +122,11 @@ class StockRepository implements StockRepositoryInterface
 
         if (! empty($filters['search']) || ! empty($filters['name'])) {
             $search = '%'.($filters['search'] ?? $filters['name']).'%';
-            if (! $hasProductJoin) {
-                $query->join('products', 'stocks.product_id', '=', 'products.id');
-            }
-            $query->where(function ($q) use ($search) {
-                $q->where('products.name', 'like', $search)
-                    ->orWhere('products.sku', 'like', $search)
-                    ->orWhere('products.brand', 'like', $search);
-            })->select('stocks.*');
+            $query->whereHas('product', function ($q) use ($search) {
+                $q->where('name', 'like', $search)
+                    ->orWhere('sku', 'like', $search)
+                    ->orWhere('brand', 'like', $search);
+            });
         }
 
         if (! empty($filters['expiry_filter'])) {
@@ -139,7 +140,7 @@ class StockRepository implements StockRepositoryInterface
             }
         }
 
-        return $query->latest()->paginate($perPage);
+        return $query->orderBy('stocks.id', 'desc')->paginate($perPage);
     }
 
     public function getLowStockItems(?int $clinicId = null): Collection
@@ -201,6 +202,7 @@ class StockRepository implements StockRepositoryInterface
     {
         return $this->model->join('products', 'stocks.product_id', '=', 'products.id')
             ->where('products.sku', $code)
+            ->whereNull('products.deleted_at')
             ->select('stocks.*')
             ->first();
     }

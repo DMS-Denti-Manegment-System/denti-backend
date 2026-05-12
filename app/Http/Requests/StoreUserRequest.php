@@ -23,18 +23,12 @@ class StoreUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user = $this->user();
-        $isSuperAdmin = $user->isSuperAdmin();
-        $companyId = $isSuperAdmin ? (int) $this->input('company_id') : $user->company_id;
-
         return array_merge($this->commonRules(), [
             'username' => [
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('users')->where(function ($query) use ($companyId) {
-                    return $query->where('company_id', $companyId);
-                }),
+                Rule::unique('users'),
             ],
             'email' => 'nullable|string|email|max:255|unique:users',
             'password' => 'required|string|min:8',
@@ -43,11 +37,8 @@ class StoreUserRequest extends FormRequest
             'clinic_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('clinics', 'id')->where(function ($query) use ($companyId) {
-                    return $query->where('company_id', $companyId);
-                }),
+                Rule::exists('clinics', 'id'),
             ],
-            'company_id' => $isSuperAdmin ? ['required', 'integer', Rule::exists('companies', 'id')] : ['prohibited'],
         ]);
     }
 }

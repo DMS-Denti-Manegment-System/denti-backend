@@ -4,7 +4,6 @@
 
 namespace App\Models;
 
-use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Stock extends Model
 {
-    use HasFactory, SoftDeletes, Tenantable;
+    use HasFactory, SoftDeletes;
 
     protected $appends = [];
 
@@ -24,7 +23,6 @@ class Stock extends Model
         'expiry_yellow_days', 'expiry_red_days',
         'clinic_id', 'storage_location',
         'has_sub_unit', 'sub_unit_name', 'sub_unit_multiplier', 'current_sub_stock',
-        'company_id',
     ];
 
     // İlişkiler
@@ -61,11 +59,6 @@ class Stock extends Model
         'current_sub_stock' => 0,
     ];
 
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
-
     public function supplier(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Supplier::class);
@@ -98,7 +91,7 @@ class Stock extends Model
     public static function totalBaseUnitsRaw(): string
     {
         return '(CASE 
-                    WHEN stocks.has_sub_unit = 1 THEN (stocks.current_stock * COALESCE(stocks.sub_unit_multiplier, 1)) + stocks.current_sub_stock 
+                    WHEN stocks.has_sub_unit THEN (stocks.current_stock * COALESCE(stocks.sub_unit_multiplier, 1)) + stocks.current_sub_stock 
                     ELSE stocks.current_stock 
                  END)';
     }
@@ -117,8 +110,9 @@ class Stock extends Model
     public function scopeLowStock($query)
     {
         return $query->join('products', 'stocks.product_id', '=', 'products.id')
+            ->whereNull('products.deleted_at')
             ->whereRaw(self::totalBaseUnitsRaw().' <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
-            ->whereRaw('('.self::totalBaseUnitsRaw().' > COALESCE(products.red_alert_level, products.critical_stock_level) OR ('.self::totalBaseUnitsRaw().' = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))')
+            ->whereRaw('('.self::totalBaseUnitsRaw().' > COALESCE(products.red_alert_level, products.critical_stock_level) OR ('.self::totalBaseUnitsRaw().' = 0 AND NOT COALESCE(products.show_zero_stock_in_critical, true)))')
             ->where('stocks.is_active', true)
             ->select('stocks.*');
     }
@@ -126,8 +120,9 @@ class Stock extends Model
     public function scopeCriticalStock($query)
     {
         return $query->join('products', 'stocks.product_id', '=', 'products.id')
+            ->whereNull('products.deleted_at')
             ->whereRaw(self::totalBaseUnitsRaw().' <= COALESCE(products.red_alert_level, products.critical_stock_level)')
-            ->whereRaw('NOT ('.self::totalBaseUnitsRaw().' = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)')
+            ->whereRaw('NOT ('.self::totalBaseUnitsRaw().' = 0 AND NOT COALESCE(products.show_zero_stock_in_critical, true))')
             ->where('stocks.is_active', true)
             ->select('stocks.*');
     }

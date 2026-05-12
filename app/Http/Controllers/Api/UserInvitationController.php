@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\AcceptInvitationRequest;
 use App\Http\Requests\StoreInvitationRequest;
 use App\Mail\UserInvitationMail;
-use App\Models\Company;
 use App\Models\User;
 use App\Models\UserInvitation;
 use Illuminate\Http\JsonResponse;
@@ -18,23 +17,12 @@ use Illuminate\Support\Str;
 
 class UserInvitationController extends Controller
 {
-    /**
-     * Invite a new user to the company.
-     */
     public function invite(StoreInvitationRequest $request): JsonResponse
     {
-        $user = Auth::user();
         try {
-            $invitation = DB::transaction(function () use ($request, $user) {
-                $company = Company::whereKey($user->company_id)->lockForUpdate()->firstOrFail();
-
-                if ($company->users()->count() + $company->invitations()->whereNull('accepted_at')->count() >= $company->max_users) {
-                    throw new \RuntimeException('Maximum user limit reached for your subscription plan.');
-                }
-
+            $invitation = DB::transaction(function () use ($request) {
                 return UserInvitation::create([
                     'email' => $request->email,
-                    'company_id' => $company->id,
                     'role' => $request->role,
                     'token' => Str::random(40),
                     'expires_at' => now()->addHours(24),
@@ -74,10 +62,8 @@ class UserInvitationController extends Controller
                 'name' => $request->name,
                 'email' => $invitation->email,
                 'password' => Hash::make($request->password),
-                'company_id' => $invitation->company_id,
             ]);
 
-            setPermissionsTeamId($invitation->company_id);
             $user->assignRole($invitation->role);
 
             $invitation->update(['accepted_at' => now()]);

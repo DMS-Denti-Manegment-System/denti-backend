@@ -9,31 +9,14 @@ use Spatie\Permission\PermissionRegistrar;
 
 class CompanyRoleService
 {
-    public function ensureSystemRoles(): void
+    public function ensureRoles(): void
     {
         $this->ensurePermissions();
-        setPermissionsTeamId(0);
-
-        $role = Role::withoutGlobalScopes()->firstOrCreate([
-            'name' => 'Super Admin',
-            'guard_name' => 'web',
-            'company_id' => 0,
-        ]);
-        $role->syncPermissions(Permission::all());
-
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
-    }
-
-    public function ensureCompanyRoles(int $companyId): void
-    {
-        $this->ensurePermissions();
-        setPermissionsTeamId($companyId);
 
         foreach ($this->rolePermissions() as $roleName => $permissions) {
-            $role = Role::withoutGlobalScopes()->firstOrCreate([
+            $role = Role::query()->firstOrCreate([
                 'name' => $roleName,
                 'guard_name' => 'web',
-                'company_id' => $companyId,
             ]);
 
             $role->syncPermissions($permissions === ['*'] ? Permission::all() : $permissions);
@@ -52,7 +35,6 @@ class CompanyRoleService
     private function rolePermissions(): array
     {
         return [
-            'Company Owner' => ['*'],
             'Admin' => ['*'],
             'Stock Manager' => [
                 'view-stocks', 'create-stocks', 'update-stocks', 'delete-stocks',

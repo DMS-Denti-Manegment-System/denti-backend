@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
@@ -19,10 +18,7 @@ class AuthenticatedSessionController extends Controller
 
     public function store(LoginRequest $request)
     {
-        // Frontend'den clinic_code veya company_code gelebilir — normalize et
-        $clinicCode = $request->input('clinic_code') ?? $request->input('company_code');
-
-        $throttleKey = Str::lower($request->input('username')).'|'.($clinicCode ?? 'admin').'|'.$request->ip();
+        $throttleKey = Str::lower($request->input('username')).'|single-company|'.$request->ip();
 
         if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
             $seconds = RateLimiter::availableIn($throttleKey);
@@ -44,41 +40,9 @@ class AuthenticatedSessionController extends Controller
             return back()->withErrors(['username' => 'Hesabınız pasif durumdadır.']);
         }
 
-        // Eğer clinic_code YOKSA (Admin Login), Super Admin kontrolü yap
-        if (empty($clinicCode)) {
-            if (! $user->isSuperAdmin()) {
-                return back()->withErrors(['username' => 'Bu alana sadece sistem yöneticileri erişebilir.']);
-            }
-        } else {
-            // Eğer clinic_code VARSA, kullanıcının o şirkete ait olduğundan emin ol
-            $company = Company::whereRaw('LOWER(code) = ?', [strtolower($clinicCode)])->first();
-
-            if (! $company) {
-                return back()->withErrors(['clinic_code' => 'Geçersiz klinik kodu.']);
-            }
-
-            if ($user->company_id !== $company->id && ! $user->isSuperAdmin()) {
-                \Log::warning('Login yetki hatası', [
-                    'user_id' => $user->id,
-                    'user_company_id' => $user->company_id,
-                    'attempted_company_id' => $company->id,
-                    'attempted_company_code' => $company->code,
-                    'username' => $user->username,
-                ]);
-
-                return back()->withErrors([
-                    'username' => "Bu klinik için yetkiniz bulunmuyor. (Kullanıcı şirket ID: {$user->company_id}, Klinik şirket ID: {$company->id})",
-                ]);
-            }
-        }
-
         Auth::login($user, $request->boolean('remember'));
         RateLimiter::clear($throttleKey);
         $request->session()->regenerate();
-
-        if ($user->isSuperAdmin()) {
-            return redirect()->route('admin.companies');
-        }
 
         return redirect()->intended('/');
     }

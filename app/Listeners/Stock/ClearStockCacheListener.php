@@ -3,6 +3,7 @@
 namespace App\Listeners\Stock;
 
 use App\Events\Stock\StockLevelChanged;
+use App\Support\StockStatsCache;
 use Illuminate\Support\Facades\Cache;
 
 /**
@@ -19,9 +20,6 @@ class ClearStockCacheListener
 {
     public function handle(StockLevelChanged $event): void
     {
-        Cache::forget("stock_stats_{$event->companyId}_all");
-        if ($event->clinicId) {
-            Cache::forget("stock_stats_{$event->companyId}_{$event->clinicId}");
-        }
+        StockStatsCache::bump();
     }
 }

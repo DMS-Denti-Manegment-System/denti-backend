@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
+use App\Services\CompanyRoleService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -13,20 +14,27 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // 1. Rolleri ve Yetkileri oluştur
+        // 1. Sistem izinlerini oluştur
         $this->call(RolesAndPermissionsSeeder::class);
 
-        // 2. Super Admin Kullanıcısı oluştur (Şirket bağımsız)
-        setPermissionsTeamId(0);
-        $superAdmin = User::create([
-            'company_id' => null,
-            'name' => 'Super Admin',
-            'username' => 'superadmin',
-            'email' => 'superadmin@denti.com',
-            'password' => Hash::make('superadmin123'),
-            'is_active' => true,
-        ]);
+        // 2. Uygulama rollerini oluştur
+        app(CompanyRoleService::class)->ensureRoles();
 
-        $superAdmin->assignRole('Super Admin');
+        $owner = User::query()
+            ->where('username', config('denti.owner.username', 'admin'))
+            ->first();
+
+        if (! $owner) {
+            $owner = User::create([
+                'name' => config('denti.owner.name', 'Klinik Yetkilisi'),
+                'username' => config('denti.owner.username', 'admin'),
+                'email' => config('denti.owner.email', 'admin@denti.local'),
+                'password' => Hash::make(config('denti.owner.password', 'admin12345')),
+                'is_active' => true,
+                'email_verified_at' => now(),
+            ]);
+        }
+
+        $owner->assignRole('Admin');
     }
 }

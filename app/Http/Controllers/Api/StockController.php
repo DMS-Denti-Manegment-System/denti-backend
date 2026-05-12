@@ -175,13 +175,13 @@ class StockController extends Controller
                 throw new StockNotFoundException($id);
             }
 
-            if ($data['type'] === 'sync') {
+            if ($data['operation_type'] === 'sync') {
                 $targetQuantity = $data['quantity'];
                 $adjustmentType = 'sync';
                 $delta = 0; // Service will calculate
             } else {
                 $targetQuantity = 0;
-                $adjustmentType = $data['type'];
+                $adjustmentType = $data['operation_type'];
                 $delta = $data['quantity'];
             }
 
@@ -260,8 +260,7 @@ class StockController extends Controller
         try {
             $this->authorize('viewAny', Stock::class);
             $clinicId = $request->query('clinic_id');
-            $user = auth()->user();
-            $cacheKey = sprintf('stocks.low_level.%d.%s', $user->company_id ?? 0, $clinicId ?? 'all');
+            $cacheKey = sprintf('stocks.low_level.%s', $clinicId ?? 'all');
             $items = Cache::remember($cacheKey, 60, fn () => $this->stockService->getLowStockItems($clinicId ? (int) $clinicId : null));
 
             return $this->success(StockResource::collection($items));
@@ -277,8 +276,7 @@ class StockController extends Controller
         try {
             $this->authorize('viewAny', Stock::class);
             $clinicId = $request->query('clinic_id');
-            $user = auth()->user();
-            $cacheKey = sprintf('stocks.critical_level.%d.%s', $user->company_id ?? 0, $clinicId ?? 'all');
+            $cacheKey = sprintf('stocks.critical_level.%s', $clinicId ?? 'all');
             $items = Cache::remember($cacheKey, 60, fn () => $this->stockService->getCriticalStockItems($clinicId ? (int) $clinicId : null));
 
             return $this->success(StockResource::collection($items));
@@ -295,8 +293,7 @@ class StockController extends Controller
             $this->authorize('viewAny', Stock::class);
             $days = $request->query('days', 30);
             $clinicId = $request->query('clinic_id');
-            $user = auth()->user();
-            $cacheKey = sprintf('stocks.expiring.%d.%s.%d', $user->company_id ?? 0, $clinicId ?? 'all', (int) $days);
+            $cacheKey = sprintf('stocks.expiring.%s.%d', $clinicId ?? 'all', (int) $days);
             $items = Cache::remember($cacheKey, 60, fn () => $this->stockService->getExpiringItems((int) $days, $clinicId ? (int) $clinicId : null));
 
             return $this->success(StockResource::collection($items));
@@ -311,26 +308,9 @@ class StockController extends Controller
     {
         try {
             $this->authorize('viewAny', Stock::class);
-            $user = auth()->user();
             $clinicId = $request->query('clinic_id');
-            $companyId = $user->company_id;
 
-            if (! $companyId && ! $user->isSuperAdmin()) {
-                return $this->error('Şirket bilgisi bulunamadı.', 404);
-            }
-
-            if (! $companyId) {
-                return $this->success([
-                    'total_items' => 0,
-                    'critical_stock_items' => 0,
-                    'low_stock_items' => 0,
-                    'out_of_stock_items' => 0,
-                    'near_expiry_items' => 0,
-                    'expired_items' => 0,
-                ]);
-            }
-
-            $stats = $this->stockService->getStockStats($companyId, $clinicId ? (int) $clinicId : null);
+            $stats = $this->stockService->getStockStats($clinicId ? (int) $clinicId : null);
 
             return $this->success($stats);
         } catch (\Exception $e) {

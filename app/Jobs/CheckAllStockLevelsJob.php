@@ -33,7 +33,7 @@ class CheckAllStockLevelsJob implements ShouldQueue
 
         foreach (
             Stock::active()
-                ->with(['product.batches', 'clinic.company'])
+                ->with(['product.batches', 'clinic'])
                 ->orderBy('product_id')
                 ->cursor() as $stock
         ) {
@@ -44,17 +44,15 @@ class CheckAllStockLevelsJob implements ShouldQueue
 
             $alerts = $stockAlertService->checkAndGetAlerts($stock);
             if (! empty($alerts)) {
-                $companyId = $stock->company_id;
-                $lowStocks[$companyId][] = [
+                $lowStocks[] = [
                     'stock' => $stock,
                     'alerts' => $alerts,
                 ];
             }
         }
 
-        // Send Digest Notifications per Company
-        foreach ($lowStocks as $companyId => $items) {
-            $stockAlertService->sendDigestNotification($companyId, $items);
+        if ($lowStocks !== []) {
+            $stockAlertService->sendDigestNotification($lowStocks);
         }
 
         \Log::info('All stock levels checked and digests sent.');

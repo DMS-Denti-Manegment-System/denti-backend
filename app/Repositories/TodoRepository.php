@@ -70,4 +70,20 @@ class TodoRepository implements TodoRepositoryInterface
     {
         return $this->model->with('category')->orderBy('created_at', 'desc')->get();
     }
+ 
+    public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
+    {
+        $query = $this->model->with('category');
+ 
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
+            $query->where('title', 'like', $search);
+        }
+ 
+        if (! empty($filters['status'])) {
+            $query->where('completed', $filters['status'] === 'completed');
+        }
+ 
+        return $query->latest()->paginate($perPage);
+    }
 }

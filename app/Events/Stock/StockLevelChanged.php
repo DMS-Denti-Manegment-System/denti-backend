@@ -9,18 +9,18 @@ use Illuminate\Queue\SerializesModels;
 
 /**
  * Stok miktarı değiştiğinde fırlatılır.
- * Listener'lar: CheckStockAlertsListener, ClearStockCacheListener
+ * Listener'lar: ClearStockCacheListener
  */
 class StockLevelChanged
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public readonly ?int $clinicId;
+
     public function __construct(
         public readonly Stock $stock,
-        ?int $companyId = null,
         ?int $clinicId = null
     ) {
-        $this->companyId = $companyId ?? $stock->company_id;
         $this->clinicId = $clinicId ?? $stock->clinic_id;
     }
 }

@@ -29,7 +29,7 @@ class ProductFactory extends Factory
         $product = $this->faker->randomElement($products);
 
         return [
-            'company_id' => \App\Models\Company::factory(),
+
             'clinic_id' => null, // Optional
             'name' => $product['name'],
             'sku' => $product['sku'].'-'.$this->faker->randomNumber(3),

@@ -27,7 +27,6 @@ class StoreClinicRequest extends FormRequest
             'website' => 'nullable|string|max:255',
             'opening_hours' => 'nullable|string|max:255',
             'is_active' => 'boolean',
-            'company_id' => 'nullable|exists:companies,id',
         ];
     }
 }

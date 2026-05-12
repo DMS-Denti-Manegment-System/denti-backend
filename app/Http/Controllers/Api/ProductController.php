@@ -56,8 +56,6 @@ class ProductController extends Controller
         try {
             $data = $request->validated();
 
-            // Set defaults
-            $data['company_id'] = auth()->user()->company_id;
             $data['is_active'] = $data['is_active'] ?? true;
 
             $product = $this->productService->createProduct($data);

@@ -35,10 +35,6 @@
     }
 </style>
 <div class="aside-menu-container flex-column-fluid px-4 py-5" id="kt_aside_menu_wrapper">
-    @php
-        $isSuperAdmin = auth()->check() && auth()->user()->hasRole('Super Admin');
-    @endphp
-
     <!-- Kaydırılabilir Alan -->
     <div class="hover-scroll-y" style="height: 100%;" data-kt-scroll="true"
         data-kt-scroll-activate="{default: false, lg: true}" data-kt-scroll-height="auto"
@@ -49,19 +45,6 @@
         <div class="menu menu-column menu-rounded menu-sub-indention fw-semibold fs-6" id="kt_aside_menu"
             data-kt-menu="true">
 
-            @if ($isSuperAdmin)
-                <div class="menu-item">
-                    <a class="menu-link {{ request()->routeIs('admin.companies*') ? 'active' : '' }}"
-                        href="{{ route('admin.companies') }}">
-                        <span class="menu-icon">
-                            <i class="ki-duotone ki-abstract-26 fs-2">
-                                <span class="path1"></span><span class="path2"></span>
-                            </i>
-                        </span>
-                        <span class="menu-title">Şirketler</span>
-                    </a>
-                </div>
-            @else
             <!-- Dashboard -->
             <div class="menu-item">
                 <a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"
@@ -210,7 +193,6 @@
                     </a>
                 </div>
             @endcan
-            @endif
 
 
         </div>

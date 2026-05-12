@@ -14,7 +14,6 @@ class SupplierFactory extends Factory
     public function definition(): array
     {
         return [
-            'company_id' => \App\Models\Company::factory(),
             'name' => $this->faker->company().' Tedarik',
             'contact_person' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),

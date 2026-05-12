@@ -22,22 +22,15 @@ class CategorySeeder extends Seeder
             ['name' => 'Pedodontik malzemeler', 'color' => '#2f54eb', 'description' => 'Çocuk diş hekimliği malzemeleri'],
         ];
 
-        $companies = \App\Models\Company::all();
-
-        foreach ($companies as $company) {
-            foreach ($categories as $category) {
-                \App\Models\Category::updateOrCreate(
-                    [
-                        'name' => $category['name'],
-                        'company_id' => $company->id,
-                    ],
-                    [
-                        'color' => $category['color'],
-                        'description' => $category['description'],
-                        'is_active' => true,
-                    ]
-                );
-            }
+        foreach ($categories as $category) {
+            \App\Models\Category::updateOrCreate(
+                ['name' => $category['name']],
+                [
+                    'color' => $category['color'],
+                    'description' => $category['description'],
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

@@ -41,7 +41,6 @@ class ExpiryAlert extends Mailable implements ShouldQueue
             metadata: [
                 'stock_id' => $this->stock->id,
                 'product_id' => $this->stock->product_id,
-                'company_id' => $this->stock->product->company_id,
             ],
         );
     }

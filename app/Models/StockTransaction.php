@@ -7,7 +7,6 @@
 
 namespace App\Models;
 
-use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,14 +14,14 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockTransaction extends Model
 {
-    use HasFactory, SoftDeletes, Tenantable;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'transaction_number', 'stock_id', 'user_id', 'clinic_id', 'type',
         'quantity', 'previous_stock', 'new_stock',
         'unit_price', 'total_price', 'stock_request_id',
         'reference_number', 'batch_number', 'description',
-        'notes', 'performed_by', 'transaction_date', 'company_id',
+        'notes', 'performed_by', 'transaction_date',
         'is_sub_unit', 'reversed_at', 'reversed_by', 'reversal_transaction_id',
     ];
 
@@ -33,11 +32,6 @@ class StockTransaction extends Model
         'is_sub_unit' => 'boolean',
         'reversed_at' => 'datetime',
     ];
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
 
     public function stock(): BelongsTo
     {

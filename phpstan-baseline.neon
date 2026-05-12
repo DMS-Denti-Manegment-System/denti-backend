@@ -21,36 +21,6 @@ parameters:
 			path: app/Events/Stock/StockLevelChanged.php
 
 		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\Admin\\\\StoreCompanyRequest\\:\\:\\$owner_email\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/Admin/CompanyController.php
-
-		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\Admin\\\\StoreCompanyRequest\\:\\:\\$owner_name\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/Admin/CompanyController.php
-
-		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\Admin\\\\StoreCompanyRequest\\:\\:\\$owner_username\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/Admin/CompanyController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Company\\:\\:create\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/Admin/CompanyController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Company\\:\\:withCount\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/Admin/CompanyController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\User\\:\\:create\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Api/Admin/CompanyController.php
-
-		-
 			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\Auth\\\\LoginRequest\\:\\:\\$password\\.$#"
 			count: 1
 			path: app/Http/Controllers/Api/AuthController.php
@@ -626,36 +596,6 @@ parameters:
 			path: app/Http/Controllers/Auth/AuthenticatedSessionController.php
 
 		-
-			message: "#^Call to static method warning\\(\\) on an unknown class Log\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/AuthenticatedSessionController.php
-
-		-
-			message: "#^Access to an undefined property App\\\\Models\\\\Company\\:\\:\\$id\\.$#"
-			count: 1
-			path: app/Http/Controllers/Web/AdminCompanyPageController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Company\\:\\:create\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Web/AdminCompanyPageController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Company\\:\\:findOrFail\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Web/AdminCompanyPageController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\Company\\:\\:withCount\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Web/AdminCompanyPageController.php
-
-		-
-			message: "#^Call to an undefined static method App\\\\Models\\\\User\\:\\:create\\(\\)\\.$#"
-			count: 1
-			path: app/Http/Controllers/Web/AdminCompanyPageController.php
-
-		-
 			message: "#^Call to an undefined static method App\\\\Models\\\\User\\:\\:create\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Controllers/Web/AuthPageController.php
@@ -1069,21 +1009,6 @@ parameters:
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Factory\\:\\:user\\(\\)\\.$#"
 			count: 1
 			path: app/Http/Middleware/RequestContextMiddleware.php
-
-		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\Admin\\\\StoreCompanyRequest\\:\\:\\$code\\.$#"
-			count: 1
-			path: app/Http/Requests/Admin/StoreCompanyRequest.php
-
-		-
-			message: "#^Access to an undefined property App\\\\Http\\\\Requests\\\\Admin\\\\UpdateCompanyRequest\\:\\:\\$code\\.$#"
-			count: 1
-			path: app/Http/Requests/Admin/UpdateCompanyRequest.php
-
-		-
-			message: "#^Cannot access property \\$id on object\\|string\\.$#"
-			count: 1
-			path: app/Http/Requests/Admin/UpdateCompanyRequest.php
 
 		-
 			message: "#^Call to an undefined method Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable\\:\\:can\\(\\)\\.$#"

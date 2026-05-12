@@ -32,7 +32,7 @@ interface StockAlertRepositoryInterface
 
     public function deleteActiveAlertsByProduct(int $productId): void;
 
-    public function resolveMissingActiveAlertsByProduct(int $productId, int $companyId, array $activeTypes): void;
+    public function resolveMissingActiveAlertsByProduct(int $productId, array $activeTypes): void;
 
     public function countActiveAlerts(?int $clinicId = null): int;
 

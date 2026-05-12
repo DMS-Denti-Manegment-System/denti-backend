@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\Admin\CompanyController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ProfileController;
@@ -12,7 +11,6 @@ use Illuminate\Support\Facades\Route;
 
 // Auth Routes (Public)
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/admin/login', [AuthController::class, 'adminLogin']);
 Route::post('/invitations/accept', [UserInvitationController::class, 'accept']);
 
 // Auth Routes (Protected)
@@ -39,7 +37,7 @@ Route::middleware(['auth:sanctum', 'set_permissions_team', '2fa.verified'])->gro
     // Invitation Routes
     Route::post('/invitations/invite', [UserInvitationController::class, 'invite'])->middleware('permission:manage-users');
 
-    // Role Management (Company Owners)
+    // Role Management
     Route::get('/roles/permissions', [RoleController::class, 'permissions'])->middleware('permission:manage-users');
     Route::apiResource('roles', RoleController::class)->middleware('permission:manage-users')->names('api.roles');
 
@@ -89,8 +87,8 @@ Route::middleware(['auth:sanctum', 'set_permissions_team', '2fa.verified'])->gro
         Route::get('/{stock}', [\App\Http\Controllers\Api\StockController::class, 'show'])->middleware('permission:view-stocks');
         Route::put('/{stock}', [\App\Http\Controllers\Api\StockController::class, 'update'])->middleware('permission:update-stocks');
         Route::delete('/{stock}', [\App\Http\Controllers\Api\StockController::class, 'destroy'])->middleware('permission:delete-stocks');
-        Route::post('/{stock}/adjust', [\App\Http\Controllers\Api\StockController::class, 'adjustStock'])->middleware('permission:adjust-stocks');
-        Route::post('/{stock}/use', [\App\Http\Controllers\Api\StockController::class, 'useStock'])->middleware('permission:use-stocks');
+        Route::post('/{stock}/adjust', [\App\Http\Controllers\Api\StockController::class, 'adjustStock'])->middleware(['permission:adjust-stocks', 'throttle:30,1']);
+        Route::post('/{stock}/use', [\App\Http\Controllers\Api\StockController::class, 'useStock'])->middleware(['permission:use-stocks', 'throttle:60,1']);
         Route::get('/{stock}/transactions', [\App\Http\Controllers\Api\StockController::class, 'transactions'])->middleware('permission:view-audit-logs');
     });
 
@@ -120,25 +118,25 @@ Route::middleware(['auth:sanctum', 'set_permissions_team', '2fa.verified'])->gro
     // Stock Requests
     Route::prefix('stock-requests')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\StockRequestController::class, 'index'])->middleware('permission:view-stocks');
-        Route::post('/', [\App\Http\Controllers\Api\StockRequestController::class, 'store'])->middleware('permission:create-stocks');
+        Route::post('/', [\App\Http\Controllers\Api\StockRequestController::class, 'store'])->middleware(['permission:create-stocks', 'throttle:30,1']);
         Route::get('/pending/list', [\App\Http\Controllers\Api\StockRequestController::class, 'getPendingRequests'])->middleware('permission:view-stocks');
         Route::get('/stats', [\App\Http\Controllers\Api\StockRequestController::class, 'getStats'])->middleware('permission:view-stocks');
         Route::get('/{id}', [\App\Http\Controllers\Api\StockRequestController::class, 'show'])->middleware('permission:view-stocks');
-        Route::put('/{id}/approve', [\App\Http\Controllers\Api\StockRequestController::class, 'approve'])->middleware('permission:adjust-stocks');
-        Route::put('/{id}/reject', [\App\Http\Controllers\Api\StockRequestController::class, 'reject'])->middleware('permission:adjust-stocks');
-        Route::put('/{id}/ship', [\App\Http\Controllers\Api\StockRequestController::class, 'ship'])->middleware('permission:adjust-stocks');
-        Route::put('/{id}/complete', [\App\Http\Controllers\Api\StockRequestController::class, 'complete'])->middleware('permission:adjust-stocks');
+        Route::put('/{id}/approve', [\App\Http\Controllers\Api\StockRequestController::class, 'approve'])->middleware(['permission:adjust-stocks', 'throttle:30,1']);
+        Route::put('/{id}/reject', [\App\Http\Controllers\Api\StockRequestController::class, 'reject'])->middleware(['permission:adjust-stocks', 'throttle:30,1']);
+        Route::put('/{id}/ship', [\App\Http\Controllers\Api\StockRequestController::class, 'ship'])->middleware(['permission:adjust-stocks', 'throttle:30,1']);
+        Route::put('/{id}/complete', [\App\Http\Controllers\Api\StockRequestController::class, 'complete'])->middleware(['permission:adjust-stocks', 'throttle:30,1']);
     });
 
     // Stock Transfers
     Route::prefix('stock-transfers')->group(function () {
         Route::get('/', [\App\Http\Controllers\Api\StockTransferController::class, 'index'])->middleware('permission:view-stocks');
         Route::get('/pending/count', [\App\Http\Controllers\Api\StockTransferController::class, 'getPendingCount'])->middleware('permission:view-stocks');
-        Route::post('/', [\App\Http\Controllers\Api\StockTransferController::class, 'store'])->middleware('permission:transfer-stocks');
+        Route::post('/', [\App\Http\Controllers\Api\StockTransferController::class, 'store'])->middleware(['permission:transfer-stocks', 'throttle:30,1']);
         Route::get('/{id}', [\App\Http\Controllers\Api\StockTransferController::class, 'show'])->middleware('permission:view-stocks');
-        Route::post('/{id}/approve', [\App\Http\Controllers\Api\StockTransferController::class, 'approve'])->middleware('permission:approve-transfers');
-        Route::post('/{id}/reject', [\App\Http\Controllers\Api\StockTransferController::class, 'reject'])->middleware('permission:approve-transfers');
-        Route::post('/{id}/cancel', [\App\Http\Controllers\Api\StockTransferController::class, 'cancel'])->middleware('permission:cancel-transfers');
+        Route::post('/{id}/approve', [\App\Http\Controllers\Api\StockTransferController::class, 'approve'])->middleware(['permission:approve-transfers', 'throttle:30,1']);
+        Route::post('/{id}/reject', [\App\Http\Controllers\Api\StockTransferController::class, 'reject'])->middleware(['permission:approve-transfers', 'throttle:30,1']);
+        Route::post('/{id}/cancel', [\App\Http\Controllers\Api\StockTransferController::class, 'cancel'])->middleware(['permission:cancel-transfers', 'throttle:30,1']);
     });
 
     // Stock Transactions
@@ -167,9 +165,4 @@ Route::middleware(['auth:sanctum', 'set_permissions_team', '2fa.verified'])->gro
         Route::post('/{id}/dismiss', [\App\Http\Controllers\Api\StockAlertController::class, 'dismiss'])->middleware('permission:adjust-stocks');
         Route::delete('/{id}', [\App\Http\Controllers\Api\StockAlertController::class, 'destroy'])->middleware('permission:delete-stocks');
     });
-});
-
-// Super Admin Panel
-Route::middleware(['auth:sanctum', 'set_permissions_team', 'role:Super Admin'])->prefix('admin')->group(function () {
-    Route::apiResource('companies', CompanyController::class);
 });

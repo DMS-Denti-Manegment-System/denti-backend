@@ -9,6 +9,6 @@ class RolesAndPermissionsSeeder extends Seeder
 {
     public function run(): void
     {
-        app(CompanyRoleService::class)->ensureSystemRoles();
+        app(CompanyRoleService::class)->ensureRoles();
     }
 }

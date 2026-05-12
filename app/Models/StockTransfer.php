@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -10,14 +9,13 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockTransfer extends Model
 {
-    use HasFactory, SoftDeletes, Tenantable;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'product_id',
         'stock_id',
         'from_clinic_id',
         'to_clinic_id',
-        'company_id',
         'quantity',
         'notes',
         'status',
@@ -71,11 +69,6 @@ class StockTransfer extends Model
     public function toClinic(): BelongsTo
     {
         return $this->belongsTo(Clinic::class, 'to_clinic_id');
-    }
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
     }
 
     public function requestedBy(): BelongsTo

@@ -27,32 +27,24 @@ class ClinicRepository implements ClinicRepositoryInterface
         return $this->model->orderBy('name')->get();
     }
 
-    public function getAllWithFilters(array $filters = []): Collection
+    public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = $this->model->newQuery();
 
-        if (! empty($filters['search']) || ! empty($filters['name'])) {
-            $search = '%'.($filters['search'] ?? $filters['name']).'%';
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', $search)
+                    ->orWhere('responsible_person', 'like', $search)
                     ->orWhere('city', 'like', $search);
             });
         }
 
-        if (isset($filters['is_active'])) {
-            $query->where('is_active', $filters['is_active']);
-        }
-
         if (! empty($filters['status'])) {
-            if ($filters['status'] === 'active') {
-                $query->where('is_active', true);
-            }
-            if ($filters['status'] === 'inactive') {
-                $query->where('is_active', false);
-            }
+            $query->where('is_active', $filters['status'] === 'active');
         }
 
-        return $query->orderBy('name')->get();
+        return $query->latest()->paginate($perPage);
     }
 
     public function find(int $id): ?Clinic
@@ -99,12 +91,10 @@ class ClinicRepository implements ClinicRepositoryInterface
 
     public function getStockSummary(int $clinicId): array
     {
-        $companyId = auth()->user()->company_id;
         $totalUnitsRaw = Stock::totalBaseUnitsRaw();
         $summary = DB::table('stocks')
             ->join('products', 'stocks.product_id', '=', 'products.id')
             ->where('stocks.clinic_id', $clinicId)
-            ->where('stocks.company_id', $companyId)
             ->where('stocks.is_active', true)
             ->whereNull('stocks.deleted_at')
             ->selectRaw("
@@ -134,14 +124,12 @@ class ClinicRepository implements ClinicRepositoryInterface
 
     public function getGlobalStats(): array
     {
-        $companyId = auth()->user()->company_id;
         $totalClinics = $this->model->count();
         $activeClinics = $this->model->where('is_active', true)->count();
         $totalUnitsRaw = Stock::totalBaseUnitsRaw();
 
         $stockStats = DB::table('stocks')
             ->join('products', 'stocks.product_id', '=', 'products.id')
-            ->where('stocks.company_id', $companyId)
             ->where('stocks.is_active', true)
             ->whereNull('stocks.deleted_at')
             ->selectRaw("
@@ -164,6 +152,21 @@ class ClinicRepository implements ClinicRepositoryInterface
             'total_stock_items' => $stockStats->total_items ?? 0,
             'low_stock_items' => $stockStats->low_stock_items ?? 0,
             'critical_stock_items' => $stockStats->critical_stock_items ?? 0,
+        ];
+    }
+    public function getClinicStats(): array
+    {
+        $stats = DB::table('clinics')
+            ->whereNull('deleted_at')
+            ->selectRaw('count(*) as total')
+            ->selectRaw('count(case when is_active = true then 1 end) as active')
+            ->selectRaw('count(case when is_active = false then 1 end) as passive')
+            ->first();
+
+        return [
+            'total' => (int) ($stats->total ?? 0),
+            'active' => (int) ($stats->active ?? 0),
+            'passive' => (int) ($stats->passive ?? 0),
         ];
     }
 }

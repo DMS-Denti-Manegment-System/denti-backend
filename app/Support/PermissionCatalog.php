@@ -26,10 +26,17 @@ class PermissionCatalog
         'view-reports' => 'Raporları Gör',
         'export-reports' => 'Rapor Dışa Aktar',
         'manage-users' => 'Personel Yönetimi',
-        'manage-company' => 'Şirket Ayarları',
         'view-audit-logs' => 'İşlem Kayıtlarını Gör',
         'view-todos' => 'Görevleri Gör',
         'manage-todos' => 'Görev Yönetimi',
+        'view-suppliers' => 'Tedarikçileri Gör',
+        'create-suppliers' => 'Tedarikçi Ekle',
+        'update-suppliers' => 'Tedarikçi Güncelle',
+        'delete-suppliers' => 'Tedarikçi Sil',
+        'view-categories' => 'Kategorileri Gör',
+        'create-categories' => 'Kategori Ekle',
+        'update-categories' => 'Kategori Güncelle',
+        'delete-categories' => 'Kategori Sil',
     ];
 
     /**
@@ -81,6 +88,24 @@ class PermissionCatalog
                 'delete' => null,
             ],
         ],
+        [
+            'module' => 'Tedarikçiler',
+            'permissions' => [
+                'show' => 'view-suppliers',
+                'create' => 'create-suppliers',
+                'update' => 'update-suppliers',
+                'delete' => 'delete-suppliers',
+            ],
+        ],
+        [
+            'module' => 'Kategoriler',
+            'permissions' => [
+                'show' => 'view-categories',
+                'create' => 'create-categories',
+                'update' => 'update-categories',
+                'delete' => 'delete-categories',
+            ],
+        ],
     ];
 
     /**
@@ -97,7 +122,6 @@ class PermissionCatalog
         'Rapor & Sistem Özellikleri' => [
             'export-reports',
             'view-audit-logs',
-            'manage-company',
             'manage-todos',
         ],
     ];
@@ -155,16 +179,6 @@ class PermissionCatalog
             $normalized[$permission] = true;
         }
 
-        $requestedPermissions = array_keys($normalized);
-        if ($assigner->isSuperAdmin()) {
-            return $requestedPermissions;
-        }
-
-        $assignerPermissions = array_flip($assigner->getAllPermissions()->pluck('name')->all());
-
-        return array_values(array_filter(
-            $requestedPermissions,
-            static fn (string $permission) => isset($assignerPermissions[$permission])
-        ));
+        return array_keys($normalized);
     }
 }

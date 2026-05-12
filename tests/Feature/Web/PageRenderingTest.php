@@ -155,20 +155,9 @@ class PageRenderingTest extends TestCase
         }
     }
 
-    public function test_admin_companies_page_renders_for_super_admin(): void
+    public function test_admin_companies_page_is_not_exposed(): void
     {
-        $superAdmin = User::factory()->create([
-            'company_id' => null,
-            'username' => 'super-admin-web',
-            'is_active' => true,
-        ]);
-
-        $superRole = Role::findOrCreate('Super Admin', 'web');
-        $superAdmin->assignRole($superRole);
-
-        $this->actingAs($superAdmin);
-
-        $this->get('/admin/companies')->assertOk();
-        $this->get('/admin/companies?modal=create')->assertOk();
+        $this->get('/admin/companies')->assertNotFound();
+        $this->get('/admin/companies?modal=create')->assertNotFound();
     }
 }

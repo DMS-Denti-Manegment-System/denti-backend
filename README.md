@@ -1,21 +1,21 @@
 # Denti
 
-Laravel 12 tabanlı, çok şirketli diş kliniği stok ve operasyon yönetim sistemi. Mevcut web arayüzü `Metronic 8 Demo 14` Blade yapısı üzerinden çalışır; eski React/Inertia yapısı artık aktif değildir.
+Laravel 12 tabanlı, tek işletme kurulumuna göre çalışan diş kliniği stok ve operasyon yönetim sistemi. Mevcut web arayüzü `Metronic 8 Demo 14` Blade yapısı üzerinden çalışır; eski React/Inertia yapısı artık aktif değildir.
 
 ## Güncel Stack
 
 - Backend: PHP 8.4+, Laravel 12, Sanctum, Spatie Permission
 - Frontend: Blade ve mevcut public assetleri
-- Veritabanı: MySQL 8+ önerilir
+- Veritabanı: VPS üzerinde SQLite
 - Test: PHPUnit 11, Pint, PHPStan
 
 ## Temel Modüller
 
-- Kimlik doğrulama: şirket/klinik kodu ile giriş, super admin girişi, 2FA akışı
+- Kimlik doğrulama: kullanıcı adı/e-posta ile giriş, 2FA akışı
 - Stok yönetimi: ürün, batch, alt birim, son kullanma tarihi, manuel stok düzeltme
 - Operasyonlar: klinikler, tedarikçiler, personel, roller, todo, stok talepleri
 - Uyarılar: düşük stok, kritik stok, SKT yaklaşan ve süresi geçmiş ürünler
-- Çok şirketli mimari: `company_id` bazlı tenant izolasyonu
+- Tek işletme mimarisi: `company_id` kullanıcıya gösterilmez, permission ve veri sahipliği için iç sistem anahtarı olarak kalır
 
 ## Kurulum
 
@@ -40,7 +40,6 @@ Bu repo içinde güncel bir `package.json` yoktur. Node/Vite komutları eklenmed
 Demo kullanıcıları seed durumuna göre değişebilir. Web giriş ekranı:
 
 - Kullanıcı girişi: `/login`
-- Sistem yöneticisi girişi: `/admin/login`
 
 API korumalı endpoint'leri `auth:sanctum` ve ek olarak izin middleware'leri ile korunur.
 
@@ -65,7 +64,9 @@ php artisan test
 ## Production Checklist
 
 - `.env` içinde `APP_ENV=production` ve `APP_DEBUG=false`
+- SQLite dosyası `DB_DATABASE` yolunda oluşturulmuş ve PHP-FPM kullanıcısı tarafından yazılabilir olmalı
 - `php artisan optimize`
+- `DENTI_COMPANY_*` ve `DENTI_OWNER_*` env değerleri kurulum yapılan kliniğe göre set edilmeli
 - Queue worker çalışır durumda olmalı
 - Scheduler cron eklenmeli: `* * * * * php /path/to/artisan schedule:run`
 - `storage` ve `bootstrap/cache` yazılabilir olmalı
@@ -77,4 +78,4 @@ php artisan test
 - Eski README içeriğindeki React/Ant Design açıklamaları artık geçerli değildir.
 - Web arayüzü Blade tabanlıdır; frontend değişiklikleri `resources/views` ve mevcut public assetleri altında yapılmalıdır.
 - Stok hareketlerinde miktar değişiminin ana sahibi `StockTransactionObserver`dır; servisler stok sayısını transaction kaydı üzerinden değiştirmelidir.
-- Spatie Permission teams özelliği `company_id` ile aktiftir. Rol/izin atamalarında team context şirket kimliğiyle set edilmelidir.
+- Spatie Permission teams özelliği `company_id` ile aktiftir. Ürün tek işletme çalışsa da bu kolon kaldırılmamalıdır; roller, indeksler ve veri sahipliği bu anahtar üzerinden tutarlı kalır.

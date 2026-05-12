@@ -24,43 +24,23 @@ class StockRequestController extends Controller
     public function store(Request $request)
     {
         $user = auth()->user();
-        $data = $request->all();
-
         if (is_null($user->clinic_id)) {
-            return $this->error('Kullaniciya atanmis bir klinik bulunmuyor. Lutfen yoneticinize basvurun.', 403);
+            return $this->error('Kullaniciya atanmis bir klinik bulunmuyor.', 403);
         }
 
-        if (! isset($data['requester_clinic_id'])) {
-            $data['requester_clinic_id'] = $user->clinic_id;
-        }
-
-        if (isset($data['requester_clinic_id']) && $data['requester_clinic_id'] != $user->clinic_id && ! $user->isSuperAdmin()) {
-            return $this->error('Sadece kendi kliniginiz icin talep olusturabilirsiniz.', 403);
-        }
-
-        if (! isset($data['requested_by'])) {
-            $data['requested_by'] = $user->name;
-        }
-
-        $clinicRule = Rule::exists('clinics', 'id');
-        $stockRule = Rule::exists('stocks', 'id');
-        if (! $user->isSuperAdmin()) {
-            $clinicRule = $clinicRule->where('company_id', $user->company_id);
-            $stockRule = $stockRule->where('company_id', $user->company_id);
-        }
-        $requestedFromClinicRule = Rule::exists('clinics', 'id');
-        if (! $user->isSuperAdmin()) {
-            $requestedFromClinicRule = $requestedFromClinicRule->where('company_id', $user->company_id);
-        }
-
-        $validated = validator($data, [
-            'requester_clinic_id' => ['required', $clinicRule],
-            'requested_from_clinic_id' => ['required', $requestedFromClinicRule, 'different:requester_clinic_id'],
-            'stock_id' => ['required', $stockRule],
+        $validated = $request->validate([
+            'requester_clinic_id' => ['required', Rule::exists('clinics', 'id')],
+            'requested_from_clinic_id' => ['required', Rule::exists('clinics', 'id'), 'different:requester_clinic_id'],
+            'stock_id' => ['required', Rule::exists('stocks', 'id')],
             'requested_quantity' => 'required|integer|min:1',
             'request_reason' => 'nullable|string|max:500',
             'requested_by' => 'required|string|max:255',
-        ])->validate();
+        ]);
+
+        // 🛡️ SECURITY: Enforce requester_clinic_id is current user's clinic
+        if ((int) $validated['requester_clinic_id'] !== (int) $user->clinic_id) {
+            return $this->error('Sadece kendi kliniginiz icin talep olusturabilirsiniz.', 403);
+        }
 
         $stock = Stock::whereKey($validated['stock_id'])->firstOrFail();
         if ((int) $stock->clinic_id !== (int) $validated['requested_from_clinic_id']) {

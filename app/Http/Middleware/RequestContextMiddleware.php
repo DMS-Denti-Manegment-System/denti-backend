@@ -21,7 +21,6 @@ class RequestContextMiddleware
             'method' => $request->method(),
             'ip' => $request->ip(),
             'user_id' => auth()->id(),
-            'company_id' => auth()->user()?->company_id,
         ]);
 
         /** @var Response $response */

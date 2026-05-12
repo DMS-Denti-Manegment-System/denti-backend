@@ -14,7 +14,6 @@ class ClinicFactory extends Factory
     public function definition(): array
     {
         return [
-            'company_id' => \App\Models\Company::factory(),
             'name' => $this->faker->randomElement(['Ana Klinik', 'Şube 1', 'Şube 2', 'Merkez Şube']),
             'address' => $this->faker->address(),
             'phone' => $this->faker->phoneNumber(),

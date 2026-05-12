@@ -19,13 +19,11 @@ class UseStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'quantity' => 'required|numeric|min:1',
-            'notes' => 'nullable|string|max:255',
-            'reason' => 'nullable|string|max:500',
-            'used_by' => 'nullable|string|max:255',
-            'is_from_reserved' => 'nullable|boolean',
+            'quantity' => 'required|numeric|min:0.01',
+            'notes' => 'nullable|string|max:500',
             'is_sub_unit' => 'nullable|boolean',
-            'show_zero_stock_in_critical' => 'nullable|boolean',
+            'is_from_reserved' => 'nullable|boolean',
+            'used_by' => 'nullable|string|max:255',
         ];
     }
 

@@ -14,13 +14,7 @@ class UserController extends Controller
 {
     public function index(\Illuminate\Http\Request $request): JsonResponse
     {
-        $user = Auth::user();
-
-        // Super Admin ise tüm kullanıcıları görebilir, değilse sadece kendi şirketini
         $query = User::query();
-        if (! $user->isSuperAdmin()) {
-            $query->where('company_id', $user->company_id);
-        }
 
         // Frontend'den gelen arama (search) parametresi
         if ($request->has('search') && ! empty($request->search)) {
@@ -43,18 +37,13 @@ class UserController extends Controller
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
-        /** @var User $currentUser */
         $currentUser = Auth::user();
-        $companyId = $currentUser->isSuperAdmin()
-            ? $request->integer('company_id')
-            : $currentUser->company_id;
 
         $user = User::create([
             'name' => $request->name,
             'username' => $request->username,
             'email' => $request->email,
             'password' => \Illuminate\Support\Facades\Hash::make($request->password),
-            'company_id' => $companyId,
             'clinic_id' => $request->clinic_id,
             'is_active' => true,
         ]);
@@ -73,11 +62,7 @@ class UserController extends Controller
      */
     public function show(int $id): JsonResponse
     {
-        $companyId = Auth::user()->company_id;
-
-        $user = User::where('company_id', $companyId)
-            ->with('permissions')
-            ->find($id);
+        $user = User::with('permissions')->find($id);
 
         if (! $user) {
             return $this->error('User not found or unauthorized access.', 404);
@@ -95,16 +80,8 @@ class UserController extends Controller
             return $this->error('Bu işlemi yapmaya yetkiniz yok.', 403);
         }
 
-        /** @var User $currentUser */
         $currentUser = Auth::user();
-        $query = User::query();
-
-        // SECURITY: Non-Super Admins can only update users within their own company
-        if (! $currentUser->isSuperAdmin()) {
-            $query->where('company_id', $currentUser->company_id);
-        }
-
-        $user = $query->find($id);
+        $user = User::query()->find($id);
 
         if (! $user) {
             return $this->error('User not found or unauthorized access.', 404);
@@ -132,9 +109,7 @@ class UserController extends Controller
         }
 
         $currentUser = Auth::user();
-        $companyId = $currentUser->company_id;
-
-        $userToDelete = User::where('company_id', $companyId)->find($id);
+        $userToDelete = User::query()->find($id);
 
         if (! $userToDelete) {
             return $this->error('User not found or unauthorized access.', 404);
@@ -145,9 +120,9 @@ class UserController extends Controller
             return $this->error('You cannot delete your own account.', 403);
         }
 
-        // SECURITY: Protect the main "Company Owner" from being deleted
+        // SECURITY: Protect the main admin from being deleted
         if ($userToDelete->hasRole(User::ROLE_OWNER)) {
-            return $this->error('The Company Owner cannot be deleted.', 403);
+            return $this->error('The main admin cannot be deleted.', 403);
         }
 
         $userToDelete->delete();

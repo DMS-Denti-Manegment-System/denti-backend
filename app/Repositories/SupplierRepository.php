@@ -25,33 +25,24 @@ class SupplierRepository implements SupplierRepositoryInterface
         return $this->model->orderBy('name')->get();
     }
 
-    public function getAllWithFilters(array $filters = []): Collection
+    public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator
     {
         $query = $this->model->newQuery();
-
-        if (! empty($filters['search']) || ! empty($filters['name'])) {
-            $search = '%'.($filters['search'] ?? $filters['name']).'%';
+ 
+        if (! empty($filters['search'])) {
+            $search = '%'.$filters['search'].'%';
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', $search)
                     ->orWhere('contact_person', 'like', $search)
                     ->orWhere('email', 'like', $search);
             });
         }
-
-        if (isset($filters['is_active'])) {
-            $query->where('is_active', $filters['is_active']);
-        }
-
+ 
         if (! empty($filters['status'])) {
-            if ($filters['status'] === 'active') {
-                $query->where('is_active', true);
-            }
-            if ($filters['status'] === 'inactive') {
-                $query->where('is_active', false);
-            }
+            $query->where('is_active', $filters['status'] === 'active');
         }
-
-        return $query->orderBy('name')->get();
+ 
+        return $query->latest()->paginate($perPage);
     }
 
     public function find(int $id): ?Supplier
@@ -105,5 +96,20 @@ class SupplierRepository implements SupplierRepositoryInterface
             ->orWhere('email', 'like', $search)
             ->orderBy('name')
             ->get();
+    }
+    public function getSupplierStats(): array
+    {
+        $stats = \Illuminate\Support\Facades\DB::table('suppliers')
+            ->whereNull('deleted_at')
+            ->selectRaw('count(*) as total')
+            ->selectRaw('count(case when is_active = true then 1 end) as active')
+            ->selectRaw('count(case when is_active = false then 1 end) as passive')
+            ->first();
+
+        return [
+            'total' => (int) ($stats->total ?? 0),
+            'active' => (int) ($stats->active ?? 0),
+            'passive' => (int) ($stats->passive ?? 0),
+        ];
     }
 }

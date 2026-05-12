@@ -3,10 +3,14 @@
 namespace App\Providers;
 
 use App\Events\Stock\StockLevelChanged;
-use App\Listeners\Stock\CheckStockAlertsListener;
 use App\Listeners\Stock\ClearStockCacheListener;
+use App\Models\Clinic;
+use App\Models\Product;
 use App\Models\StockAlert;
 use App\Models\StockTransaction;
+use App\Models\Supplier;
+use App\Models\User;
+use App\Observers\DashboardStatsObserver;
 use App\Observers\StockAlertObserver;
 use App\Observers\StockTransactionObserver;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -58,11 +62,6 @@ class AppServiceProvider extends ServiceProvider
             \App\Repositories\Interfaces\StockTransactionRepositoryInterface::class,
             \App\Repositories\StockTransactionRepository::class
         );
-
-        $this->app->bind(
-            \App\Repositories\Interfaces\StockAlertRepositoryInterface::class,
-            \App\Repositories\StockAlertRepository::class
-        );
     }
 
     /**
@@ -75,19 +74,21 @@ class AppServiceProvider extends ServiceProvider
         // 🛡️ CRITICAL FIX: StockTransaction Observer'ı register et
         StockTransaction::observe(StockTransactionObserver::class);
 
-        // 📧 StockAlert Observer - Mail bildirimleri için
-        StockAlert::observe(StockAlertObserver::class);
-
-        // Stok seviyesi değiştiğinde tetiklenecek listener'lar
-        Event::listen(StockLevelChanged::class, CheckStockAlertsListener::class);
+        // 📧 Observers
+        Product::observe(DashboardStatsObserver::class);
+        Clinic::observe(DashboardStatsObserver::class);
+        Supplier::observe(DashboardStatsObserver::class);
+        User::observe(DashboardStatsObserver::class);
+        
+        // Event Listeners
         Event::listen(StockLevelChanged::class, ClearStockCacheListener::class);
 
         Gate::policy(\App\Models\Stock::class, \App\Policies\StockPolicy::class);
         Gate::policy(\App\Models\Clinic::class, \App\Policies\ClinicPolicy::class);
 
-        // Implicitly grant "Super Admin" role all permissions
+        // 🛡️ SUPER ADMIN BYPASS: Admin rolüne sahip kullanıcılara tüm yetkileri ver
         Gate::before(function ($user, $ability) {
-            return $user->isSuperAdmin() ? true : null;
+            return $user->hasRole('Admin') ? true : null;
         });
     }
 }

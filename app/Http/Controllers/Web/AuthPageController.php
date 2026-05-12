@@ -8,54 +8,11 @@ use App\Models\User;
 use App\Models\UserInvitation;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\RateLimiter;
-use Illuminate\Support\Str;
 
 class AuthPageController extends Controller
 {
-    public function adminLoginForm(): View
-    {
-        return view('auth.admin-login');
-    }
-
-    public function adminLogin(Request $request): RedirectResponse
-    {
-        $request->validate([
-            'username' => 'required|string|max:255',
-            'password' => 'required|string',
-        ]);
-
-        $throttleKey = 'admin_login|'.Str::lower($request->input('username')).'|'.$request->ip();
-
-        if (RateLimiter::tooManyAttempts($throttleKey, 5)) {
-            $seconds = RateLimiter::availableIn($throttleKey);
-
-            return back()->withErrors(['username' => "Cok fazla giris denemesi. {$seconds} saniye sonra tekrar deneyin."]);
-        }
-
-        $user = User::where('username', $request->input('username'))->first();
-
-        if (! $user || ! $user->isSuperAdmin() || ! Hash::check($request->input('password'), $user->password)) {
-            RateLimiter::hit($throttleKey, 60);
-
-            return back()->withErrors(['username' => 'Gecersiz kullanici adi veya sifre.'])->onlyInput('username');
-        }
-
-        if (! $user->is_active) {
-            return back()->withErrors(['username' => 'Hesabiniz pasif durumdadir.'])->onlyInput('username');
-        }
-
-        Auth::login($user, $request->boolean('remember'));
-        RateLimiter::clear($throttleKey);
-        $request->session()->regenerate();
-
-        return redirect()->route('admin.companies');
-    }
-
     public function invitationForm(string $token): View
     {
         $invitation = UserInvitation::where('token', $token)->first();
@@ -89,10 +46,8 @@ class AuthPageController extends Controller
                 'name' => $request->input('name'),
                 'email' => $invitation->email,
                 'password' => Hash::make($request->input('password')),
-                'company_id' => $invitation->company_id,
             ]);
 
-            setPermissionsTeamId($invitation->company_id);
             $user->assignRole($invitation->role);
             $invitation->update(['accepted_at' => now()]);
         });

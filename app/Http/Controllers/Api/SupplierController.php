@@ -45,7 +45,7 @@ class SupplierController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('suppliers')->where(fn ($query) => $query->where('company_id', auth()->user()->company_id))->ignore($id),
+                Rule::unique('suppliers')->ignore($id),
             ],
             'contact_person' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
@@ -71,10 +71,6 @@ class SupplierController extends Controller
 
         if (! $supplier) {
             return $this->error('Tedarikci bulunamadi', 404);
-        }
-
-        if (! auth()->user()->isSuperAdmin() && $supplier->company_id !== auth()->user()->company_id) {
-            return $this->error('Bu islem icin yetkiniz yok.', 403);
         }
 
         $deleted = $this->supplierService->deleteSupplier($id);

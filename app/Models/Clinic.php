@@ -7,31 +7,21 @@
 
 namespace App\Models;
 
-use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Clinic extends Model
 {
-    use HasFactory, SoftDeletes, Tenantable;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name', 'description', 'responsible_person',
-        'phone', 'location', 'is_active', 'company_id',
+        'phone', 'location', 'is_active',
         'email', 'address', 'city', 'district',
         'postal_code', 'website', 'opening_hours',
     ];
-
-    /**
-     * Get the company that owns the clinic.
-     */
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
 
     public function stocks(): HasMany
     {

@@ -6,33 +6,37 @@ use App\Models\Product;
 use App\Models\Stock;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Builder;
 
 class ProductRepository
 {
     public function getAllWithFilters(array $filters = [], int $perPage = 15): LengthAwarePaginator
     {
-        $totalBaseUnitsSql = Stock::totalBaseUnitsRaw();
-
-        $stockSummary = Stock::query()
-            ->selectRaw('product_id')
-            ->selectRaw("SUM(CASE WHEN is_active = 1 THEN {$totalBaseUnitsSql} ELSE 0 END) as total_stock")
-            ->selectRaw('SUM(CASE WHEN is_active = 1 THEN 1 ELSE 0 END) as batches_count')
-            ->groupBy('product_id');
+        $clinicId = $filters['clinic_id'] ?? null;
 
         $query = Product::query()
             ->with([
                 'clinic:id,name',
+                'latestBatch' => fn ($batchQuery) => $batchQuery->select([
+                    'stocks.id', 'stocks.product_id', 'stocks.clinic_id', 'stocks.storage_location',
+                ]),
+                'latestBatch.clinic:id,name',
             ])
-            ->leftJoinSub($stockSummary, 'stock_summary', function ($join) {
-                $join->on('stock_summary.product_id', '=', 'products.id');
-            })
+            ->joinStockSummary($clinicId)
             ->select('products.*')
             ->selectRaw('COALESCE(stock_summary.total_stock, 0) as total_stock')
             ->selectRaw('COALESCE(stock_summary.batches_count, 0) as batches_count');
 
-        $isSqlite = \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite';
-        $now = now();
+        $this->applyFilters($query, $filters);
 
+        return $query->latest()->paginate($perPage);
+    }
+
+    /**
+     * Filtreleri sorguya uygular.
+     */
+    protected function applyFilters(Builder $query, array $filters): void
+    {
         // 1. Arama (İsim veya SKU)
         if (! empty($filters['search'])) {
             $search = '%'.$filters['search'].'%';
@@ -52,9 +56,7 @@ class ProductRepository
             $clinicId = $filters['clinic_id'];
             $query->where(function ($q) use ($clinicId) {
                 $q->where('clinic_id', $clinicId)
-                    ->orWhereHas('batches', function ($batchQuery) use ($clinicId) {
-                        $batchQuery->where('clinic_id', $clinicId);
-                    });
+                    ->orWhereHas('batches', fn ($q) => $q->where('clinic_id', $clinicId));
             });
         }
 
@@ -65,56 +67,55 @@ class ProductRepository
 
         // 5. Seviye (Stok ve SKT Uyarıları)
         if (! empty($filters['level'])) {
-            $level = $filters['level'];
-            $levelAliases = [
-                'low_stock' => 'low',
-                'critical_stock' => 'critical',
-                'low_expiry' => 'near_expiry',
-            ];
-            $level = $levelAliases[$level] ?? $level;
+            $this->applyLevelFilter($query, $filters['level']);
+        }
+    }
 
-            // Stok Miktarı Bazlı Filtreler (Total Stock)
-            if (in_array($level, ['low', 'critical'], true)) {
-                if ($level === 'critical') {
-                    $query->whereHas('batches', function ($q) {
-                        $q->where('is_active', 1);
-                    })->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.red_alert_level, products.critical_stock_level)')
-                        ->whereRaw('NOT (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)');
-                } else {
-                    $query->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
-                        ->whereRaw('(COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level) OR (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))');
-                }
-            }
+    /**
+     * Kritik/Düşük stok veya SKT filtrelerini uygular.
+     */
+    protected function applyLevelFilter(Builder $query, string $level): void
+    {
+        $levelAliases = ['low_stock' => 'low', 'critical_stock' => 'critical', 'low_expiry' => 'near_expiry'];
+        $level = $levelAliases[$level] ?? $level;
 
-            // SKT (Miyat) Bazlı Filtreler
-            if (in_array($level, ['near_expiry', 'critical_expiry', 'expired'], true)) {
-                $query->whereHas('batches', function ($q) use ($level, $isSqlite, $now) {
-                    $q->where('is_active', 1)->where('track_expiry', 1);
-
-                    if ($level === 'expired') {
-                        $q->whereDate('expiry_date', '<', $now->toDateString());
-                    } elseif ($level === 'critical_expiry') {
-                        $redDaysSql = $isSqlite
-                            ? "date(?, '+' || COALESCE(expiry_red_days, 15) || ' days')"
-                            : 'DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)';
-                        $q->whereDate('expiry_date', '>=', $now->toDateString())
-                            ->whereRaw("expiry_date <= {$redDaysSql}", [$now->toDateTimeString()]);
-                    } else { // near_expiry
-                        $yellowDaysSql = $isSqlite
-                            ? "date(?, '+' || COALESCE(expiry_yellow_days, 30) || ' days')"
-                            : 'DATE_ADD(?, INTERVAL COALESCE(expiry_yellow_days, 30) DAY)';
-                        $redDaysSql = $isSqlite
-                            ? "date(?, '+' || COALESCE(expiry_red_days, 15) || ' days')"
-                            : 'DATE_ADD(?, INTERVAL COALESCE(expiry_red_days, 15) DAY)';
-                        $q->whereDate('expiry_date', '>=', $now->toDateString())
-                            ->whereRaw("expiry_date <= {$yellowDaysSql}", [$now->toDateTimeString()])
-                            ->whereRaw("expiry_date > {$redDaysSql}", [$now->toDateTimeString()]);
-                    }
-                });
-            }
+        // Stok Miktarı Bazlı Filtreler
+        if ($level === 'critical') {
+            $query->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.red_alert_level, products.critical_stock_level)')
+                ->whereRaw('NOT (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)');
+        } elseif ($level === 'low') {
+            $query->whereRaw('COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.yellow_alert_level, products.min_stock_level)')
+                ->whereRaw('(COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level) OR (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))');
         }
 
-        return $query->latest()->paginate($perPage);
+        // SKT (Miyat) Bazlı Filtreler
+        if (in_array($level, ['near_expiry', 'critical_expiry', 'expired'], true)) {
+            $query->whereHas('batches', function ($q) use ($level) {
+                $q->where('is_active', 1)->where('track_expiry', 1);
+                $now = now();
+
+                if ($level === 'expired') {
+                    $q->whereDate('expiry_date', '<', $now->toDateString());
+                } elseif ($level === 'critical_expiry') {
+                    $q->whereDate('expiry_date', '>=', $now->toDateString())
+                        ->whereRaw("expiry_date <= " . $this->getDateAddSql('expiry_red_days', 15), [$now->toDateTimeString()]);
+                } else { // near_expiry
+                    $q->whereDate('expiry_date', '>=', $now->toDateString())
+                        ->whereRaw("expiry_date <= " . $this->getDateAddSql('expiry_yellow_days', 30), [$now->toDateTimeString()])
+                        ->whereRaw("expiry_date > " . $this->getDateAddSql('expiry_red_days', 15), [$now->toDateTimeString()]);
+                }
+            });
+        }
+    }
+
+    /**
+     * SQL Sürücüsüne göre tarih ekleme fonksiyonunu döndürür.
+     */
+    protected function getDateAddSql(string $column, int $default): string
+    {
+        return \Illuminate\Support\Facades\DB::getDriverName() === 'sqlite'
+            ? "date(?, '+' || COALESCE({$column}, {$default}) || ' days')"
+            : "DATE_ADD(?, INTERVAL COALESCE({$column}, {$default}) DAY)";
     }
 
     public function find(int $id): ?Product

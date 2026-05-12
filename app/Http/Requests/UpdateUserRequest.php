@@ -23,10 +23,6 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        $user = $this->user();
-        $companyId = $user->company_id;
-        $isSuperAdmin = $user->isSuperAdmin();
-
         return array_merge($this->commonRules(), [
             'is_active' => ['sometimes', 'boolean'],
             'permissions' => $this->permissionsRule(),
@@ -34,15 +30,8 @@ class UpdateUserRequest extends FormRequest
             'clinic_id' => [
                 'nullable',
                 'integer',
-                Rule::exists('clinics', 'id')->where(function ($query) use ($companyId, $isSuperAdmin) {
-                    if ($isSuperAdmin) {
-                        return $query;
-                    }
-
-                    return $query->where('company_id', $companyId);
-                }),
+                Rule::exists('clinics', 'id'),
             ],
-            'company_id' => ['prohibited'],
         ]);
     }
 }

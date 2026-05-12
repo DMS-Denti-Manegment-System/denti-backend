@@ -2,23 +2,23 @@
 
 namespace App\Models;
 
-use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection;
 
 class Product extends Model
 {
-    use HasFactory, SoftDeletes, Tenantable;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name', 'sku', 'description', 'unit', 'category', 'brand',
         'min_stock_level', 'critical_stock_level',
         'yellow_alert_level', 'red_alert_level',
-        'is_active', 'has_expiration_date', 'company_id', 'clinic_id',
+        'is_active', 'has_expiration_date', 'clinic_id',
         'has_sub_unit', 'sub_unit_name', 'sub_unit_multiplier',
         'show_zero_stock_in_critical',
     ];
@@ -37,11 +37,6 @@ class Product extends Model
     ];
 
     // Relationships
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
-
     public function clinic(): BelongsTo
     {
         return $this->belongsTo(Clinic::class);
@@ -50,6 +45,11 @@ class Product extends Model
     public function batches(): HasMany
     {
         return $this->hasMany(Stock::class, 'product_id');
+    }
+
+    public function latestBatch(): HasOne
+    {
+        return $this->hasOne(Stock::class, 'product_id')->latestOfMany('id');
     }
 
     public function transactions(): HasMany
@@ -154,16 +154,27 @@ class Product extends Model
 
     public function getLastPurchasePriceAttribute()
     {
-        $lastBatch = $this->getLoadedOrFreshBatches()
+        if ($this->relationLoaded('batches')) {
+            $lastBatch = $this->batches
+                ->where('current_stock', '>', 0)
+                ->sortByDesc(function (Stock $batch) {
+                    return sprintf(
+                        '%s-%010d',
+                        optional($batch->purchase_date)->format('Y-m-d H:i:s') ?? '0000-00-00 00:00:00',
+                        $batch->id
+                    );
+                })
+                ->first();
+
+            return $lastBatch ? $lastBatch->purchase_price : 0;
+        }
+
+        // Aggregate using DB query if relation not loaded to prevent N+1 and memory exhaustion
+        $lastBatch = Stock::where('product_id', $this->id)
             ->where('current_stock', '>', 0)
-            ->sortByDesc(function (Stock $batch) {
-                return sprintf(
-                    '%s-%010d',
-                    optional($batch->purchase_date)->format('Y-m-d H:i:s') ?? '0000-00-00 00:00:00',
-                    $batch->id
-                );
-            })
-            ->first();
+            ->orderByDesc('purchase_date')
+            ->orderByDesc('id')
+            ->first(['purchase_price']);
 
         return $lastBatch ? $lastBatch->purchase_price : 0;
     }
@@ -242,5 +253,29 @@ class Product extends Model
             'adjustment_minus',
             'adjustment_decrease',
         ];
+    }
+
+    /**
+     * Stok özet verilerini sorguya join eder.
+     */
+    public function scopeJoinStockSummary($query, ?int $clinicId = null)
+    {
+        $totalBaseUnitsSql = Stock::totalBaseUnitsRaw();
+
+        $stockSummary = Stock::query()
+            ->selectRaw('product_id')
+            ->selectRaw("SUM(CASE WHEN is_active THEN {$totalBaseUnitsSql} ELSE 0 END) as total_stock")
+            ->selectRaw('SUM(CASE WHEN is_active THEN 1 ELSE 0 END) as batches_count')
+            ->whereNull('deleted_at');
+
+        if ($clinicId) {
+            $stockSummary->where('clinic_id', $clinicId);
+        }
+
+        $stockSummary->groupBy('product_id');
+
+        return $query->leftJoinSub($stockSummary, 'stock_summary', function ($join) {
+            $join->on('stock_summary.product_id', '=', 'products.id');
+        });
     }
 }

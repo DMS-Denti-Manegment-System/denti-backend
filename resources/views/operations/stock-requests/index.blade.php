@@ -4,7 +4,9 @@
 @section('page-subtitle', 'Klinikler arasi talep akisi')
 @section('content')
     <div id="stockRequestsModule" class="app-module-shell" data-index-url="{{ route('stock-requests.index') }}">
-        @include('operations.stock-requests.components.stats')
+        <div id="stockRequestStatsContainer">
+            @include('operations.stock-requests.components.stats')
+        </div>
         @include('operations.stock-requests.components.filters')
         <div id="stockRequestsTableContainer" data-module-table>
             @include('operations.stock-requests.table.index')
@@ -26,6 +28,11 @@
                 root: '#stockRequestsModule',
                 indexUrl: @json(route('stock-requests.index')),
                 modalHost: '#stockRequestModalHost',
+                onAfterLoad: function(response) {
+                    if (response.statsHtml) {
+                        $('#stockRequestStatsContainer').html(response.statsHtml);
+                    }
+                }
             });
         });
     </script>

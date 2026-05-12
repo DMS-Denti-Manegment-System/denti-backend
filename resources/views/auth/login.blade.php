@@ -12,17 +12,7 @@
                             @csrf
                             <div class="text-center mb-11">
                                 <h1 class="text-gray-900 fw-bolder mb-3">Denti Yonetim</h1>
-                                <div class="text-gray-500 fw-semibold fs-6">Klinik kodu, kullanici adi ve sifre ile giris
-                                    yapin.</div>
-                            </div>
-
-                            <div class="fv-row mb-8">
-                                <input type="text" name="clinic_code" value="{{ old('clinic_code') }}"
-                                    placeholder="Klinik kodu"
-                                    class="form-control bg-transparent @error('clinic_code') is-invalid @enderror" />
-                                @error('clinic_code')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <div class="text-gray-500 fw-semibold fs-6">Kullanici adi veya e-posta ile giris yapin.</div>
                             </div>
 
                             <div class="fv-row mb-8">
@@ -48,7 +38,6 @@
                                         {{ old('remember') ? 'checked' : '' }} />
                                     <span class="form-check-label text-gray-700">Beni hatirla</span>
                                 </label>
-                                <a href="{{ route('admin.login') }}" class="link-primary">Super Admin girisi</a>
                             </div>
 
                             <div class="d-grid mb-10">

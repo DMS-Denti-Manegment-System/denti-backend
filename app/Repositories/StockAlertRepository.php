@@ -161,10 +161,9 @@ class StockAlertRepository implements StockAlertRepositoryInterface
             ]);
     }
 
-    public function resolveMissingActiveAlertsByProduct(int $productId, int $companyId, array $activeTypes): void
+    public function resolveMissingActiveAlertsByProduct(int $productId, array $activeTypes): void
     {
         $query = $this->model->where('product_id', $productId)
-            ->where('company_id', $companyId)
             ->where('is_active', true)
             ->where('is_resolved', false);
 

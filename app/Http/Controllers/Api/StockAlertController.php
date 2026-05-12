@@ -75,13 +75,10 @@ class StockAlertController extends Controller
         $this->authorize('viewAny', StockAlert::class);
 
         $clinicId = $request->integer('clinic_id') ?: null;
-        $user = auth()->user();
-        $companyId = $user->company_id;
-        $cacheKey = "pending_alerts_count_{$companyId}_".($clinicId ?? 'all');
+        $cacheKey = 'pending_alerts_count_'.($clinicId ?? 'all');
 
-        $count = Cache::remember($cacheKey, 60, function () use ($companyId, $clinicId) {
-            $query = StockAlert::where('company_id', $companyId)
-                ->where('is_active', true)
+        $count = Cache::remember($cacheKey, 60, function () use ($clinicId) {
+            $query = StockAlert::where('is_active', true)
                 ->where('is_resolved', false);
 
             if ($clinicId) {

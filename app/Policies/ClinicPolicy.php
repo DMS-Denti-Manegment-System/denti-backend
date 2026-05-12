@@ -17,23 +17,21 @@ class ClinicPolicy
 
     public function view(User $user, Clinic $clinic): bool
     {
-        return $user->isSuperAdmin() || $user->company_id === $clinic->company_id;
+        return $user->hasPermissionTo('view-clinics');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('create-clinics') || $user->hasRole('Company Owner');
+        return $user->hasPermissionTo('create-clinics') || $user->hasRole(User::ROLE_OWNER);
     }
 
     public function update(User $user, Clinic $clinic): bool
     {
-        return ($user->isSuperAdmin() || $user->company_id === $clinic->company_id)
-            && ($user->hasPermissionTo('update-clinics') || $user->hasRole('Company Owner'));
+        return $user->hasPermissionTo('update-clinics') || $user->hasRole(User::ROLE_OWNER);
     }
 
     public function delete(User $user, Clinic $clinic): bool
     {
-        return ($user->isSuperAdmin() || $user->company_id === $clinic->company_id)
-            && ($user->hasPermissionTo('delete-clinics') || $user->hasRole('Company Owner'));
+        return $user->hasPermissionTo('delete-clinics') || $user->hasRole(User::ROLE_OWNER);
     }
 }

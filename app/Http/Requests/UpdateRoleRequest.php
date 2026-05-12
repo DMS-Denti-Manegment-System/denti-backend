@@ -21,9 +21,7 @@ class UpdateRoleRequest extends FormRequest
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('roles', 'name')->ignore($roleId)->where(function ($query) {
-                    return $query->where('company_id', auth()->user()->company_id);
-                }),
+                Rule::unique('roles', 'name')->ignore($roleId),
             ],
             'permissions' => 'required|array',
             'permissions.*' => 'exists:permissions,name',

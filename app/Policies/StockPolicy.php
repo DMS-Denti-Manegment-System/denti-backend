@@ -14,7 +14,7 @@ class StockPolicy
 
     public function view(User $user, Stock $stock): bool
     {
-        return $user->company_id === $stock->company_id && $user->hasPermissionTo('view-stocks');
+        return $user->hasPermissionTo('view-stocks');
     }
 
     public function create(User $user): bool
@@ -24,21 +24,21 @@ class StockPolicy
 
     public function update(User $user, Stock $stock): bool
     {
-        return $user->company_id === $stock->company_id && $user->hasPermissionTo('update-stocks');
+        return $user->hasPermissionTo('update-stocks');
     }
 
     public function delete(User $user, Stock $stock): bool
     {
-        return $user->company_id === $stock->company_id && $user->hasPermissionTo('delete-stocks');
+        return $user->hasPermissionTo('delete-stocks');
     }
 
     public function adjust(User $user, Stock $stock): bool
     {
-        return $user->company_id === $stock->company_id && $user->hasPermissionTo('adjust-stocks');
+        return $user->hasPermissionTo('adjust-stocks');
     }
 
     public function use(User $user, Stock $stock): bool
     {
-        return $user->company_id === $stock->company_id && $user->hasPermissionTo('use-stocks');
+        return $user->hasPermissionTo('use-stocks');
     }
 }

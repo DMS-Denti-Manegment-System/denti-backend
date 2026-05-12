@@ -19,7 +19,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', Rule::unique('categories')->where(fn ($query) => $query->where('company_id', auth()->user()->company_id))],
+            'name' => ['required', 'string', 'max:255', Rule::unique('categories')],
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string|max:500',
             'is_active' => 'sometimes|boolean',
@@ -49,7 +49,7 @@ class CategoryController extends Controller
                 'required',
                 'string',
                 'max:255',
-                Rule::unique('categories')->where(fn ($query) => $query->where('company_id', auth()->user()->company_id))->ignore($id),
+                Rule::unique('categories')->ignore($id),
             ],
             'color' => 'nullable|string|max:7',
             'description' => 'nullable|string|max:500',

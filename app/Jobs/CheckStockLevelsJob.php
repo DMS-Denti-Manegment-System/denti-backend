@@ -16,19 +16,14 @@ class CheckStockLevelsJob implements ShouldQueue
 
     protected $stockId;
 
-    protected $companyId;
-
-    public function __construct(int $stockId, int $companyId)
+    public function __construct(int $stockId)
     {
         $this->stockId = $stockId;
-        $this->companyId = $companyId;
     }
 
     public function handle(StockAlertService $stockAlertService)
     {
-        $stock = Stock::withoutGlobalScopes()
-            ->where('company_id', $this->companyId)
-            ->find($this->stockId);
+        $stock = Stock::query()->find($this->stockId);
 
         if ($stock) {
             $stockAlertService->checkAndCreateAlerts($stock);

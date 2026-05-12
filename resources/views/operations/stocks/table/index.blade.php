@@ -13,7 +13,7 @@
                 <tbody class="text-gray-700 fw-semibold">
                     @forelse ($products as $product)
                         @php
-                            $latestBatch = $product->batches->first();
+                            $latestBatch = $product->latestBatch;
                             $status = $product->stock_status;
                             $statusClass = $status === 'critical' ? 'danger' : ($status === 'low_stock' ? 'warning' : 'success');
                             $statusLabel = $status === 'critical' ? 'Kritik Seviye' : ($status === 'low_stock' ? 'Düşük Seviye' : 'Normal');

@@ -22,6 +22,8 @@ class AuthApiTest extends TestCase
     {
         parent::setUp();
 
+        config(['denti.company.code' => 'DEMO']);
+
         $this->company = Company::factory()->create([
             'code' => 'DEMO',
         ]);
@@ -43,7 +45,6 @@ class AuthApiTest extends TestCase
     public function user_can_login_with_valid_credentials()
     {
         $response = $this->postJson('/api/login', [
-            'company_code' => 'DEMO',
             'username' => 'admin',
             'password' => 'password123',
         ]);
@@ -62,7 +63,7 @@ class AuthApiTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function user_cannot_login_with_invalid_company_code()
+    public function legacy_company_code_is_ignored_in_single_company_login()
     {
         $response = $this->postJson('/api/login', [
             'company_code' => 'INVALID',
@@ -70,18 +71,13 @@ class AuthApiTest extends TestCase
             'password' => 'password123',
         ]);
 
-        $response->assertStatus(422)
-            ->assertJson([
-                'success' => false,
-                'message' => 'Geçersiz şirket kodu, kullanıcı adı veya şifre',
-            ]);
+        $response->assertStatus(200);
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
     public function user_cannot_login_with_invalid_password()
     {
         $response = $this->postJson('/api/login', [
-            'company_code' => 'DEMO',
             'username' => 'admin',
             'password' => 'wrongpassword',
         ]);
@@ -89,7 +85,7 @@ class AuthApiTest extends TestCase
         $response->assertStatus(422)
             ->assertJson([
                 'success' => false,
-                'message' => 'Geçersiz şirket kodu, kullanıcı adı veya şifre',
+                'message' => 'Geçersiz kullanıcı adı veya şifre',
             ]);
     }
 
@@ -99,7 +95,6 @@ class AuthApiTest extends TestCase
         $this->user->update(['is_active' => false]);
 
         $response = $this->postJson('/api/login', [
-            'company_code' => 'DEMO',
             'username' => 'admin',
             'password' => 'password123',
         ]);
@@ -154,7 +149,6 @@ class AuthApiTest extends TestCase
         // 5 başarısız deneme
         for ($i = 0; $i < 5; $i++) {
             $this->postJson('/api/login', [
-                'company_code' => 'DEMO',
                 'username' => 'admin',
                 'password' => 'wrongpassword',
             ]);
@@ -162,7 +156,6 @@ class AuthApiTest extends TestCase
 
         // 6. deneme rate limited
         $response = $this->postJson('/api/login', [
-            'company_code' => 'DEMO',
             'username' => 'admin',
             'password' => 'wrongpassword',
         ]);
@@ -175,10 +168,10 @@ class AuthApiTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function user_can_login_using_clinic_code_instead_of_company_code()
+    public function legacy_clinic_code_is_ignored_in_single_company_login()
     {
         $response = $this->postJson('/api/login', [
-            'clinic_code' => 'DEMO',
+            'clinic_code' => 'IGNORED',
             'username' => 'admin',
             'password' => 'password123',
         ]);
@@ -194,37 +187,36 @@ class AuthApiTest extends TestCase
     }
 
     #[\PHPUnit\Framework\Attributes\Test]
-    public function super_admin_can_login_without_clinic_or_company_code()
+    public function user_from_another_company_cannot_login()
     {
-        $superAdmin = User::factory()->create([
-            'username' => 'super',
+        $otherCompany = Company::factory()->create(['code' => 'OTHER']);
+        User::factory()->create([
+            'company_id' => $otherCompany->id,
+            'username' => 'other-admin',
             'password' => bcrypt('password123'),
             'is_active' => true,
         ]);
 
-        \Spatie\Permission\Models\Role::create(['name' => 'Super Admin']);
-        $superAdmin->assignRole('Super Admin');
-
-        $response = $this->postJson('/api/admin/login', [
-            'username' => 'super',
-            'password' => 'password123',
-        ]);
-
-        $response->assertStatus(200);
-    }
-
-    #[\PHPUnit\Framework\Attributes\Test]
-    public function normal_user_cannot_login_without_clinic_or_company_code()
-    {
         $response = $this->postJson('/api/login', [
-            'username' => 'admin',
+            'username' => 'other-admin',
             'password' => 'password123',
         ]);
 
         $response->assertStatus(422)
             ->assertJson([
                 'success' => false,
-                'message' => 'Şirket kodu gereklidir.',
+                'message' => 'Geçersiz kullanıcı adı veya şifre',
             ]);
+    }
+
+    #[\PHPUnit\Framework\Attributes\Test]
+    public function user_can_login_without_clinic_or_company_code()
+    {
+        $response = $this->postJson('/api/login', [
+            'username' => 'admin',
+            'password' => 'password123',
+        ]);
+
+        $response->assertStatus(200);
     }
 }

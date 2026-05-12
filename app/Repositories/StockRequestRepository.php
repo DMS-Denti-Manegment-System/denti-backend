@@ -24,6 +24,7 @@ class StockRequestRepository implements StockRequestRepositoryInterface
     {
         return $this->model->with(['requesterClinic', 'requestedFromClinic', 'stock'])
             ->orderByDesc('requested_at')
+            ->limit(1000)
             ->get();
     }
 
@@ -143,15 +144,33 @@ class StockRequestRepository implements StockRequestRepositoryInterface
             ->get();
     }
 
-    public function getStats(): array
+    public function getStats(?int $clinicId = null): array
     {
+        $query = \Illuminate\Support\Facades\DB::table('stock_requests')
+            ->whereNull('deleted_at');
+        
+        if ($clinicId) {
+            $query->where(function ($q) use ($clinicId) {
+                $q->where('requester_clinic_id', $clinicId)
+                  ->orWhere('requested_from_clinic_id', $clinicId);
+            });
+        }
+
+        $stats = $query->selectRaw('count(*) as total')
+            ->selectRaw("count(case when status = 'pending' then 1 end) as pending")
+            ->selectRaw("count(case when status = 'approved' then 1 end) as approved")
+            ->selectRaw("count(case when status = 'in_transit' then 1 end) as in_transit")
+            ->selectRaw("count(case when status = 'completed' then 1 end) as completed")
+            ->selectRaw("count(case when status = 'rejected' then 1 end) as rejected")
+            ->first();
+
         return [
-            'total' => $this->model->count(),
-            'pending' => $this->model->where('status', 'pending')->count(),
-            'approved' => $this->model->where('status', 'approved')->count(),
-            'in_transit' => $this->model->where('status', 'in_transit')->count(),
-            'completed' => $this->model->where('status', 'completed')->count(),
-            'rejected' => $this->model->where('status', 'rejected')->count(),
+            'total' => (int) ($stats->total ?? 0),
+            'pending' => (int) ($stats->pending ?? 0),
+            'approved' => (int) ($stats->approved ?? 0),
+            'in_transit' => (int) ($stats->in_transit ?? 0),
+            'completed' => (int) ($stats->completed ?? 0),
+            'rejected' => (int) ($stats->rejected ?? 0),
         ];
     }
 }

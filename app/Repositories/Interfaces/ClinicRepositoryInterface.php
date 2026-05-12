@@ -14,7 +14,7 @@ interface ClinicRepositoryInterface
 {
     public function all(): Collection;
 
-    public function getAllWithFilters(array $filters = []): Collection;
+    public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator;
 
     public function find(int $id): ?Clinic;
 
@@ -29,4 +29,6 @@ interface ClinicRepositoryInterface
     public function getStockSummary(int $clinicId): array;
 
     public function getGlobalStats(): array;
+    
+    public function getClinicStats(): array;
 }

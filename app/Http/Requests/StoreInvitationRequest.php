@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class StoreInvitationRequest extends FormRequest
 {
@@ -22,14 +23,12 @@ class StoreInvitationRequest extends FormRequest
      */
     public function rules(): array
     {
-        $companyId = $this->user()->company_id;
-
         return [
             'email' => 'required|email|unique:users,email',
             'role' => [
                 'required',
                 'string',
-                \Illuminate\Validation\Rule::exists('roles', 'name')->where('company_id', $companyId),
+                Rule::exists('roles', 'name'),
             ],
         ];
     }

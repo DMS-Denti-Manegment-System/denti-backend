@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreStockRequest extends FormRequest
 {
@@ -13,20 +14,18 @@ class StoreStockRequest extends FormRequest
 
     public function rules(): array
     {
-        $companyId = auth()->user()->company_id;
-
         return [
             'product_id' => [
                 'required',
-                new \App\Rules\CompanyOwned('products'),
+                Rule::exists('products', 'id'),
             ],
             'supplier_id' => [
                 'required',
-                new \App\Rules\CompanyOwned('suppliers'),
+                Rule::exists('suppliers', 'id'),
             ],
             'clinic_id' => [
                 'required',
-                new \App\Rules\CompanyOwned('clinics'),
+                Rule::exists('clinics', 'id'),
             ],
             'purchase_price' => 'required|numeric|min:0',
             'currency' => 'nullable|string|max:10',

@@ -14,7 +14,7 @@ interface SupplierRepositoryInterface
 {
     public function all(): Collection;
 
-    public function getAllWithFilters(array $filters = []): Collection;
+    public function getAllWithFilters(array $filters = [], int $perPage = 15): \Illuminate\Pagination\LengthAwarePaginator;
 
     public function find(int $id): ?Supplier;
 
@@ -27,4 +27,6 @@ interface SupplierRepositoryInterface
     public function getActive(): Collection;
 
     public function search(string $term): Collection;
+
+    public function getSupplierStats(): array;
 }

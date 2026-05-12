@@ -23,12 +23,6 @@ class EnsureRole
             throw UnauthorizedException::missingTraitHasRoles($user);
         }
 
-        setPermissionsTeamId($user->company_id ?? 0);
-
-        if (method_exists($user, 'isSuperAdmin') && $user->isSuperAdmin()) {
-            return $next($request);
-        }
-
         $roles = explode('|', $role);
 
         if (! $user->hasAnyRole($roles)) {

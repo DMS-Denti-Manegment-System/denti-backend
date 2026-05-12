@@ -33,8 +33,7 @@ class StockTransferController extends Controller
             'toClinic:id,name',
             'requestedBy:id,name',
             'approvedBy:id,name',
-        ])
-            ->where('company_id', $user->company_id);
+        ]);
 
         // Klinik filtresi
         if ($clinicId) {
@@ -68,11 +67,11 @@ class StockTransferController extends Controller
         $validated = $request->validate([
             'stock_id' => [
                 'required',
-                Rule::exists('stocks', 'id')->where('company_id', Auth::user()->company_id),
+                Rule::exists('stocks', 'id'),
             ],
             'to_clinic_id' => [
                 'required',
-                Rule::exists('clinics', 'id')->where('company_id', Auth::user()->company_id),
+                Rule::exists('clinics', 'id'),
             ],
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string|max:500',
@@ -127,7 +126,6 @@ class StockTransferController extends Controller
                     'stock_id' => $lockedStock->id,
                     'from_clinic_id' => $lockedStock->clinic_id,
                     'to_clinic_id' => $toClinic->id,
-                    'company_id' => $user->company_id,
                     'quantity' => $validated['quantity'],
                     'notes' => $validated['notes'] ?? null,
                     'status' => StockTransfer::STATUS_PENDING,
@@ -163,7 +161,6 @@ class StockTransferController extends Controller
             'approvedBy:id,name,email',
             'completedBy:id,name,email',
         ])
-            ->where('company_id', $user->company_id)
             ->findOrFail($id);
 
         return $this->success($transfer, 'Transfer details retrieved.');
@@ -176,7 +173,7 @@ class StockTransferController extends Controller
     {
         $user = Auth::user();
 
-        $transfer = StockTransfer::where('company_id', $user->company_id)->findOrFail($id);
+        $transfer = StockTransfer::query()->findOrFail($id);
 
         // Yetki kontrolü: Hedef klinik yetkilisi mi?
         if ($transfer->to_clinic_id !== $user->clinic_id && ! $user->hasPermissionTo('approve-transfers')) {
@@ -189,7 +186,7 @@ class StockTransferController extends Controller
 
         try {
             $transfer = DB::transaction(function () use ($id, $user) {
-                $transfer = StockTransfer::where('company_id', $user->company_id)
+                $transfer = StockTransfer::query()
                     ->whereKey($id)
                     ->lockForUpdate()
                     ->firstOrFail();
@@ -224,7 +221,6 @@ class StockTransferController extends Controller
                     'performed_by' => $user->name,
                     'user_id' => $user->id,
                     'transaction_date' => now(),
-                    'company_id' => $transfer->company_id,
                 ]);
 
                 $stock->refresh();
@@ -245,7 +241,6 @@ class StockTransferController extends Controller
                     'performed_by' => $user->name,
                     'user_id' => $user->id,
                     'transaction_date' => now(),
-                    'company_id' => $transfer->company_id,
                 ]);
 
                 $transfer->update([
@@ -278,7 +273,7 @@ class StockTransferController extends Controller
 
         $user = Auth::user();
 
-        $transfer = StockTransfer::where('company_id', $user->company_id)
+        $transfer = StockTransfer::query()
             ->findOrFail($id);
 
         // Yetki kontrolü
@@ -324,7 +319,7 @@ class StockTransferController extends Controller
     {
         $user = Auth::user();
 
-        $transfer = StockTransfer::where('company_id', $user->company_id)
+        $transfer = StockTransfer::query()
             ->findOrFail($id);
 
         // Yetki kontrolü: Sadece isteyen veya admin
@@ -386,7 +381,6 @@ class StockTransferController extends Controller
     {
         $targetStock = Stock::where('product_id', $sourceStock->product_id)
             ->where('clinic_id', $targetClinicId)
-            ->where('company_id', $sourceStock->company_id)
             ->where('batch_code', $sourceStock->batch_code)
             ->lockForUpdate()
             ->first();
@@ -407,7 +401,6 @@ class StockTransferController extends Controller
             'reserved_stock' => 0,
             'available_stock' => 0,
             'clinic_id' => $targetClinicId,
-            'company_id' => $sourceStock->company_id,
             'has_sub_unit' => $sourceStock->has_sub_unit,
             'sub_unit_multiplier' => $sourceStock->sub_unit_multiplier,
             'sub_unit_name' => $sourceStock->sub_unit_name,

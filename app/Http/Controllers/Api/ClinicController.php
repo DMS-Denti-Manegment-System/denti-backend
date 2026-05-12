@@ -43,15 +43,6 @@ class ClinicController extends Controller
 
         try {
             $validatedData = $request->validated();
-
-            if (! auth()->user()->isSuperAdmin()) {
-                $validatedData['company_id'] = auth()->user()->company_id;
-            }
-
-            if (empty($validatedData['company_id'])) {
-                return $this->error('Klinik oluşturmak için bir şirkete bağlı olmalısınız.', 400);
-            }
-
             $clinic = $this->clinicService->createClinic($validatedData);
 
             return $this->success($clinic, 'Klinik başarıyla oluşturuldu', 201);

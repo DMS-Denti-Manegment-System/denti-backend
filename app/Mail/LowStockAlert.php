@@ -34,7 +34,6 @@ class LowStockAlert extends Mailable implements ShouldQueue
             tags: ['stock-alert', 'low-stock'],
             metadata: [
                 'product_id' => $this->product->id,
-                'company_id' => $this->product->company_id,
             ],
         );
     }

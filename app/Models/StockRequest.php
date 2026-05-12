@@ -7,21 +7,20 @@
 
 namespace App\Models;
 
-use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class StockRequest extends Model
 {
-    use SoftDeletes, Tenantable;
+    use SoftDeletes;
 
     protected $fillable = [
         'request_number', 'requester_clinic_id', 'requested_from_clinic_id',
         'stock_id', 'requested_quantity', 'approved_quantity', 'status',
         'request_reason', 'admin_notes', 'rejection_reason',
         'requested_at', 'approved_at', 'completed_at',
-        'requested_by', 'approved_by', 'company_id',
+        'requested_by', 'approved_by',
     ];
 
     protected $casts = [
@@ -29,11 +28,6 @@ class StockRequest extends Model
         'approved_at' => 'datetime',
         'completed_at' => 'datetime',
     ];
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
 
     public function requesterClinic(): BelongsTo
     {

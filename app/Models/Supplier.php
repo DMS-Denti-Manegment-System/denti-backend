@@ -7,33 +7,26 @@
 
 namespace App\Models;
 
-use App\Traits\Tenantable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
 class Supplier extends Model
 {
-    use HasFactory, SoftDeletes, Tenantable;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name', 'contact_person', 'phone', 'email', 'address',
         'tax_number', 'website', 'payment_terms', 'notes',
-        'is_active', 'additional_info', 'company_id',
+        'is_active', 'additional_info',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'additional_info' => 'array',
     ];
-
-    public function company(): BelongsTo
-    {
-        return $this->belongsTo(Company::class);
-    }
 
     public function stocks(): HasMany
     {

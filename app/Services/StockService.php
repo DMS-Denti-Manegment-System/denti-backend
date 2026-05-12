@@ -7,6 +7,7 @@ use App\Exceptions\Stock\InsufficientStockException;
 use App\Exceptions\Stock\StockNotFoundException;
 use App\Models\Stock;
 use App\Repositories\Interfaces\StockRepositoryInterface;
+use App\Support\StockStatsCache;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -60,14 +61,13 @@ class StockService
                     'performed_by' => auth()->user()?->name ?? 'Sistem',
                     'user_id' => auth()->id(),
                     'transaction_date' => now(),
-                    'company_id' => $stock->company_id,
                     'is_sub_unit' => false,
                 ]);
             }
 
             if ($updatedStock) {
                 DB::afterCommit(function () use ($updatedStock) {
-                    StockLevelChanged::dispatch($updatedStock->fresh(), $updatedStock->company_id, $updatedStock->clinic_id);
+                    StockLevelChanged::dispatch($updatedStock->fresh(), $updatedStock->clinic_id);
                 });
             }
 
@@ -170,16 +170,16 @@ class StockService
 
                 // ⚠️ SKT Kontrolü
                 if ($stock->expiry_date && $stock->expiry_date->isPast()) {
-                    throw new \Exception('Bu stok partisinin son kullanma tarihi ('.$stock->expiry_date->format('d/m/Y').') geçmiştir. Kullanılamaz!');
+                    throw new \Exception(__('stocks.errors.expired_batch', ['date' => $stock->expiry_date->format('d/m/Y')]));
                 }
 
                 // 🛡️ Rezerve kontrolü
                 if ($isFromReserved && $stock->reserved_stock < $quantity) {
-                    throw new InsufficientStockException($stock->reserved_stock, $quantity, 'Yeterli rezerve stok bulunmamaktadır.');
+                    throw new InsufficientStockException($stock->reserved_stock, $quantity, __('stocks.errors.insufficient_reserved'));
                 }
 
                 if ($isSubUnit && (! $stock->has_sub_unit || (int) ($stock->sub_unit_multiplier ?? 0) <= 0)) {
-                    throw new \Exception('Bu stok için alt birim kullanımı aktif değil.');
+                    throw new \Exception(__('stocks.errors.sub_unit_not_active'));
                 }
 
                 $isSubUnitUsage = $isSubUnit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0;
@@ -302,8 +302,6 @@ class StockService
     public function createStock(array $data): Stock
     {
         return DB::transaction(function () use ($data) {
-            $data['company_id'] = $data['company_id'] ?? auth()->user()?->company_id;
-
             $initialQuantity = $data['current_stock'] ?? 0;
 
             // Başlangıç stoğunu 0 olarak kaydediyoruz, çünkü StockTransaction oluşturulduğunda
@@ -330,7 +328,7 @@ class StockService
                 ]);
             } else {
                 DB::afterCommit(function () use ($stock) {
-                    StockLevelChanged::dispatch($stock, $stock->company_id, $stock->clinic_id);
+                    StockLevelChanged::dispatch($stock, $stock->clinic_id);
                 });
             }
 
@@ -369,79 +367,101 @@ class StockService
         }
     }
 
-    public function getStockStats(int $companyId, ?int $clinicId = null): array
+    public function getStockStats(?int $clinicId = null): array
     {
-        $cacheKey = "stock_stats_{$companyId}_".($clinicId ?? 'all');
-
-        return \Illuminate\Support\Facades\Cache::remember($cacheKey, 900, function () use ($companyId, $clinicId) {
-            return $this->calculateStockStats($companyId, $clinicId);
-        });
+        return $this->calculateStockStats($clinicId);
     }
 
-    protected function calculateStockStats(int $companyId, ?int $clinicId = null): array
+    protected function calculateStockStats(?int $clinicId = null): array
     {
         try {
-            $baseQuery = Stock::query();
-            if ($clinicId) {
-                $baseQuery->where('clinic_id', $clinicId);
-            } else {
-                $baseQuery->where('stocks.company_id', $companyId);
-            }
-
             $now = now()->toDateTimeString();
             $totalUnitsRaw = Stock::totalBaseUnitsRaw();
-            $isSqlite = DB::getDriverName() === 'sqlite';
+            $driver = DB::getDriverName();
 
-            // SQLite ve MySQL için farklı tarih fonksiyonları
-            $redDaysSql = $isSqlite
-                ? "date(?, '+' || COALESCE(stocks.expiry_red_days, 15) || ' days')"
-                : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_red_days, 15) DAY)';
+            // PostgreSQL compatibility
+            $isPostgres = $driver === 'pgsql';
+            $isSqlite = $driver === 'sqlite';
 
-            $yellowDaysSql = $isSqlite
-                ? "date(?, '+' || COALESCE(stocks.expiry_yellow_days, 30) || ' days')"
-                : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_yellow_days, 30) DAY)';
+            $redDaysSql = $isPostgres 
+                ? "CAST(? AS DATE) + CAST(COALESCE(stocks.expiry_red_days, 15) AS INTEGER)"
+                : ($isSqlite ? "date(?, '+' || COALESCE(stocks.expiry_red_days, 15) || ' days')" : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_red_days, 15) DAY)');
 
-            $stats = $baseQuery->join('products', 'stocks.product_id', '=', 'products.id')
-                ->selectRaw("
-                    COUNT(DISTINCT stocks.product_id) as total_items,
-                    
-                    -- Stok Seviyesi Uyarıları
-                    COUNT(DISTINCT CASE WHEN stocks.is_active = 1
-                        AND {$totalUnitsRaw} <= COALESCE(products.red_alert_level, products.critical_stock_level)
-                        AND NOT ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)
-                        THEN stocks.product_id END) as critical_stock_items,
-                    COUNT(DISTINCT CASE WHEN stocks.is_active = 1
-                        AND {$totalUnitsRaw} <= COALESCE(products.yellow_alert_level, products.min_stock_level)
-                        AND ({$totalUnitsRaw} > COALESCE(products.red_alert_level, products.critical_stock_level)
-                            OR ({$totalUnitsRaw} = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))
-                        THEN stocks.product_id END) as low_stock_items,
-                    
-                    -- Miyat (SKT) Uyarıları
-                    COUNT(DISTINCT CASE WHEN stocks.is_active = 1 AND stocks.track_expiry = 1 
-                        AND (stocks.expiry_date <= {$redDaysSql})
-                        THEN stocks.product_id END) as critical_expiring_items,
-                        
-                    COUNT(DISTINCT CASE WHEN stocks.is_active = 1 AND stocks.track_expiry = 1 
-                        AND (stocks.expiry_date <= {$yellowDaysSql})
-                        AND (stocks.expiry_date > {$redDaysSql})
-                        THEN stocks.product_id END) as low_expiring_items,
+            $yellowDaysSql = $isPostgres
+                ? "CAST(? AS DATE) + CAST(COALESCE(stocks.expiry_yellow_days, 30) AS INTEGER)"
+                : ($isSqlite ? "date(?, '+' || COALESCE(stocks.expiry_yellow_days, 30) || ' days')" : 'DATE_ADD(?, INTERVAL COALESCE(stocks.expiry_yellow_days, 30) DAY)');
 
-                    SUM(stocks.purchase_price * stocks.current_stock) as total_value
-                ", [$now, $now, $now])->first();
+            // 1. Ürün Bazlı Stok Özet Alt Sorgusu
+            $stockSummaryQuery = DB::table('stocks')
+                ->select('product_id')
+                ->selectRaw("SUM({$totalUnitsRaw}) as total_stock")
+                ->selectRaw("SUM(purchase_price * current_stock) as total_value")
+                ->whereNull('deleted_at')
+                ->where('is_active', true);
+
+            if ($clinicId) {
+                $stockSummaryQuery->where('clinic_id', $clinicId);
+            }
+            
+            // 2. Ana Sorgu (Products üzerinden Left Join)
+            $statsQuery = DB::table('products')
+                ->leftJoinSub($stockSummaryQuery, 'stock_summary', 'products.id', '=', 'stock_summary.product_id')
+                ->whereNull('products.deleted_at')
+                ->where('products.is_active', true);
+
+            if ($clinicId) {
+                $statsQuery->where(function($q) use ($clinicId) {
+                    $q->where('products.clinic_id', $clinicId)
+                      ->orWhereNotNull('stock_summary.product_id');
+                });
+            }
+
+            $stats = $statsQuery->selectRaw("
+                COUNT(products.id) as total_items,
+                
+                -- Kritik Stok (Ürün Toplam Stok Bazlı)
+                COUNT(CASE WHEN COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.red_alert_level, products.critical_stock_level, 5)
+                    AND NOT (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0)
+                    THEN 1 END) as critical_stock_items,
+
+                -- Düşük Stok (Ürün Toplam Stok Bazlı)
+                COUNT(CASE WHEN COALESCE(stock_summary.total_stock, 0) <= COALESCE(products.yellow_alert_level, products.min_stock_level, 10)
+                    AND (COALESCE(stock_summary.total_stock, 0) > COALESCE(products.red_alert_level, products.critical_stock_level, 5)
+                        OR (COALESCE(stock_summary.total_stock, 0) = 0 AND COALESCE(products.show_zero_stock_in_critical, 1) = 0))
+                    THEN 1 END) as low_stock_items,
+                
+                SUM(COALESCE(stock_summary.total_value, 0)) as total_value
+            ")->first();
+
+            // 3. Miyat (SKT) Uyarıları (Batch Bazlı - Her zaman batch bazlı olmalı)
+            $expiryQuery = DB::table('stocks')
+                ->whereNull('deleted_at')
+                ->where('is_active', true)
+                ->where('track_expiry', true);
+
+            if ($clinicId) {
+                $expiryQuery->where('clinic_id', $clinicId);
+            }
+
+            $expiryStats = $expiryQuery->selectRaw("
+                COUNT(DISTINCT CASE WHEN expiry_date <= {$redDaysSql} THEN id END) as critical_expiring_items,
+                COUNT(DISTINCT CASE WHEN expiry_date <= {$yellowDaysSql} AND expiry_date > {$redDaysSql} THEN id END) as low_expiring_items
+            ", [$now, $now, $now])->first();
 
             return [
                 'total_items' => (int) ($stats->total_items ?? 0),
+                'total_batches' => (int) DB::table('stocks')->whereNull('deleted_at')->where('is_active', true)->when($clinicId, fn($q) => $q->where('clinic_id', $clinicId))->count(),
                 'low_stock_items' => (int) ($stats->low_stock_items ?? 0),
                 'critical_stock_items' => (int) ($stats->critical_stock_items ?? 0),
-                'low_expiring_items' => (int) ($stats->low_expiring_items ?? 0),
-                'critical_expiring_items' => (int) ($stats->critical_expiring_items ?? 0),
+                'low_expiring_items' => (int) ($expiryStats->low_expiring_items ?? 0),
+                'critical_expiring_items' => (int) ($expiryStats->critical_expiring_items ?? 0),
                 'total_value' => round((float) ($stats->total_value ?? 0), 2),
             ];
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('Stock Stats Error: '.$e->getMessage(), ['company_id' => $companyId]);
-
+            \Illuminate\Support\Facades\Log::error('Stock Stats Error: '.$e->getMessage());
             return [
                 'total_items' => 0,
+                'total_batches' => 0,
                 'low_stock_items' => 0,
                 'critical_stock_items' => 0,
                 'low_expiring_items' => 0,
@@ -497,7 +517,70 @@ class StockService
     protected function createTransaction(array $data): void
     {
         $data['transaction_number'] = $this->generateTransactionNumber();
-        $this->transactionService->createTransaction($data);
+        $transaction = $this->transactionService->createTransaction($data);
+        $this->applyTransactionToStock($transaction);
+    }
+
+    public function applyTransactionToStock(\App\Models\StockTransaction $transaction): void
+    {
+        $stock = $transaction->stock;
+        if (! $stock) {
+            return;
+        }
+
+        $isPositive = match ($transaction->type) {
+            'entry', 'adjustment_plus', 'adjustment_increase', 'purchase', 'transfer_in', 'returned', 'return_in' => true,
+            'usage', 'loss', 'adjustment_minus', 'adjustment_decrease', 'transfer_out', 'expired', 'damaged', 'return_out' => false,
+            default => null,
+        };
+
+        if ($isPositive === null) {
+            return;
+        }
+
+        $quantity = (int) $transaction->quantity;
+
+        if ($transaction->is_sub_unit && $stock->has_sub_unit && $stock->sub_unit_multiplier > 0) {
+            $this->handleSubUnitCalculation($stock, $quantity, $isPositive);
+        } else {
+            if ($isPositive) {
+                $stock->increment('current_stock', $quantity);
+            } else {
+                $stock->decrement('current_stock', $quantity);
+            }
+
+            $stock->updateQuietly([
+                'available_stock' => $stock->current_stock - $stock->reserved_stock,
+            ]);
+        }
+
+        \App\Events\Stock\StockLevelChanged::dispatch($stock->fresh(), $stock->clinic_id);
+    }
+
+    private function handleSubUnitCalculation(Stock $stock, int $quantity, bool $isPositive): void
+    {
+        $multiplier = (int) $stock->sub_unit_multiplier;
+        $stock->refresh();
+
+        if ($isPositive) {
+            $totalSubUnits = $stock->current_sub_stock + $quantity;
+            $extraBaseUnits = (int) floor($totalSubUnits / $multiplier);
+            $newSubStock = $totalSubUnits % $multiplier;
+
+            if ($extraBaseUnits > 0) {
+                $stock->increment('current_stock', $extraBaseUnits);
+            }
+            $stock->current_sub_stock = $newSubStock;
+        } else {
+            $currentTotalSub = ($stock->current_stock * $multiplier) + $stock->current_sub_stock;
+            $newTotalSub = max(0, $currentTotalSub - $quantity);
+
+            $stock->current_stock = (int) floor($newTotalSub / $multiplier);
+            $stock->current_sub_stock = $newTotalSub % $multiplier;
+        }
+
+        $stock->available_stock = $stock->current_stock - $stock->reserved_stock;
+        $stock->saveQuietly();
     }
 
     /**
@@ -513,19 +596,21 @@ class StockService
     {
         try {
             return DB::transaction(function () use ($transactionId) {
+                // 🛡️ DEADLOCK PREVENTION: Always lock the parent resource (Stock) BEFORE the child (Transaction)
+                $tempTxn = \App\Models\StockTransaction::findOrFail($transactionId);
+                $stock = $tempTxn->stock()->lockForUpdate()->first();
+                
                 $transaction = \App\Models\StockTransaction::whereKey($transactionId)
                     ->lockForUpdate()
                     ->firstOrFail();
 
                 if ($transaction->reversed_at !== null) {
-                    throw new \Exception('Bu stok hareketi zaten geri alınmış.');
+                    throw new \Exception(__('stocks.errors.already_reversed'));
                 }
 
                 if ($transaction->reversal_transaction_id !== null) {
-                    throw new \Exception('Geri alma hareketi tekrar geri alınamaz.');
+                    throw new \Exception(__('stocks.errors.cannot_reverse_reversal'));
                 }
-
-                $stock = $transaction->stock()->lockForUpdate()->first();
 
                 if (! $stock) {
                     return false;
@@ -559,7 +644,6 @@ class StockService
                     'performed_by' => auth()->user()?->name ?? 'Sistem',
                     'user_id' => auth()->id(),
                     'transaction_date' => now(),
-                    'company_id' => $transaction->company_id,
                     'is_sub_unit' => $transaction->is_sub_unit,
                 ]);
 

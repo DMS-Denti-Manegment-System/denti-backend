@@ -20,11 +20,6 @@ class StockAlertPolicy
      */
     public function view(User $user, StockAlert $stockAlert): bool
     {
-        // Tenant check - user can only view alerts from their company
-        if ($stockAlert->company_id !== $user->company_id) {
-            return false;
-        }
-
         return $user->hasPermissionTo('view-stocks');
     }
 
@@ -34,7 +29,7 @@ class StockAlertPolicy
     public function create(User $user): bool
     {
         // Alerts are typically created by system, not users
-        return $user->isSuperAdmin() || $user->hasRole(User::ROLE_OWNER);
+        return $user->hasRole(User::ROLE_OWNER);
     }
 
     /**
@@ -42,11 +37,6 @@ class StockAlertPolicy
      */
     public function resolve(User $user, StockAlert $stockAlert): bool
     {
-        // Tenant check
-        if ($stockAlert->company_id !== $user->company_id) {
-            return false;
-        }
-
         return $user->hasPermissionTo('adjust-stocks');
     }
 
@@ -55,11 +45,6 @@ class StockAlertPolicy
      */
     public function dismiss(User $user, StockAlert $stockAlert): bool
     {
-        // Tenant check
-        if ($stockAlert->company_id !== $user->company_id) {
-            return false;
-        }
-
         return $user->hasPermissionTo('adjust-stocks');
     }
 
@@ -68,11 +53,6 @@ class StockAlertPolicy
      */
     public function delete(User $user, StockAlert $stockAlert): bool
     {
-        // Tenant check
-        if ($stockAlert->company_id !== $user->company_id) {
-            return false;
-        }
-
         return $user->hasPermissionTo('delete-stocks');
     }
 

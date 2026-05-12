@@ -2,7 +2,7 @@
     <div class="card card-flush h-xl-100">
         <div class="card-header"><h3 class="card-title">Guvenlik ve Yetki</h3></div>
         <div class="card-body">
-            <div class="mb-5"><span class="text-muted d-block fs-7">Sirket</span><span class="fw-bold fs-5">{{ $user->company?->name ?: '-' }}</span></div>
+            <div class="mb-5"><span class="text-muted d-block fs-7">Kullanıcı</span><span class="fw-bold fs-5">{{ $user->name }}</span></div>
             <div class="mb-5"><span class="text-muted d-block fs-7">Roller</span><span class="fw-bold fs-5">{{ $user->roles->pluck('name')->implode(', ') ?: '-' }}</span></div>
             <div class="mb-5">
                 <span class="text-muted d-block fs-7">2FA (İki Faktörlü Doğrulama)</span>

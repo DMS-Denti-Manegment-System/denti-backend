@@ -26,11 +26,8 @@ class CompanyOwned implements ValidationRule
             return;
         }
 
-        $companyId = auth()->user()->company_id;
-
         $exists = DB::table($this->table)
             ->where($this->column, $value)
-            ->where('company_id', $companyId)
             ->exists();
 
         if (! $exists) {

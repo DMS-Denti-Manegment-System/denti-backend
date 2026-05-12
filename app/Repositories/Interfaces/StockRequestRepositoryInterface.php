@@ -30,5 +30,5 @@ interface StockRequestRepositoryInterface
 
     public function getRequestsByStatus(string $status): Collection;
 
-    public function getStats(): array;
+    public function getStats(?int $clinicId = null): array;
 }
