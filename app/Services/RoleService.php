@@ -7,7 +7,7 @@ use App\Support\PermissionCatalog;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\PermissionRegistrar;
 
-class CompanyRoleService
+class RoleService
 {
     public function ensureRoles(): void
     {

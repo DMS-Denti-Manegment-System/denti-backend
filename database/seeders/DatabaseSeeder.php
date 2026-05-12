@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Services\CompanyRoleService;
+use App\Services\RoleService;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 
@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call(RolesAndPermissionsSeeder::class);
 
         // 2. Uygulama rollerini oluştur
-        app(CompanyRoleService::class)->ensureRoles();
+        app(RoleService::class)->ensureRoles();
 
         $owner = User::query()
             ->where('username', config('denti.owner.username', 'admin'))

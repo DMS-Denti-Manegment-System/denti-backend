@@ -14,7 +14,7 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::post('/invitations/accept', [UserInvitationController::class, 'accept']);
 
 // Auth Routes (Protected)
-Route::middleware(['auth:sanctum', 'set_permissions_team', '2fa.verified'])->group(function () {
+Route::middleware(['auth:sanctum', '2fa.verified'])->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
     Route::get('/dashboard/stats', [DashboardController::class, 'index']);
     Route::post('/auth/logout', [AuthController::class, 'logout']);

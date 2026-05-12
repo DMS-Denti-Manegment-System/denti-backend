@@ -24,7 +24,7 @@ Route::get('/accept-invitation/{token}', [AuthPageController::class, 'invitation
 Route::post('/accept-invitation', [AuthPageController::class, 'acceptInvitation'])->name('invitation.accept.store');
 Route::get('/up', HealthController::class)->name('health.up');
 
-Route::middleware(['auth', 'set_permissions_team'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/', DashboardPageController::class)->name('dashboard');
 
     // Stocks & Products

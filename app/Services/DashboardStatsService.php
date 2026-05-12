@@ -36,7 +36,7 @@ class DashboardStatsService
         $stockStats = $this->stockService->getStockStats($clinicId);
 
         return [
-            'company_name' => config('app.name', 'Denti'),
+            'system_name' => config('app.name', 'Denti'),
             'total_users' => User::query()->count(),
             'total_doctors' => (int) DB::table('model_has_roles')
                 ->join('roles', 'roles.id', '=', 'model_has_roles.role_id')

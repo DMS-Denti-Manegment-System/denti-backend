@@ -8,7 +8,7 @@
     <div class="card card-flush mb-8 app-panel-surface border-0 shadow-none bg-transparent">
         <div class="card-body p-0">
             <div class="d-flex flex-column">
-                <h1 class="text-gray-900 fw-bolder fs-2tx mb-2">Hoş Geldiniz, {{ $stats['company_name'] ?? 'Denti' }}</h1>
+                <h1 class="text-gray-900 fw-bolder fs-2tx mb-2">Hoş Geldiniz, {{ $stats['system_name'] ?? 'Denti' }}</h1>
                 <p class="text-gray-500 fs-4 fw-semibold">Denti Klinik Yönetim Paneli ile her şey kontrolünüz altında.</p>
             </div>
         </div>
@@ -83,7 +83,7 @@
         <div class="card-body p-10 text-center">
             <h2 class="text-primary fw-bold mb-4">Mutlu Gülüşler, Profesyonel Yönetim</h2>
             <p class="text-gray-700 fs-5 max-w-800px mx-auto mb-0">
-                {{ $stats['company_name'] ?? 'Denti' }} bünyesindeki tüm süreçlerinizi dijitalleştirerek hastalarınıza en iyi hizmeti sunmaya odaklanın.
+                {{ $stats['system_name'] ?? 'Denti' }} bünyesindeki tüm süreçlerinizi dijitalleştirerek hastalarınıza en iyi hizmeti sunmaya odaklanın.
             </p>
         </div>
     </div>

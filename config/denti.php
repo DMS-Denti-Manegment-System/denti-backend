@@ -6,19 +6,18 @@ return [
     | Deployment Model
     |--------------------------------------------------------------------------
     |
-    | Denti is deployed as a single-company application. The company record is
+    | Denti is deployed as a single-tenant application. The system record is
     | kept as an internal boundary for permissions, indexes and data ownership;
-    | users should not create or switch companies from the product UI.
+    | users should not create or switch systems from the product UI.
     |
     */
-    'deployment_model' => env('DENTI_DEPLOYMENT_MODEL', 'single_company'),
+    'deployment_model' => env('DENTI_DEPLOYMENT_MODEL', 'single_tenant'),
 
-    'company' => [
-        'name' => env('DENTI_COMPANY_NAME', 'Denti Klinik'),
-        'code' => env('DENTI_COMPANY_CODE', 'default'),
-        'domain' => env('DENTI_COMPANY_DOMAIN', 'local'),
-        'email' => env('DENTI_COMPANY_EMAIL'),
-        'max_users' => (int) env('DENTI_COMPANY_MAX_USERS', 25),
+    'system' => [
+        'name' => env('DENTI_SYSTEM_NAME', 'Denti Klinik'),
+        'domain' => env('DENTI_SYSTEM_DOMAIN', 'local'),
+        'email' => env('DENTI_SYSTEM_EMAIL'),
+        'max_users' => (int) env('DENTI_SYSTEM_MAX_USERS', 25),
     ],
 
     'owner' => [
